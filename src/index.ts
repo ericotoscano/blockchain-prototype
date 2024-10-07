@@ -1,33 +1,26 @@
 import express, { Express, json } from 'express';
 import 'dotenv/config';
 
-import blockchainRoute from '../src/routes/blockchain.route';
+import blockchainRoutes from '../src/routes/blockchain.routes';
+import nodesRoutes from '../src/routes/nodes.routes';
 
 const app: Express = express();
-const port: string = process.env.PORT || '3000';
+
+const PORT: string = process.env.PORT || '3000';
 
 app.use(json());
 
-/* const arguments: string[] = process.argv;
+app.use('/blockchain', blockchainRoutes);
+app.use('/nodes', nodesRoutes);
 
-if (arguments.length > 2) {
-  SERVER_PORT = parseInt(arguments[2]);
-} 
+app.listen(PORT, () => {
+  console.log(`[server]: Server is running at http://localhost:${PORT}`);
+});
 
-let nodes = [];
+/* 
 let transactions = [];
 let allTransactions = [];
 
-app.post('/nodes/register', (req, res) => {
-  const urls = req.body;
-
-  urls.forEach((url) => {
-    const node = new BlockchainNode(url);
-    nodes.push(node);
-  });
-
-  res.json(nodes);
-});
 
 app.post('/transactions', (req, res) => {
   const from = req.body.from;
@@ -88,13 +81,4 @@ app.get('/mine', (req, res) => {
 
   res.json(block);
 });
-
-app.get('/blockchain', (req, res) => {
-  res.json(blockchain);
-});
 */
-app.use('/blockchain', blockchainRoute);
-
-app.listen(port, () => {
-  console.log(`[server]: Server is running at http://localhost:${port}`);
-});

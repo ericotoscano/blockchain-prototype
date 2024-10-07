@@ -1,6 +1,6 @@
 import { sha256 } from 'js-sha256';
 
-import { BlockchainType } from './types/blockchain.types';
+import { BlockchainType } from '../types/blockchain.types';
 
 import { Block } from './Block';
 import { Transaction } from './Transaction';

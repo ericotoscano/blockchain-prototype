@@ -1,4 +1,4 @@
-import { BlockType } from './types/block.types';
+import { BlockType } from '../types/block.types';
 import { Transaction } from './Transaction';
 
 export class Block implements BlockType {

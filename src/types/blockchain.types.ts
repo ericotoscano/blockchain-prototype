@@ -1,5 +1,5 @@
-import { Block } from '../Block';
-import { Transaction } from '../Transaction';
+import { Block } from '../models/Block';
+import { Transaction } from '../models/Transaction';
 
 export interface BlockchainType {
   chain: Block[];

@@ -1,8 +1,8 @@
 import { Router } from 'express';
 
-import blockchainController from '../controllers/blockchain.controller';
+import nodesController from '../controllers/nodes.controller';
 
-const { create } = blockchainController;
+const { create } = nodesController;
 
 const router: Router = Router();
 
