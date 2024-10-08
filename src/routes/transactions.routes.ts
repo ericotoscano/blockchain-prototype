@@ -1,8 +1,8 @@
 import { Router } from 'express';
 
-import nodesController from '../controllers/nodes.controller';
+import transactionsController from '../controllers/transactions.controller';
 
-const { create } = nodesController;
+const { create } = transactionsController;
 
 const router: Router = Router();
 

@@ -4,31 +4,37 @@ import { BlockchainType } from '../types/blockchain.types';
 
 import { Block } from './Block';
 import { Transaction } from './Transaction';
-
 export class Blockchain implements BlockchainType {
-  genesisBlock: Block;
   chain: Block[];
+  mempool: Transaction[];
   targetDifficulty: string;
   maxTransactionsPerBlock: number;
 
-  constructor(difficultyLevel: number, maxTransactionsPerBlock: number) {
-    this.targetDifficulty = this.generateTarget(difficultyLevel);
-    this.maxTransactionsPerBlock = maxTransactionsPerBlock;
-
+  constructor() {
     this.chain = [];
+    this.mempool = [];
+    this.targetDifficulty = '';
+    this.maxTransactionsPerBlock = 1;
 
-    this.genesisBlock = new Block();
-    this.genesisBlock.previousHash = '0000000000000000000000000000000000000000000000000000000000000000';
-    this.genesisBlock.hash = this.generateHash(this.genesisBlock);
+    this.setTargetDifficulty(3);
+    this.setMaxTransactionsPerBlock(10);
+    this.addBlock(this.createGenesisBlock());
+  }
 
-    this.addBlock(this.genesisBlock);
+  createGenesisBlock(): Block {
+    let genesisBlock = new Block();
+
+    genesisBlock.previousHash = '0000000000000000000000000000000000000000000000000000000000000000';
+    genesisBlock.hash = this.generateHash(genesisBlock);
+
+    return genesisBlock;
   }
 
   addBlock(block: Block): void {
     this.chain.push(block);
   }
 
-  getNextBlock(transactions: Transaction[]): Block {
+  createNextBlock(transactions: Transaction[]): Block {
     let block = new Block();
 
     transactions.forEach((transaction) => {
@@ -54,17 +60,20 @@ export class Blockchain implements BlockchainType {
     while (BigInt('0x' + hash) >= BigInt('0x' + this.targetDifficulty)) {
       block.nonce += 1;
       hash = sha256(block.getData());
-      console.log(hash);
     }
 
     return hash;
   }
 
-  generateTarget(numberOfZeros: number): string {
+  setTargetDifficulty(numberOfZeros: number): void {
     const ZERO_STRING = '0';
     const SIXTEEN_STRING = 'f';
 
-    return ZERO_STRING.repeat(numberOfZeros).concat(SIXTEEN_STRING.repeat(64 - numberOfZeros));
+    this.targetDifficulty = ZERO_STRING.repeat(numberOfZeros).concat(SIXTEEN_STRING.repeat(64 - numberOfZeros));
+  }
+
+  setMaxTransactionsPerBlock(numberOfBlocks: number) {
+    this.maxTransactionsPerBlock = numberOfBlocks;
   }
 
   validateChain(): boolean {

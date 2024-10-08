@@ -6,6 +6,7 @@ declare global {
   var nodes: Node[];
 }
 
+global.blockchain = new Blockchain();
 global.nodes = [];
 
 export {};

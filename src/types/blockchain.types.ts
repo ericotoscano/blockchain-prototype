@@ -5,10 +5,13 @@ export interface BlockchainType {
   chain: Block[];
   targetDifficulty: string;
   maxTransactionsPerBlock: number;
+  mempool: Transaction[];
+  createGenesisBlock(): Block;
   addBlock(block: Block): void;
-  getNextBlock(transactions: Transaction[]): Block;
+  createNextBlock(transactions: Transaction[]): Block;
   getPreviousBlock(): void;
   generateHash(block: Block): string;
-  generateTarget(numberOfZeros: number): string;
+  setTargetDifficulty(numberOfZeros: number): void;
+  setMaxTransactionsPerBlock(numberOfBlocks: number): void;
   validateChain(): boolean;
 }

@@ -2,7 +2,7 @@ import express, { Express, json } from 'express';
 import 'dotenv/config';
 
 import blockchainRoutes from '../src/routes/blockchain.routes';
-import nodesRoutes from '../src/routes/nodes.routes';
+import transactionsRoutes from './routes/transactions.routes';
 
 const app: Express = express();
 
@@ -11,7 +11,7 @@ const PORT: string = process.env.PORT || '3000';
 app.use(json());
 
 app.use('/blockchain', blockchainRoutes);
-app.use('/nodes', nodesRoutes);
+app.use('/transactions', transactionsRoutes);
 
 app.listen(PORT, () => {
   console.log(`[server]: Server is running at http://localhost:${PORT}`);
