@@ -2,11 +2,11 @@ import { Block } from '../models/Block';
 import { Transaction } from '../models/Transaction';
 
 export interface BlockchainType {
-  chain: Block[];
+  blocks: Block[];
   targetDifficulty: string;
   maxTransactionsPerBlock: number;
   mempool: Transaction[];
-  createGenesisBlock(): Block;
+  mineGenesisBlock(): Block;
   addBlock(block: Block): void;
   createNextBlock(transactions: Transaction[]): Block;
   getPreviousBlock(): void;

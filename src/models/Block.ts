@@ -2,7 +2,7 @@ import { BlockType } from '../types/block.types';
 import { Transaction } from './Transaction';
 
 export class Block implements BlockType {
-  index: number;
+  height: number;
   timestamp: Date;
   hash: string;
   previousHash: string;
@@ -10,16 +10,16 @@ export class Block implements BlockType {
   nonce: number;
 
   constructor() {
-    this.index = 0;
-    this.timestamp = new Date();
+    this.height = 0;
+    this.nonce = 0;
     this.hash = '';
     this.previousHash = '';
     this.transactions = [];
-    this.nonce = 0;
+    this.timestamp = new Date();
   }
 
   getData(): string {
-    return this.index + JSON.stringify(this.timestamp) + this.previousHash + JSON.stringify(this.transactions) + this.nonce;
+    return this.height + JSON.stringify(this.timestamp) + this.previousHash + JSON.stringify(this.transactions) + this.nonce;
   }
 
   addTransaction(transaction: Transaction): void {

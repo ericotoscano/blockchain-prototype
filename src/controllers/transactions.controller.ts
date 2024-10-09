@@ -17,11 +17,12 @@ const create = async (req: Request, res: Response): Promise<any> => {
       data: {
         transaction: {
           txId: transaction.txId,
-          timestamp: transaction.timestamp,
+          status: transaction.status,
           from: transaction.from,
           to: transaction.to,
           amount: transaction.amount,
           fee: transaction.fee,
+          timestamp: transaction.timestamp,
         },
       },
     });
@@ -38,4 +39,31 @@ const create = async (req: Request, res: Response): Promise<any> => {
   }
 };
 
-export default { create };
+const getAllPending = async (req: Request, res: Response): Promise<any> => {
+  try {
+    if (!global.blockchain.mempool.some((transaction) => transaction.status === 'Pending')) {
+      return res.status(400).send({ message: 'There are no pending transactions on mempool.' });
+    }
+
+    const pendingTransactions = global.blockchain.mempool.filter((transaction) => transaction.status === 'Pending').map((transaction) => ({ ...transaction }));
+
+    res.status(201).send({
+      message: 'There are pending transactions on mempool.',
+      data: {
+        pendingTransactions,
+      },
+    });
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
+
+    res.status(500).send({
+      message: 'An error ocurred.',
+      error: {
+        code: 500,
+        message: errorMessage,
+      },
+    });
+  }
+};
+
+export default { create, getAllPending };

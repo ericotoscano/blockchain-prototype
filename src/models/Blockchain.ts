@@ -5,23 +5,23 @@ import { BlockchainType } from '../types/blockchain.types';
 import { Block } from './Block';
 import { Transaction } from './Transaction';
 export class Blockchain implements BlockchainType {
-  chain: Block[];
+  blocks: Block[];
   mempool: Transaction[];
   targetDifficulty: string;
   maxTransactionsPerBlock: number;
 
   constructor() {
-    this.chain = [];
+    this.blocks = [];
     this.mempool = [];
     this.targetDifficulty = '';
     this.maxTransactionsPerBlock = 1;
 
     this.setTargetDifficulty(3);
     this.setMaxTransactionsPerBlock(10);
-    this.addBlock(this.createGenesisBlock());
+    this.addBlock(this.mineGenesisBlock());
   }
 
-  createGenesisBlock(): Block {
+  mineGenesisBlock(): Block {
     let genesisBlock = new Block();
 
     genesisBlock.previousHash = '0000000000000000000000000000000000000000000000000000000000000000';
@@ -31,7 +31,7 @@ export class Blockchain implements BlockchainType {
   }
 
   addBlock(block: Block): void {
-    this.chain.push(block);
+    this.blocks.push(block);
   }
 
   createNextBlock(transactions: Transaction[]): Block {
@@ -43,7 +43,7 @@ export class Blockchain implements BlockchainType {
 
     let previousBlock = this.getPreviousBlock();
 
-    block.index = this.chain.length;
+    block.height = this.blocks.length;
     block.previousHash = previousBlock.hash;
     block.hash = this.generateHash(block);
 
@@ -51,7 +51,7 @@ export class Blockchain implements BlockchainType {
   }
 
   getPreviousBlock(): Block {
-    return this.chain[this.chain.length - 1];
+    return this.blocks[this.blocks.length - 1];
   }
 
   generateHash(block: Block): string {
@@ -77,8 +77,8 @@ export class Blockchain implements BlockchainType {
   }
 
   validateChain(): boolean {
-    for (let i = this.chain.length - 1; i > 0; i--) {
-      if (this.chain[i].previousHash !== this.chain[i - 1].hash) {
+    for (let i = this.blocks.length - 1; i > 0; i--) {
+      if (this.blocks[i].previousHash !== this.blocks[i - 1].hash) {
         return false;
       }
     }

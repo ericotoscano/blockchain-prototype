@@ -1,7 +1,7 @@
 import { TransactionType } from './transaction.types';
 
 export interface BlockType {
-  index: number;
+  height: number;
   timestamp: Date;
   hash: string;
   previousHash: string;
