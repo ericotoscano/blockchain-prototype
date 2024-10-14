@@ -4,17 +4,20 @@ import { BlockchainType } from '../types/blockchain.types';
 
 import { Block } from './Block';
 import { Transaction } from './Transaction';
+import { Node } from './Node';
 export class Blockchain implements BlockchainType {
   blocks: Block[];
   mempool: Transaction[];
   targetDifficulty: string;
   maxTransactionsPerBlock: number;
+  nodes: Node;
 
   constructor() {
     this.blocks = [];
     this.mempool = [];
     this.targetDifficulty = '';
     this.maxTransactionsPerBlock = 1;
+    this.nodes = { currentNodeUrl: (process.env.BASE_URL || 'http://localhost:') + process.argv[2], networkNodes: [] };
 
     this.setTargetDifficulty(3);
     this.setMaxTransactionsPerBlock(10);
@@ -30,8 +33,20 @@ export class Blockchain implements BlockchainType {
     return genesisBlock;
   }
 
+  addNode(nodeUrl: string): void {
+    this.nodes.networkNodes.push(nodeUrl);
+  }
+
   addBlock(block: Block): void {
     this.blocks.push(block);
+  }
+
+  addTransactionToMempool(transaction: Transaction): void {
+    this.mempool.push(transaction);
+  }
+
+  getPendingTransactions(): Transaction[] {
+    return structuredClone(this.mempool.filter((transaction) => transaction.status === 'Pending'));
   }
 
   createNextBlock(transactions: Transaction[]): Block {

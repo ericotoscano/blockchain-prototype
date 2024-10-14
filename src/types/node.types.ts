@@ -1,6 +1,4 @@
-import { TransactionType } from './transaction.types';
-
 export interface NodeType {
-  url: string;
-  mempool: TransactionType[];
+  currentNodeUrl: string;
+  networkNodes: string[];
 }
