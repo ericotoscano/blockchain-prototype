@@ -1,8 +1,11 @@
 import { Request, Response } from 'express';
+import axios, { AxiosResponse } from 'axios';
 
 import '../global';
 
-import { RegisterNodeRequest, MineNextBlockRequest, CreateTransactionRequest } from '../types/request.types';
+import { ConnectNodeRequest, RegisterNodeRequest, MineNextBlockRequest, CreateTransactionRequest, UpdateNetworkNodesRequest } from '../types/request.types';
+
+import { RegisterNodeResponse, UpdateNetworkNodesResponse } from '../types/response.types';
 
 import { Transaction } from '../models/Transaction';
 
@@ -127,30 +130,39 @@ const createTransaction = async (req: Request, res: Response): Promise<any> => {
     });
   }
 };
-//put: broadcast newNode to another nodes in networkNodes
-//post: register newNode
-//update: devolve pra o newNode o array com todos os nos que receberam o newNode
 
 const connectNodes = async (req: Request, res: Response): Promise<any> => {
   try {
-    const { newNodeUrl }: RegisterNodeRequest = req.body;
+    const { newNodeUrl }: ConnectNodeRequest = req.body;
     const { blockchain } = global;
 
-    if (!blockchain.nodes.networkNodes.includes(newNodeUrl)) {
+    const registerPromises: Promise<RegisterNodeResponse>[] = [];
+
+    if (!blockchain.nodes.connectedNodes.includes(newNodeUrl)) {
       blockchain.addNode(newNodeUrl);
     }
 
-    for (const networkNode of blockchain.nodes.networkNodes) {
-      await fetch(`${networkNode}/blockchain/nodes`, {
-        method: 'POST',
-        body: JSON.stringify({ newNodeUrl: newNodeUrl }),
-        headers: { 'Content-Type': 'application/json' },
-      });
+    for (const networkNode of blockchain.nodes.connectedNodes) {
+      const promise = axios
+        .post<RegisterNodeResponse>(networkNode + '/blockchain/nodes', { origin: newNodeUrl, target: blockchain.nodes.currentNodeUrl })
+        .then((response: AxiosResponse<RegisterNodeResponse>) => {
+          return response.data;
+        });
+
+      registerPromises.push(promise);
     }
+
+    Promise.all(registerPromises).then(() => {
+      const nodesExceptNewOne = blockchain.nodes.connectedNodes.filter((node) => node !== newNodeUrl);
+
+      const connectedNodes = [...nodesExceptNewOne, blockchain.nodes.currentNodeUrl];
+
+      axios.patch(newNodeUrl + '/blockchain/nodes', { connectedNodes });
+    });
 
     res.status(201).send({
       message: 'A new node has been registered.',
-      data: { nodeUrl: blockchain.nodes.networkNodes[blockchain.nodes.networkNodes.indexOf(newNodeUrl)] },
+      data: { nodeUrl: newNodeUrl },
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
@@ -167,16 +179,16 @@ const connectNodes = async (req: Request, res: Response): Promise<any> => {
 
 const registerNode = async (req: Request, res: Response): Promise<any> => {
   try {
-    const { newNodeUrl }: RegisterNodeRequest = req.body;
+    const { origin, target }: RegisterNodeRequest = req.body;
     const { blockchain } = global;
 
-    if (!blockchain.nodes.networkNodes.includes(newNodeUrl) && blockchain.nodes.currentNodeUrl !== newNodeUrl) {
-      blockchain.addNode(newNodeUrl);
+    if (!blockchain.nodes.connectedNodes.includes(origin) && blockchain.nodes.currentNodeUrl !== origin) {
+      blockchain.addNode(origin);
     }
 
-    res.status(201).send({
-      message: 'A new node has been registered.',
-      data: { nodeUrl: blockchain.nodes.networkNodes[blockchain.nodes.networkNodes.indexOf(newNodeUrl)] },
+    res.send({
+      message: 'New network connection!',
+      data: { origin, target },
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
@@ -193,28 +205,14 @@ const registerNode = async (req: Request, res: Response): Promise<any> => {
 
 const updateNetworkNodes = async (req: Request, res: Response): Promise<any> => {
   try {
-    const { newNodeUrl }: RegisterNodeRequest = req.body;
+    const { connectedNodes }: UpdateNetworkNodesRequest = req.body;
     const { blockchain } = global;
 
-    if (blockchain.nodes.networkNodes.includes(newNodeUrl)) {
-      return res.status(400).send({ message: 'This node has already been registered.' });
-    }
-
-    blockchain.addNode(newNodeUrl);
-
-    /*     for (const networkNode of blockchain.nodes.networkNodes) {
-      const response = await fetch(`${networkNode} + /blockchain/register-node`, {
-        method: 'post',
-        body: JSON.stringify({ newNodeUrl: newNodeUrl }),
-        headers: { 'Content-Type': 'application/json' },
-      });
-
-      const responseJson = await response.json();
-    } */
+    blockchain.nodes.connectedNodes = structuredClone(connectedNodes);
 
     res.status(201).send({
-      message: 'A new node has been registered.',
-      data: { nodeUrl: blockchain.nodes.networkNodes[blockchain.nodes.networkNodes.indexOf(newNodeUrl)] },
+      message: 'Done.',
+      data: { allNetworkNodes: blockchain.nodes.connectedNodes },
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';

@@ -17,7 +17,7 @@ export class Blockchain implements BlockchainType {
     this.mempool = [];
     this.targetDifficulty = '';
     this.maxTransactionsPerBlock = 1;
-    this.nodes = { currentNodeUrl: (process.env.BASE_URL || 'http://localhost:') + process.argv[2], networkNodes: [] };
+    this.nodes = { currentNodeUrl: (process.env.BASE_URL || 'http://localhost:') + process.argv[2], connectedNodes: [] };
 
     this.setTargetDifficulty(3);
     this.setMaxTransactionsPerBlock(10);
@@ -34,7 +34,7 @@ export class Blockchain implements BlockchainType {
   }
 
   addNode(nodeUrl: string): void {
-    this.nodes.networkNodes.push(nodeUrl);
+    this.nodes.connectedNodes.push(nodeUrl);
   }
 
   addBlock(block: Block): void {

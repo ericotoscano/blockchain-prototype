@@ -1,11 +1,15 @@
 import { Transaction } from '../models/Transaction';
 
 export interface UpdateNetworkNodesRequest {
-  allNetworkNodes: string[];
+  connectedNodes: string[];
 }
 
-export interface RegisterNodeRequest {
+export interface ConnectNodeRequest {
   newNodeUrl: string;
+}
+export interface RegisterNodeRequest {
+  origin: string;
+  target: string;
 }
 
 export interface MineNextBlockRequest {
