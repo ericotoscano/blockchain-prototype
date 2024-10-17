@@ -1,8 +1,10 @@
 export interface RegisterNodeResponse {
   message: string;
-  data: { target: string };
+  data?: { from: string; to: string };
+  error?: { code?: number; message?: string };
 }
 export interface UpdateNetworkNodesResponse {
   message: string;
-  data: { connectedNodes: string[] };
+  data?: { networkNodes?: string[] };
+  error?: { code?: number; message?: string };
 }

@@ -1,11 +1,11 @@
-import { BlockType } from '../types/block.types';
-import { Transaction } from './Transaction';
+import { BlocksType } from '../types/blocks.types';
+import { Transactions } from './Transactions';
 
-export class Block implements BlockType {
+export class Blocks implements BlocksType {
   height: number;
   hash: string;
   previousHash: string;
-  transactions: Transaction[];
+  transactions: Transactions[];
   nonce: number;
 
   constructor() {
@@ -20,7 +20,7 @@ export class Block implements BlockType {
     return JSON.stringify(this.transactions) + this.height + this.previousHash + this.nonce;
   }
 
-  addTransaction(transaction: Transaction): void {
+  addTransaction(transaction: Transactions): void {
     this.transactions.push(transaction);
   }
 }

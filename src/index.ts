@@ -2,6 +2,7 @@ import express, { Express, json } from 'express';
 import 'dotenv/config';
 
 import blockchainRoutes from '../src/routes/blockchain.routes';
+import nodesRoutes from '../src/routes/nodes.routes';
 
 const app: Express = express();
 
@@ -17,6 +18,7 @@ if (!portNumber || isNaN(Number(portNumber)) || !portsNumbers.includes(portNumbe
 app.use(json());
 
 app.use('/blockchain', blockchainRoutes);
+app.use('/nodes', nodesRoutes);
 
 const server = app.listen(portNumber, () => {
   console.log(`[server]: Server is running at http://localhost:${portNumber}`);

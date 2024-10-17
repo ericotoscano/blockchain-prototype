@@ -1,4 +1,4 @@
-export interface TransactionType {
+export interface TransactionsType {
   txId: string;
   status: string;
   from: string;

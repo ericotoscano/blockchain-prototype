@@ -1,8 +1,8 @@
 import { sha256 } from 'js-sha256';
 
-import { TransactionType } from '../types/transaction.types';
+import { TransactionsType } from '../types/transactions.types';
 
-export class Transaction implements TransactionType {
+export class Transactions implements TransactionsType {
   txId: string;
   status: string;
   from: string;

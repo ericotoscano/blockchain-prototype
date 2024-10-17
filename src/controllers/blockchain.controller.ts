@@ -1,13 +1,10 @@
 import { Request, Response } from 'express';
-import axios, { AxiosResponse } from 'axios';
 
 import '../global';
 
-import { ConnectNodeRequest, RegisterNodeRequest, MineNextBlockRequest, CreateTransactionRequest, UpdateNetworkNodesRequest } from '../types/request.types';
+import { MineNextBlockRequest, CreateTransactionRequest } from '../types/request.types';
 
-import { RegisterNodeResponse, UpdateNetworkNodesResponse } from '../types/response.types';
-
-import { Transaction } from '../models/Transaction';
+import { Transactions } from '../models/Transactions';
 
 const getBlockchain = async (req: Request, res: Response): Promise<any> => {
   try {
@@ -100,7 +97,7 @@ const createTransaction = async (req: Request, res: Response): Promise<any> => {
     const { from, to, amount, fee }: CreateTransactionRequest = req.body;
     const { blockchain } = global;
 
-    const transaction = new Transaction(from, to, amount, fee);
+    const transaction = new Transactions(from, to, amount, fee);
 
     blockchain.addTransactionToMempool(transaction);
 
@@ -131,100 +128,4 @@ const createTransaction = async (req: Request, res: Response): Promise<any> => {
   }
 };
 
-const connectNodes = async (req: Request, res: Response): Promise<any> => {
-  try {
-    const { newNodeUrl }: ConnectNodeRequest = req.body;
-    const { blockchain } = global;
-
-    const registerPromises: Promise<RegisterNodeResponse>[] = [];
-
-    if (!blockchain.nodes.connectedNodes.includes(newNodeUrl)) {
-      blockchain.addNode(newNodeUrl);
-    }
-
-    for (const networkNode of blockchain.nodes.connectedNodes) {
-      const promise = axios
-        .post<RegisterNodeResponse>(networkNode + '/blockchain/nodes', { origin: newNodeUrl, target: blockchain.nodes.currentNodeUrl })
-        .then((response: AxiosResponse<RegisterNodeResponse>) => {
-          return response.data;
-        });
-
-      registerPromises.push(promise);
-    }
-
-    Promise.all(registerPromises).then(() => {
-      const nodesExceptNewOne = blockchain.nodes.connectedNodes.filter((node) => node !== newNodeUrl);
-
-      const connectedNodes = [...nodesExceptNewOne, blockchain.nodes.currentNodeUrl];
-
-      axios.patch(newNodeUrl + '/blockchain/nodes', { connectedNodes });
-    });
-
-    res.status(201).send({
-      message: 'A new node has been registered.',
-      data: { nodeUrl: newNodeUrl },
-    });
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
-
-    res.status(500).send({
-      message: 'An error ocurred.',
-      error: {
-        code: 500,
-        message: errorMessage,
-      },
-    });
-  }
-};
-
-const registerNode = async (req: Request, res: Response): Promise<any> => {
-  try {
-    const { origin, target }: RegisterNodeRequest = req.body;
-    const { blockchain } = global;
-
-    if (!blockchain.nodes.connectedNodes.includes(origin) && blockchain.nodes.currentNodeUrl !== origin) {
-      blockchain.addNode(origin);
-    }
-
-    res.send({
-      message: 'New network connection!',
-      data: { origin, target },
-    });
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
-
-    res.status(500).send({
-      message: 'An error ocurred.',
-      error: {
-        code: 500,
-        message: errorMessage,
-      },
-    });
-  }
-};
-
-const updateNetworkNodes = async (req: Request, res: Response): Promise<any> => {
-  try {
-    const { connectedNodes }: UpdateNetworkNodesRequest = req.body;
-    const { blockchain } = global;
-
-    blockchain.nodes.connectedNodes = structuredClone(connectedNodes);
-
-    res.status(201).send({
-      message: 'Done.',
-      data: { allNetworkNodes: blockchain.nodes.connectedNodes },
-    });
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
-
-    res.status(500).send({
-      message: 'An error ocurred.',
-      error: {
-        code: 500,
-        message: errorMessage,
-      },
-    });
-  }
-};
-
-export default { getBlockchain, mineNextBlock, getAllPendingTransactions, createTransaction, registerNode, connectNodes, updateNetworkNodes };
+export default { getBlockchain, mineNextBlock, getAllPendingTransactions, createTransaction };

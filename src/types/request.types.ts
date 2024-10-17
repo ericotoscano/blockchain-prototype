@@ -1,19 +1,19 @@
-import { Transaction } from '../models/Transaction';
+import { Transactions } from '../models/Transactions';
 
 export interface UpdateNetworkNodesRequest {
-  connectedNodes: string[];
+  networkNodes: string[];
 }
 
 export interface ConnectNodeRequest {
   newNodeUrl: string;
 }
 export interface RegisterNodeRequest {
-  origin: string;
-  target: string;
+  from: string;
+  to: string;
 }
 
 export interface MineNextBlockRequest {
-  nextBlockTransactions: Transaction[];
+  nextBlockTransactions: Transactions[];
 }
 
 export interface CreateTransactionRequest {

@@ -1,21 +1,17 @@
-import { Block } from '../models/Block';
-import { Transaction } from '../models/Transaction';
-import { Node } from '../models/Node';
-
+import { Blocks } from '../models/Blocks';
+import { Transactions } from '../models/Transactions';
 export interface BlockchainType {
-  blocks: Block[];
+  blocks: Blocks[];
   targetDifficulty: string;
   maxTransactionsPerBlock: number;
-  mempool: Transaction[];
-  nodes: Node;
-  mineGenesisBlock(): Block;
-  addNode(nodeUrl: string): void;
-  addBlock(block: Block): void;
-  addTransactionToMempool(transaction: Transaction): void;
-  getPendingTransactions(): Transaction[];
-  createNextBlock(transactions: Transaction[]): Block;
+  mempool: Transactions[];
+  mineGenesisBlock(): Blocks;
+  addBlock(block: Blocks): void;
   getPreviousBlock(): void;
-  generateHash(block: Block): string;
+  createNextBlock(transactions: Transactions[]): Blocks;
+  addTransactionToMempool(transaction: Transactions): void;
+  getPendingTransactions(): Transactions[];
+  generateHash(block: Blocks): string;
   setTargetDifficulty(numberOfZeros: number): void;
   setMaxTransactionsPerBlock(numberOfBlocks: number): void;
   validateChain(): boolean;
