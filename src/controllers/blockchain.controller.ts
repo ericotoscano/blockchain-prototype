@@ -38,7 +38,66 @@ const getBlockchain = async (req: Request, res: Response): Promise<any> => {
   }
 };
 
+const broadcastMinedBlock = async (req: Request, res: Response): Promise<any> => {
+  try {
+    const { blockchain } = global;
+
+    if (!blockchain) {
+      return res.status(400).send({ message: 'There is no blockchain created yet.' });
+    }
+
+    blockchain.nodes.networkNodes.sort();
+
+    res.status(200).send({
+      message: 'Blockchain found.',
+      data: {
+        blockchain,
+      },
+    });
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
+
+    res.status(500).send({
+      message: 'An error ocurred.',
+      error: {
+        code: 500,
+        message: errorMessage,
+      },
+    });
+  }
+};
+
 const mineNextBlock = async (req: Request, res: Response): Promise<any> => {
+  try {
+    const { nextBlockTransactions }: MineNextBlockRequest = req.body;
+    const { blockchain } = global;
+
+    if (!blockchain) {
+      return res.status(400).send({ message: 'There is no blockchain created yet.' });
+    }
+
+    const nextBlock = blockchain.createNextBlock(nextBlockTransactions);
+
+    res.status(201).send({
+      message: 'Block mined.',
+      data: {
+        block: nextBlock,
+      },
+    });
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
+
+    res.status(500).send({
+      message: 'An error ocurred.',
+      error: {
+        code: 500,
+        message: errorMessage,
+      },
+    });
+  }
+};
+
+const updateBlockchain = async (req: Request, res: Response): Promise<any> => {
   try {
     const { nextBlockTransactions }: MineNextBlockRequest = req.body;
     const { blockchain } = global;
@@ -282,4 +341,15 @@ const connectNodes = async (req: Request, res: Response): Promise<any> => {
   }
 };
 
-export default { getBlockchain, mineNextBlock, getAllPendingTransactions, broadcastTransaction, addTransactionToMempool, registerNode, updateNetworkNodes, connectNodes };
+export default {
+  getBlockchain,
+  broadcastMinedBlock,
+  mineNextBlock,
+  updateBlockchain,
+  getAllPendingTransactions,
+  broadcastTransaction,
+  addTransactionToMempool,
+  registerNode,
+  updateNetworkNodes,
+  connectNodes,
+};
