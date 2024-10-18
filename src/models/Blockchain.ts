@@ -4,17 +4,20 @@ import { BlockchainType } from '../types/blockchain.types';
 
 import { Blocks } from './Blocks';
 import { Transactions } from './Transactions';
+import { Nodes } from './Nodes';
 export class Blockchain implements BlockchainType {
   blocks: Blocks[];
   mempool: Transactions[];
   targetDifficulty: string;
   maxTransactionsPerBlock: number;
+  nodes: Nodes;
 
   constructor() {
     this.blocks = [];
     this.mempool = [];
     this.targetDifficulty = '';
     this.maxTransactionsPerBlock = 1;
+    this.nodes = new Nodes();
 
     this.setTargetDifficulty(3);
     this.setMaxTransactionsPerBlock(10);
@@ -82,6 +85,10 @@ export class Blockchain implements BlockchainType {
 
   setMaxTransactionsPerBlock(numberOfBlocks: number) {
     this.maxTransactionsPerBlock = numberOfBlocks;
+  }
+
+  setNetworkNodes(networkNodes: string[]) {
+    this.nodes.networkNodes = structuredClone(networkNodes);
   }
 
   validateChain(): boolean {

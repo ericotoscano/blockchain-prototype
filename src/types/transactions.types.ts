@@ -5,7 +5,6 @@ export interface TransactionsType {
   to: string;
   amount: number;
   fee: number;
-  timestamp: Date;
   getData(): string;
   createTxId(): string;
   changeStatus(): void;

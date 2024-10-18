@@ -1,10 +1,12 @@
 import { Blocks } from '../models/Blocks';
 import { Transactions } from '../models/Transactions';
+import { Nodes } from '../models/Nodes';
 export interface BlockchainType {
   blocks: Blocks[];
+  mempool: Transactions[];
   targetDifficulty: string;
   maxTransactionsPerBlock: number;
-  mempool: Transactions[];
+  nodes: Nodes;
   mineGenesisBlock(): Blocks;
   addBlock(block: Blocks): void;
   getPreviousBlock(): void;
