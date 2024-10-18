@@ -14,3 +14,4 @@ export interface BroadcastTransactionResponse {
   data?: { transaction: Transactions; from: string; to: string };
   error?: { code?: number; message?: string };
 }
+

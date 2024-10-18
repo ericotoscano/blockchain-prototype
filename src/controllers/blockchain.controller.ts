@@ -197,9 +197,8 @@ const registerNode = async (req: Request, res: Response): Promise<any> => {
     const { from, to }: RegisterNodeRequest = req.body;
     const { blockchain } = global;
 
-    if (!blockchain.nodes.networkNodes.includes(from)) {
-      blockchain.nodes.addNode(from);
-    }
+    blockchain.nodes.addNode(from);
+
     return res.send({
       message: 'Registered.',
       data: { from, to },
@@ -246,14 +245,7 @@ const connectNodes = async (req: Request, res: Response): Promise<any> => {
     let registerPromise: Promise<RegisterNodeResponse>;
     const registerPromises: Promise<RegisterNodeResponse>[] = [];
 
-    if (!blockchain.nodes.networkNodes.includes(newNodeUrl)) {
-      blockchain.nodes.addNode(newNodeUrl);
-    } else {
-      return res.status(200).send({
-        message: 'The node is already connected.',
-        data: { currentNodeNetwork: blockchain.nodes.networkNodes.sort() },
-      });
-    }
+    blockchain.nodes.addNode(newNodeUrl);
 
     for (const networkNode of blockchain.nodes.networkNodes) {
       if (newNodeUrl !== networkNode) {
