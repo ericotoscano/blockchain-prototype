@@ -126,7 +126,7 @@ const broadcastTransaction = async (req: Request, res: Response): Promise<any> =
     });
   }
 };
-//nao adicionar a transacao com o mesmo id (pensar em como ser unico, ja que tirou o timestamp), se um no se conecta a outro pos transacoes, o mesmo deve pegar uma copia da blockchain inteira do outro
+
 const addTransactionToMempool = async (req: Request, res: Response): Promise<any> => {
   try {
     const { from, to, amount, fee }: CreateTransactionRequest = req.body;
@@ -135,34 +135,50 @@ const addTransactionToMempool = async (req: Request, res: Response): Promise<any
     let transactionPromise: Promise<BroadcastTransactionResponse>;
     const transactionPromises: Promise<BroadcastTransactionResponse>[] = [];
 
-    const transaction = new Transactions(from, to, amount, fee);
-    const origin = blockchain.nodes.currentNodeUrl;
+    if (blockchain.checkMempoolLength()) {
+      const transaction = new Transactions(from, to, amount, fee);
 
-    blockchain.addTransactionToMempool(transaction);
+      if (blockchain.checkTransactionId(transaction)) {
+        blockchain.addTransactionToMempool(transaction);
+      } else {
+        return res.status(200).send({
+          message: 'This transaction is already on the mempool.',
+          data: { mempool: blockchain.mempool },
+        });
+      }
 
-    for (const networkNode of blockchain.nodes.networkNodes) {
-      transactionPromise = axios
-        .post<BroadcastTransactionResponse>(`${networkNode}/blockchain/transactions`, { transaction, origin })
-        .then((response: AxiosResponse<BroadcastTransactionResponse>) => response.data);
+      const origin = blockchain.nodes.currentNodeUrl;
 
-      transactionPromises.push(transactionPromise);
-    }
+      for (const networkNode of blockchain.nodes.networkNodes) {
+        transactionPromise = axios
+          .post<BroadcastTransactionResponse>(`${networkNode}/blockchain/transactions`, { transaction, origin })
+          .then((response: AxiosResponse<BroadcastTransactionResponse>) => response.data);
 
-    Promise.all(transactionPromises).then((responses: BroadcastTransactionResponse[]) => {
-      return res.status(201).send({
-        message: 'A new transaction was sent to mempool.',
-        data: {
-          transaction: {
-            txId: transaction.txId,
-            status: transaction.status,
-            from: transaction.from,
-            to: transaction.to,
-            amount: transaction.amount,
-            fee: transaction.fee,
+        transactionPromises.push(transactionPromise);
+      }
+
+      Promise.all(transactionPromises).then((responses: BroadcastTransactionResponse[]) => {
+        return res.status(201).send({
+          message: 'A new transaction was sent to mempool.',
+          data: {
+            transaction: {
+              txId: transaction.txId,
+              status: transaction.status,
+              timestamp: transaction.timestamp,
+              from: transaction.from,
+              to: transaction.to,
+              amount: transaction.amount,
+              fee: transaction.fee,
+            },
           },
-        },
+        });
       });
-    });
+    } else {
+      return res.status(200).send({
+        message: 'The mempool has reached the maximum number of transactions for the next block.',
+        data: { maxTransactionsPerBlock: blockchain.maxTransactionsPerBlock },
+      });
+    }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
 

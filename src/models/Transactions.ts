@@ -5,6 +5,7 @@ import { TransactionsType } from '../types/transactions.types';
 export class Transactions implements TransactionsType {
   txId: string;
   status: string;
+  timestamp: Date;
   from: string;
   to: string;
   amount: number;
@@ -16,11 +17,12 @@ export class Transactions implements TransactionsType {
     this.amount = amount;
     this.fee = fee;
     this.status = 'Pending';
+    this.timestamp = new Date();
     this.txId = this.createTxId();
   }
 
   getData(): string {
-    return this.status + this.from + this.to + this.amount.toString() + this.fee.toString();
+    return this.timestamp.toString() + this.status + this.from + this.to + this.amount.toString() + this.fee.toString();
   }
 
   createTxId(): string {

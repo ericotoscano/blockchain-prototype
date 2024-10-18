@@ -57,8 +57,16 @@ export class Blockchain implements BlockchainType {
     return block;
   }
 
+  checkTransactionId(transaction: Transactions): boolean {
+    return this.mempool.every((mempoolTransaction: Transactions) => mempoolTransaction.txId !== transaction.txId);
+  }
+
   addTransactionToMempool(transaction: Transactions): void {
     this.mempool.push(transaction);
+  }
+
+  checkMempoolLength(): boolean {
+    return this.mempool.length < this.maxTransactionsPerBlock;
   }
 
   getPendingTransactions(): Transactions[] {

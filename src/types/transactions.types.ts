@@ -1,6 +1,7 @@
 export interface TransactionsType {
   txId: string;
   status: string;
+  timestamp: Date;
   from: string;
   to: string;
   amount: number;

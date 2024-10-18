@@ -11,7 +11,9 @@ export interface BlockchainType {
   addBlock(block: Blocks): void;
   getPreviousBlock(): void;
   createNextBlock(transactions: Transactions[]): Blocks;
+  checkTransactionId(transaction: Transactions): boolean;
   addTransactionToMempool(transaction: Transactions): void;
+  checkMempoolLength(): boolean;
   getPendingTransactions(): Transactions[];
   generateHash(block: Blocks): string;
   setTargetDifficulty(numberOfZeros: number): void;
