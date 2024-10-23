@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 
-import { MineNextBlockRequest, RegisterNodeRequest, UpdateNetworkNodesRequest, ConnectNodeRequest, CreateTransactionRequest, BroadcastTransactionRequest } from '../types/request.types';
+import { ConnectNodeRequest, UpdateNetworkNodesRequest } from '../types/request.types';
 
 import { getNodesUrlOptions } from '../helpers/ports.helpers';
 
@@ -12,21 +12,14 @@ const validateNewNodeUrl = async (req: Request, res: Response, next: NextFunctio
 
     if (!newNodeUrl) {
       return res.status(200).send({
-        message: 'The node url was not provided.',
-        data: { nodeUrlOptions },
-      });
-    }
-
-    if (nodeUrlOptions.length === 0) {
-      return res.status(200).send({
-        message: 'No port number specified in the .env file.',
+        message: 'The node url was not sent.',
         data: { nodeUrlOptions },
       });
     }
 
     if (!nodeUrlOptions.includes(newNodeUrl)) {
       return res.status(200).send({
-        message: 'The node URL does not contain one of the available ports numbers in the .env file.',
+        message: 'The sent node url does not contain one of the available port numbers in the .env file.',
         data: { nodeUrlOptions },
       });
     }
@@ -52,14 +45,14 @@ const validateNewNodeConnection = async (req: Request, res: Response, next: Next
 
     if (blockchain.nodes.networkNodes.includes(newNodeUrl)) {
       return res.status(200).send({
-        message: 'The node is already connected to the current node.',
+        message: 'The sent node is already connected to the current node.',
         data: { currentNodeNetwork: blockchain.nodes.networkNodes.sort() },
       });
     }
 
     if (blockchain.nodes.currentNodeUrl === newNodeUrl) {
       return res.status(200).send({
-        message: 'The node is the current node.',
+        message: 'The sent node is the current node.',
         data: { currentNode: blockchain.nodes.currentNodeUrl },
       });
     }
@@ -79,13 +72,20 @@ const validateNewNodeConnection = async (req: Request, res: Response, next: Next
 
 const validateNewNodeRegistration = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
   try {
-    const { from, to }: RegisterNodeRequest = req.body;
+    const { newNodeUrl }: ConnectNodeRequest = req.body;
     const { blockchain } = global;
 
-    if (blockchain.nodes.networkNodes.includes(from)) {
+    if (blockchain.nodes.networkNodes.includes(newNodeUrl)) {
       return res.status(200).send({
-        message: 'In registration request, "from" and "to" nodes are the same.',
-        data: { registration: { from, to } },
+        message: 'The sent node is already registered in the current node network.',
+        data: { currentNodeNetwork: blockchain.nodes.networkNodes.sort() },
+      });
+    }
+
+    if (blockchain.nodes.currentNodeUrl === newNodeUrl) {
+      return res.status(200).send({
+        message: 'The sent node is the current node.',
+        data: { currentNode: blockchain.nodes.currentNodeUrl },
       });
     }
 
@@ -103,4 +103,40 @@ const validateNewNodeRegistration = async (req: Request, res: Response, next: Ne
   }
 };
 
-export default { validateNewNodeUrl, validateNewNodeConnection, validateNewNodeRegistration };
+const validateNetworkNodesUpdate = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+  try {
+    const { networkNodes }: UpdateNetworkNodesRequest = req.body;
+    const { blockchain } = global;
+
+    const nodeUrlOptions = getNodesUrlOptions();
+
+    if (networkNodes.includes(blockchain.nodes.currentNodeUrl)) {
+      return res.status(200).send({
+        message: 'The sent network nodes contain the current node url.',
+        data: { currentNodeUrl: blockchain.nodes.currentNodeUrl },
+      });
+    }
+    const invalidNodeUrl = networkNodes.filter((nodeUrl) => !nodeUrlOptions.includes(nodeUrl));
+
+    if (invalidNodeUrl.length !== 0) {
+      return res.status(200).send({
+        message: "The sent network nodes contain one or more invalid node url's.",
+        data: { invalidNodeUrl },
+      });
+    }
+
+    next();
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
+
+    res.status(500).send({
+      message: 'An error occurred.',
+      error: {
+        code: 500,
+        message: errorMessage,
+      },
+    });
+  }
+};
+
+export default { validateNewNodeUrl, validateNewNodeConnection, validateNewNodeRegistration, validateNetworkNodesUpdate };

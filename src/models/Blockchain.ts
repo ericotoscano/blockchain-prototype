@@ -6,21 +6,24 @@ import { Blocks } from './Blocks';
 import { Transactions } from './Transactions';
 import { Nodes } from './Nodes';
 export class Blockchain implements BlockchainType {
-  blocks: Blocks[];
-  mempool: Transactions[];
-  targetDifficulty: string;
-  maxTransactionsPerBlock: number;
   nodes: Nodes;
+  maxTransactionsPerBlock: number;
+  targetDifficulty: string;
+  reward: number;
+  mempool: Transactions[];
+  blocks: Blocks[];
 
   constructor() {
-    this.blocks = [];
-    this.mempool = [];
-    this.targetDifficulty = '';
-    this.maxTransactionsPerBlock = 1;
     this.nodes = new Nodes();
+    this.maxTransactionsPerBlock = 0;
+    this.targetDifficulty = '';
+    this.reward = 0;
+    this.mempool = [];
+    this.blocks = [];
 
-    this.setTargetDifficulty(3);
     this.setMaxTransactionsPerBlock(10);
+    this.setTargetDifficulty(3);
+    this.setReward(3.125);
     this.addBlock(this.mineGenesisBlock());
   }
 
@@ -41,12 +44,14 @@ export class Blockchain implements BlockchainType {
     return this.blocks[this.blocks.length - 1];
   }
 
-  createNextBlock(transactions: Transactions[]): Blocks {
+  mineNextBlock(transactions: Transactions[]): Blocks {
     let block = new Blocks();
 
     transactions.forEach((transaction) => {
       block.addTransaction(transaction);
     });
+
+    block.addRewardTransaction();
 
     let previousBlock = this.getPreviousBlock();
 
@@ -63,10 +68,6 @@ export class Blockchain implements BlockchainType {
 
   addTransactionToMempool(transaction: Transactions): void {
     this.mempool.push(transaction);
-  }
-
-  checkMempoolLength(): boolean {
-    return this.mempool.length < this.maxTransactionsPerBlock;
   }
 
   getPendingTransactions(): Transactions[] {
@@ -93,6 +94,10 @@ export class Blockchain implements BlockchainType {
 
   setMaxTransactionsPerBlock(numberOfBlocks: number) {
     this.maxTransactionsPerBlock = numberOfBlocks;
+  }
+
+  setReward(blockReward: number): void {
+    this.reward = blockReward;
   }
 
   setNetworkNodes(networkNodes: string[]) {

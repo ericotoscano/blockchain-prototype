@@ -1,10 +1,7 @@
+import { Blocks } from '../models/Blocks';
 import { Transactions } from '../models/Transactions';
 export interface MineNextBlockRequest {
   nextBlockTransactions: Transactions[];
-}
-export interface RegisterNodeRequest {
-  from: string;
-  to: string;
 }
 export interface UpdateNetworkNodesRequest {
   networkNodes: string[];
@@ -12,13 +9,17 @@ export interface UpdateNetworkNodesRequest {
 export interface ConnectNodeRequest {
   newNodeUrl: string;
 }
-export interface CreateTransactionRequest {
+export interface SendTransactionToMempoolRequest {
   from: string;
   to: string;
   amount: number;
   fee: number;
 }
-export interface BroadcastTransactionRequest {
+export interface RegisterTransactionInMempoolRequest {
   transaction: Transactions;
+  originNode: string;
+}
+export interface BroadcastMinedBlockRequest {
+  nextBlock: Blocks;
   origin: string;
 }

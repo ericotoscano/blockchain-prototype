@@ -1,5 +1,6 @@
 import { BlocksType } from '../types/blocks.types';
 import { Transactions } from './Transactions';
+import { Blockchain } from './Blockchain';
 
 export class Blocks implements BlocksType {
   height: number;
@@ -22,5 +23,13 @@ export class Blocks implements BlocksType {
 
   addTransaction(transaction: Transactions): void {
     this.transactions.push(transaction);
+  }
+
+  addRewardTransaction(): void {
+    const allFees = this.transactions.reduce((sum, transaction) => sum + transaction.fee, 0);
+
+    const rewardTransaction = new Transactions('Block Reward', 'Miner Address', blockchain.reward + allFees, 0);
+
+    this.transactions.unshift(rewardTransaction);
   }
 }

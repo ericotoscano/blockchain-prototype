@@ -1,7 +1,6 @@
 import { sha256 } from 'js-sha256';
 
 import { TransactionsType } from '../types/transactions.types';
-
 export class Transactions implements TransactionsType {
   txId: string;
   status: string;
@@ -29,7 +28,7 @@ export class Transactions implements TransactionsType {
     return sha256(this.getData());
   }
 
-  changeStatus() {
+  changeStatus(): void {
     if (this.status === 'Pending') {
       this.status = 'Confirmed';
     } else {
