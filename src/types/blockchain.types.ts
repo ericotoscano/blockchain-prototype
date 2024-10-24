@@ -12,7 +12,7 @@ export interface BlockchainType {
   addBlock(block: Blocks): void;
   getPreviousBlock(): void;
   mineNextBlock(transactions: Transactions[]): Blocks;
-  checkTransactionId(transaction: Transactions): boolean;
+  checkTransactionIsNotInMempool(transaction: Transactions): boolean;
   addTransactionToMempool(transaction: Transactions): void;
   getPendingTransactions(): Transactions[];
   generateHash(block: Blocks): string;

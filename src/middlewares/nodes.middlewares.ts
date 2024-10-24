@@ -1,12 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
 
-import { ConnectNodeRequest, UpdateNetworkNodesRequest } from '../types/request.types';
+import { NewNodeRequest, UpdateNetworkNodesRequest } from '../types/request.types';
 
 import { getNodesUrlOptions } from '../helpers/ports.helpers';
 
 const validateNewNodeUrl = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
   try {
-    const { newNodeUrl }: ConnectNodeRequest = req.body;
+    const { newNodeUrl }: NewNodeRequest = req.body;
 
     const nodeUrlOptions = getNodesUrlOptions();
 
@@ -40,7 +40,7 @@ const validateNewNodeUrl = async (req: Request, res: Response, next: NextFunctio
 
 const validateNewNodeConnection = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
   try {
-    const { newNodeUrl }: ConnectNodeRequest = req.body;
+    const { newNodeUrl }: NewNodeRequest = req.body;
     const { blockchain } = global;
 
     if (blockchain.nodes.networkNodes.includes(newNodeUrl)) {
@@ -72,7 +72,7 @@ const validateNewNodeConnection = async (req: Request, res: Response, next: Next
 
 const validateNewNodeRegistration = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
   try {
-    const { newNodeUrl }: ConnectNodeRequest = req.body;
+    const { newNodeUrl }: NewNodeRequest = req.body;
     const { blockchain } = global;
 
     if (blockchain.nodes.networkNodes.includes(newNodeUrl)) {

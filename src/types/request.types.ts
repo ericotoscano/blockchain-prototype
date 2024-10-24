@@ -1,23 +1,30 @@
 import { Blocks } from '../models/Blocks';
 import { Transactions } from '../models/Transactions';
-export interface MineNextBlockRequest {
-  nextBlockTransactions: Transactions[];
+
+/* declare global {
+  namespace Express {
+    interface Request {
+      formattedTransaction: Transactions;
+    }
+  }
+} */
+export interface NewNodeRequest {
+  newNodeUrl: string;
 }
 export interface UpdateNetworkNodesRequest {
   networkNodes: string[];
 }
-export interface ConnectNodeRequest {
-  newNodeUrl: string;
+export interface MineNextBlockRequest {
+  nextBlockTransactions: Transactions[];
 }
 export interface SendTransactionToMempoolRequest {
-  from: string;
-  to: string;
+  sender: string;
+  recipient: string;
   amount: number;
   fee: number;
 }
 export interface RegisterTransactionInMempoolRequest {
   transaction: Transactions;
-  originNode: string;
 }
 export interface BroadcastMinedBlockRequest {
   nextBlock: Blocks;

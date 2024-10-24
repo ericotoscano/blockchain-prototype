@@ -1,11 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
 
-const validateBlockchainExistance = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+const validateBlockchain = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { blockchain } = global;
 
     if (!blockchain) {
-      return res.status(200).send({ message: 'There is no blockchain created yet.' });
+      res.status(400).send({ message: 'There is no blockchain created yet.' });
     }
 
     next();
@@ -22,4 +22,4 @@ const validateBlockchainExistance = async (req: Request, res: Response, next: Ne
   }
 };
 
-export default { validateBlockchainExistance };
+export default { validateBlockchain };

@@ -7,12 +7,27 @@ export interface RegisterNodeResponse {
 }
 export interface UpdateNetworkNodesResponse {
   message: string;
-  data?: { newNode?: { networkNodes?: string[] } };
+  data?: { currentNodeUrl: string; networkNodes: string[] };
   error?: { code?: number; message?: string };
 }
-export interface BroadcastTransactionResponse {
+export interface ConnectNodesResponse {
   message: string;
-  data?: { transaction: Transactions; from: string; to: string };
+  data?: { connectedTo: string[] };
+  error?: { code?: number; message?: string };
+}
+export interface RegisterTransactionInMempoolResponse {
+  message: string;
+  data?: { transaction: Transactions };
+  error?: { code?: number; message?: string };
+}
+export interface SendTransactionToMempoolResponse {
+  message: string;
+  data?: { transaction: { txId: string; status: string; timestamp: Date; sender: string; recipient: string; amount: number; fee: number } };
+  error?: { code?: number; message?: string };
+}
+export interface getAllPendingTransactionsResponse {
+  message: string;
+  data?: { pendingTransactions: Transactions[] };
   error?: { code?: number; message?: string };
 }
 export interface BroadcastMinedBlockResponse {

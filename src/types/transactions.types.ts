@@ -2,8 +2,8 @@ export interface TransactionsType {
   txId: string;
   status: string;
   timestamp: Date;
-  from: string;
-  to: string;
+  sender: string;
+  recipient: string;
   amount: number;
   fee: number;
   getData(): string;

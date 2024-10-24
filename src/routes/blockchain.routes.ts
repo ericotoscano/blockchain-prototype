@@ -19,33 +19,52 @@ const {
   updateNetworkNodes,
 } = blockchainController;
 
-const { validateBlockchainExistance } = blockchainMiddlewares;
+const { validateBlockchain } = blockchainMiddlewares;
 
 const { validateNewNodeUrl, validateNewNodeConnection, validateNewNodeRegistration, validateNetworkNodesUpdate } = nodesMiddlewares;
 
-const { validatePendingTransactions, validateTransactionsPerBlock, validateNewTransactionRegistration } = transactionsMiddlewares;
+const {
+  validatePendingTransactions,
+  validateAddressesForANewTransaction,
+  validateValuesForANewTransaction,
+  validateTransaction,
+  validateAddressesOfTransaction,
+  validateValuesOfTransaction,
+  validateStatusOfTransaction,
+  validateTimestampOfTransaction,
+  validateTxIdOfTransaction,
+  validateTransactionsPerBlock,
+} = transactionsMiddlewares;
 
 const router: Router = Router();
-
+//organizar a rota '/' de acordo com o padrão das outras
 router
   .route('/')
-  .get(validateBlockchainExistance, getBlockchain)
-  .post(validateBlockchainExistance, validateTransactionsPerBlock, mineNextBlock)
-  .put(validateBlockchainExistance, registerMinedBlock)
-  .patch(validateBlockchainExistance, updateBlockchain); //consensus
+  .get(validateBlockchain, getBlockchain)
+  .post(validateBlockchain, validateTransactionsPerBlock, mineNextBlock)
+  .put(validateBlockchain, registerMinedBlock)
+  .patch(validateBlockchain, updateBlockchain); //consensus
 
 router
   .route('/transactions')
-  .get(validateBlockchainExistance, getAllPendingTransactions)
-  .post(validateBlockchainExistance, sendTransactionToMempool)
-  .put(validateBlockchainExistance, validateNewTransactionRegistration, registerTransactionInMempool);
+  .get(validateBlockchain, validatePendingTransactions, getAllPendingTransactions)
+  .post(validateBlockchain, validateAddressesForANewTransaction, validateValuesForANewTransaction, sendTransactionToMempool)
+  .put(
+    validateBlockchain,
+    validateTransaction,
+    validateAddressesOfTransaction,
+    validateValuesOfTransaction,
+    validateStatusOfTransaction,
+    validateTimestampOfTransaction,
+    validateTxIdOfTransaction,
+    registerTransactionInMempool
+  );
+//.delete transações que forem incluidas no bloco
 
 router
   .route('/nodes')
-  .post(validateBlockchainExistance, validateNewNodeUrl, validateNewNodeConnection, connectNodes)
-  .put(validateBlockchainExistance, validateNewNodeUrl, validateNewNodeRegistration, registerNode)
-  .patch(validateBlockchainExistance, validateNetworkNodesUpdate, updateNetworkNodes);
+  .post(validateBlockchain, validateNewNodeUrl, validateNewNodeConnection, connectNodes)
+  .put(validateBlockchain, validateNewNodeUrl, validateNewNodeRegistration, registerNode)
+  .patch(validateBlockchain, validateNetworkNodesUpdate, updateNetworkNodes);
 
 export default router;
-
-//revisar /transactions e / tendo o /nodes como padrao de middlewares e controller

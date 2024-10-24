@@ -5,14 +5,14 @@ export class Transactions implements TransactionsType {
   txId: string;
   status: string;
   timestamp: Date;
-  from: string;
-  to: string;
+  sender: string;
+  recipient: string;
   amount: number;
   fee: number;
 
-  constructor(from: string, to: string, amount: number, fee: number) {
-    this.from = from;
-    this.to = to;
+  constructor(sender: string, recipient: string, amount: number, fee: number) {
+    this.sender = sender;
+    this.recipient = recipient;
     this.amount = amount;
     this.fee = fee;
     this.status = 'Pending';
@@ -21,7 +21,7 @@ export class Transactions implements TransactionsType {
   }
 
   getData(): string {
-    return this.timestamp.toString() + this.status + this.from + this.to + this.amount.toString() + this.fee.toString();
+    return this.timestamp.toString() + this.status + this.sender + this.recipient + this.amount.toString() + this.fee.toString();
   }
 
   createTxId(): string {

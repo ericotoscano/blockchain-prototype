@@ -62,7 +62,7 @@ export class Blockchain implements BlockchainType {
     return block;
   }
 
-  checkTransactionId(transaction: Transactions): boolean {
+  checkTransactionIsNotInMempool(transaction: Transactions): boolean {
     return this.mempool.every((mempoolTransaction: Transactions) => mempoolTransaction.txId !== transaction.txId);
   }
 
