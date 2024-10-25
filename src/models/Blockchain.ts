@@ -24,10 +24,10 @@ export class Blockchain implements BlockchainType {
     this.setMaxTransactionsPerBlock(10);
     this.setTargetDifficulty(3);
     this.setReward(3.125);
-    this.addBlock(this.mineGenesisBlock());
+    this.addBlock(this.createGenesisBlock());
   }
 
-  mineGenesisBlock(): Blocks {
+  createGenesisBlock(): Blocks {
     let genesisBlock = new Blocks();
 
     genesisBlock.previousHash = '0000000000000000000000000000000000000000000000000000000000000000';
@@ -44,7 +44,7 @@ export class Blockchain implements BlockchainType {
     return this.blocks[this.blocks.length - 1];
   }
 
-  mineNextBlock(transactions: Transactions[]): Blocks {
+  createNextBlock(transactions: Transactions[]): Blocks {
     let block = new Blocks();
 
     transactions.forEach((transaction) => {

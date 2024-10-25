@@ -1,27 +1,28 @@
 import { Request, Response, NextFunction } from 'express';
 
 import { NewNodeRequest, UpdateNetworkNodesRequest } from '../types/request.types';
+import { CustomResponse, ErrorData, MiddlewareResponse } from '../types/response.types';
 
 import { getNodesUrlOptions } from '../helpers/ports.helpers';
 
-const validateNewNodeUrl = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+const validateNewNodeUrl = async (req: Request<{}, {}, NewNodeRequest>, res: Response<MiddlewareResponse | CustomResponse<ErrorData>>, next: NextFunction): Promise<void> => {
   try {
-    const { newNodeUrl }: NewNodeRequest = req.body;
+    const { newNodeUrl } = req.body;
 
     const nodeUrlOptions = getNodesUrlOptions();
 
     if (!newNodeUrl) {
-      return res.status(200).send({
+      res.status(400).send({
         message: 'The node url was not sent.',
-        data: { nodeUrlOptions },
       });
+      return;
     }
 
     if (!nodeUrlOptions.includes(newNodeUrl)) {
-      return res.status(200).send({
+      res.status(400).send({
         message: 'The sent node url does not contain one of the available port numbers in the .env file.',
-        data: { nodeUrlOptions },
       });
+      return;
     }
 
     next();
@@ -30,31 +31,32 @@ const validateNewNodeUrl = async (req: Request, res: Response, next: NextFunctio
 
     res.status(500).send({
       message: 'An error occurred.',
-      error: {
+      data: {
         code: 500,
         message: errorMessage,
       },
     });
+    return;
   }
 };
 
-const validateNewNodeConnection = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+const validateNewNodeConnection = async (req: Request<{}, {}, NewNodeRequest>, res: Response<MiddlewareResponse | CustomResponse<ErrorData>>, next: NextFunction): Promise<void> => {
   try {
-    const { newNodeUrl }: NewNodeRequest = req.body;
+    const { newNodeUrl } = req.body;
     const { blockchain } = global;
 
     if (blockchain.nodes.networkNodes.includes(newNodeUrl)) {
-      return res.status(200).send({
+      res.status(400).send({
         message: 'The sent node is already connected to the current node.',
-        data: { currentNodeNetwork: blockchain.nodes.networkNodes.sort() },
       });
+      return;
     }
 
     if (blockchain.nodes.currentNodeUrl === newNodeUrl) {
-      return res.status(200).send({
+      res.status(400).send({
         message: 'The sent node is the current node.',
-        data: { currentNode: blockchain.nodes.currentNodeUrl },
       });
+      return;
     }
     next();
   } catch (error) {
@@ -62,31 +64,32 @@ const validateNewNodeConnection = async (req: Request, res: Response, next: Next
 
     res.status(500).send({
       message: 'An error occurred.',
-      error: {
+      data: {
         code: 500,
         message: errorMessage,
       },
     });
+    return;
   }
 };
 
-const validateNewNodeRegistration = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+const validateNewNodeRegistration = async (req: Request<{}, {}, NewNodeRequest>, res: Response<MiddlewareResponse | CustomResponse<ErrorData>>, next: NextFunction): Promise<void> => {
   try {
-    const { newNodeUrl }: NewNodeRequest = req.body;
+    const { newNodeUrl } = req.body;
     const { blockchain } = global;
 
     if (blockchain.nodes.networkNodes.includes(newNodeUrl)) {
-      return res.status(200).send({
+      res.status(400).send({
         message: 'The sent node is already registered in the current node network.',
-        data: { currentNodeNetwork: blockchain.nodes.networkNodes.sort() },
       });
+      return;
     }
 
     if (blockchain.nodes.currentNodeUrl === newNodeUrl) {
-      return res.status(200).send({
+      res.status(400).send({
         message: 'The sent node is the current node.',
-        data: { currentNode: blockchain.nodes.currentNodeUrl },
       });
+      return;
     }
 
     next();
@@ -95,34 +98,35 @@ const validateNewNodeRegistration = async (req: Request, res: Response, next: Ne
 
     res.status(500).send({
       message: 'An error occurred.',
-      error: {
+      data: {
         code: 500,
         message: errorMessage,
       },
     });
+    return;
   }
 };
 
-const validateNetworkNodesUpdate = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+const validateNetworkNodesUpdate = async (req: Request<{}, {}, UpdateNetworkNodesRequest>, res: Response<MiddlewareResponse | CustomResponse<ErrorData>>, next: NextFunction): Promise<void> => {
   try {
-    const { networkNodes }: UpdateNetworkNodesRequest = req.body;
+    const { networkNodes } = req.body;
     const { blockchain } = global;
 
     const nodeUrlOptions = getNodesUrlOptions();
 
     if (networkNodes.includes(blockchain.nodes.currentNodeUrl)) {
-      return res.status(200).send({
+      res.status(400).send({
         message: 'The sent network nodes contain the current node url.',
-        data: { currentNodeUrl: blockchain.nodes.currentNodeUrl },
       });
+      return;
     }
     const invalidNodeUrl = networkNodes.filter((nodeUrl) => !nodeUrlOptions.includes(nodeUrl));
 
     if (invalidNodeUrl.length !== 0) {
-      return res.status(200).send({
+      res.status(400).send({
         message: "The sent network nodes contain one or more invalid node url's.",
-        data: { invalidNodeUrl },
       });
+      return;
     }
 
     next();
@@ -131,11 +135,12 @@ const validateNetworkNodesUpdate = async (req: Request, res: Response, next: Nex
 
     res.status(500).send({
       message: 'An error occurred.',
-      error: {
+      data: {
         code: 500,
         message: errorMessage,
       },
     });
+    return;
   }
 };
 

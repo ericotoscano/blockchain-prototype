@@ -7,19 +7,19 @@ import nodesMiddlewares from '../middlewares/nodes.middlewares';
 import transactionsMiddlewares from '../middlewares/transactions.middlewares';
 
 const {
-  getBlockchain,
-  registerMinedBlock,
-  mineNextBlock,
-  updateBlockchain,
-  getAllPendingTransactions,
-  registerTransactionInMempool,
-  sendTransactionToMempool,
-  registerNode,
   connectNodes,
+  registerNode,
   updateNetworkNodes,
+  getAllPendingTransactions,
+  sendTransactionToMempool,
+  registerTransactionInMempool,
+  getBlockchain,
+  registerCreatedBlock,
+  createNextBlock,
+  updateBlockchain,
 } = blockchainController;
 
-const { validateBlockchain } = blockchainMiddlewares;
+const { validateBlockchain, validateNextBlock, validateHeightOfBlock, validateHashOfBlock, validatePreviousHashOfBlock, validateTransactionsOfBlock, validateNonceOfBlock } = blockchainMiddlewares;
 
 const { validateNewNodeUrl, validateNewNodeConnection, validateNewNodeRegistration, validateNetworkNodesUpdate } = nodesMiddlewares;
 
@@ -37,13 +37,15 @@ const {
 } = transactionsMiddlewares;
 
 const router: Router = Router();
+
 //organizar a rota '/' de acordo com o padrão das outras
+
 router
   .route('/')
   .get(validateBlockchain, getBlockchain)
-  .post(validateBlockchain, validateTransactionsPerBlock, mineNextBlock)
-  .put(validateBlockchain, registerMinedBlock)
-  .patch(validateBlockchain, updateBlockchain); //consensus
+  .post(validateBlockchain, validateTransactionsPerBlock, createNextBlock)
+  .put(validateBlockchain, validateNextBlock, validateHeightOfBlock, validateHashOfBlock, validatePreviousHashOfBlock, validateTransactionsOfBlock, validateNonceOfBlock, registerCreatedBlock)
+  .patch(validateBlockchain, updateBlockchain); //consenso
 
 router
   .route('/transactions')

@@ -6,44 +6,48 @@ import '../global';
 import {
   NewNodeRequest,
   UpdateNetworkNodesRequest,
-  MineNextBlockRequest,
+  CreateNextBlockRequest,
   SendTransactionToMempoolRequest,
   RegisterTransactionInMempoolRequest,
-  BroadcastMinedBlockRequest,
+  RegisterCreatedBlockRequest,
 } from '../types/request.types';
 
 import {
-  RegisterNodeResponse,
-  UpdateNetworkNodesResponse,
-  ConnectNodesResponse,
-  RegisterTransactionInMempoolResponse,
-  BroadcastMinedBlockResponse,
-  SendTransactionToMempoolResponse,
-  getAllPendingTransactionsResponse,
+  CustomResponse,
+  RegisterTransactionInMempoolData,
+  RegisterCreatedBlockData,
+  SendTransactionToMempoolData,
+  GetAllPendingTransactionsData,
+  ErrorData,
+  RegisterNodeData,
+  UpdateNetworkNodesData,
+  ConnectNodesData,
+  GetBlockchainData,
+  CreateNextBlockData,
 } from '../types/response.types';
 
 import { Transactions } from '../models/Transactions';
 
-const connectNodes = async (req: Request<{}, {}, NewNodeRequest>, res: Response<ConnectNodesResponse>): Promise<void> => {
+const connectNodes = async (req: Request<{}, {}, NewNodeRequest>, res: Response<CustomResponse<ConnectNodesData | ErrorData>>): Promise<void> => {
   try {
     const { newNodeUrl } = req.body;
     const { blockchain } = global;
 
     blockchain.nodes.addNode(newNodeUrl);
 
-    const registerPromises: Promise<RegisterNodeResponse>[] = [];
+    const registerNodePromises: Promise<CustomResponse<RegisterNodeData | ErrorData>>[] = [];
 
     for (const networkNode of blockchain.nodes.networkNodes) {
-      const registerPromise = axios.put<RegisterNodeResponse>(`${networkNode}/blockchain/nodes`, { newNodeUrl }).then((response) => response.data);
+      const registerNodePromise = axios.put<CustomResponse<RegisterNodeData | ErrorData>>(`${networkNode}/blockchain/nodes`, { newNodeUrl }).then((response) => response.data);
 
-      registerPromises.push(registerPromise);
+      registerNodePromises.push(registerNodePromise);
     }
 
-    await Promise.all(registerPromises);
+    await Promise.all(registerNodePromises);
 
     const networkNodes = blockchain.nodes.broadcastNodesTo(newNodeUrl);
 
-    axios.patch<UpdateNetworkNodesResponse>(`${newNodeUrl}/blockchain/nodes`, { networkNodes });
+    axios.patch<CustomResponse<UpdateNetworkNodesData | ErrorData>>(`${newNodeUrl}/blockchain/nodes`, { networkNodes });
 
     res.status(201).send({
       message: 'A new node has been connected.',
@@ -54,7 +58,7 @@ const connectNodes = async (req: Request<{}, {}, NewNodeRequest>, res: Response<
 
     res.status(500).send({
       message: 'An error occurred.',
-      error: {
+      data: {
         code: 500,
         message: errorMessage,
       },
@@ -62,7 +66,7 @@ const connectNodes = async (req: Request<{}, {}, NewNodeRequest>, res: Response<
   }
 };
 
-const registerNode = async (req: Request<{}, {}, NewNodeRequest>, res: Response<RegisterNodeResponse>): Promise<void> => {
+const registerNode = async (req: Request<{}, {}, NewNodeRequest>, res: Response<CustomResponse<RegisterNodeData | ErrorData>>): Promise<void> => {
   try {
     const { newNodeUrl } = req.body;
     const { blockchain } = global;
@@ -78,7 +82,7 @@ const registerNode = async (req: Request<{}, {}, NewNodeRequest>, res: Response<
 
     res.status(500).send({
       message: 'An error occurred.',
-      error: {
+      data: {
         code: 500,
         message: errorMessage,
       },
@@ -86,7 +90,7 @@ const registerNode = async (req: Request<{}, {}, NewNodeRequest>, res: Response<
   }
 };
 
-const updateNetworkNodes = async (req: Request<{}, {}, UpdateNetworkNodesRequest>, res: Response<UpdateNetworkNodesResponse>): Promise<void> => {
+const updateNetworkNodes = async (req: Request<{}, {}, UpdateNetworkNodesRequest>, res: Response<CustomResponse<UpdateNetworkNodesData | ErrorData>>): Promise<void> => {
   try {
     const { networkNodes } = req.body;
     const { blockchain } = global;
@@ -102,7 +106,7 @@ const updateNetworkNodes = async (req: Request<{}, {}, UpdateNetworkNodesRequest
 
     res.status(500).send({
       message: 'An error occurred.',
-      error: {
+      data: {
         code: 500,
         message: errorMessage,
       },
@@ -110,7 +114,30 @@ const updateNetworkNodes = async (req: Request<{}, {}, UpdateNetworkNodesRequest
   }
 };
 
-const sendTransactionToMempool = async (req: Request<{}, {}, SendTransactionToMempoolRequest>, res: Response<SendTransactionToMempoolResponse>): Promise<void> => {
+const getAllPendingTransactions = async (req: Request, res: Response<CustomResponse<GetAllPendingTransactionsData | ErrorData>>): Promise<void> => {
+  try {
+    const { blockchain } = global;
+
+    const pendingTransactions = blockchain.getPendingTransactions();
+
+    res.status(200).send({
+      message: 'There are pending transactions on mempool.',
+      data: { pendingTransactions },
+    });
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
+
+    res.status(500).send({
+      message: 'An error ocurred.',
+      data: {
+        code: 500,
+        message: errorMessage,
+      },
+    });
+  }
+};
+
+const sendTransactionToMempool = async (req: Request<{}, {}, SendTransactionToMempoolRequest>, res: Response<CustomResponse<SendTransactionToMempoolData | ErrorData>>): Promise<void> => {
   try {
     const { sender, recipient, amount, fee } = req.body;
     const { blockchain } = global;
@@ -119,17 +146,17 @@ const sendTransactionToMempool = async (req: Request<{}, {}, SendTransactionToMe
 
     blockchain.addTransactionToMempool(transaction);
 
-    const transactionPromises: Promise<RegisterTransactionInMempoolResponse>[] = [];
+    const registerTransactionPromises: Promise<CustomResponse<RegisterTransactionInMempoolData | ErrorData>>[] = [];
 
     for (const networkNode of blockchain.nodes.networkNodes) {
-      const transactionPromise = axios
-        .put<RegisterTransactionInMempoolResponse>(`${networkNode}/blockchain/transactions`, { transaction })
-        .then((response: AxiosResponse<RegisterTransactionInMempoolResponse>) => response.data);
+      const registerTransactionPromise = axios
+        .put<CustomResponse<RegisterTransactionInMempoolData | ErrorData>>(`${networkNode}/blockchain/transactions`, { transaction })
+        .then((response: AxiosResponse<CustomResponse<RegisterTransactionInMempoolData | ErrorData>>) => response.data);
 
-      transactionPromises.push(transactionPromise);
+      registerTransactionPromises.push(registerTransactionPromise);
     }
     //futuramente, pensar em alguma checagem dessas promises(erro na requisicao de cima)
-    await Promise.all(transactionPromises);
+    await Promise.all(registerTransactionPromises);
 
     res.status(201).send({
       message: 'A new transaction was sent to mempool.',
@@ -150,7 +177,7 @@ const sendTransactionToMempool = async (req: Request<{}, {}, SendTransactionToMe
 
     res.status(500).send({
       message: 'An error ocurred.',
-      error: {
+      data: {
         code: 500,
         message: errorMessage,
       },
@@ -158,7 +185,7 @@ const sendTransactionToMempool = async (req: Request<{}, {}, SendTransactionToMe
   }
 };
 
-const registerTransactionInMempool = async (req: Request<{}, {}, RegisterTransactionInMempoolRequest>, res: Response<RegisterTransactionInMempoolResponse>): Promise<void> => {
+const registerTransactionInMempool = async (req: Request<{}, {}, RegisterTransactionInMempoolRequest>, res: Response<CustomResponse<RegisterTransactionInMempoolData | ErrorData>>): Promise<void> => {
   try {
     const { transaction } = req.body;
     const { blockchain } = global;
@@ -176,32 +203,7 @@ const registerTransactionInMempool = async (req: Request<{}, {}, RegisterTransac
 
     res.status(500).send({
       message: 'An error ocurred.',
-      error: {
-        code: 500,
-        message: errorMessage,
-      },
-    });
-  }
-};
-
-const getAllPendingTransactions = async (req: Request, res: Response<getAllPendingTransactionsResponse>): Promise<void> => {
-  try {
-    const { blockchain } = global;
-
-    const pendingTransactions = blockchain.getPendingTransactions();
-
-    res.status(200).send({
-      message: 'There are pending transactions on mempool.',
       data: {
-        pendingTransactions,
-      },
-    });
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
-
-    res.status(500).send({
-      message: 'An error ocurred.',
-      error: {
         code: 500,
         message: errorMessage,
       },
@@ -209,7 +211,7 @@ const getAllPendingTransactions = async (req: Request, res: Response<getAllPendi
   }
 };
 
-const getBlockchain = async (req: Request, res: Response): Promise<void> => {
+const getBlockchain = async (req: Request, res: Response<CustomResponse<GetBlockchainData | ErrorData>>): Promise<void> => {
   try {
     const { blockchain } = global;
 
@@ -226,7 +228,7 @@ const getBlockchain = async (req: Request, res: Response): Promise<void> => {
 
     res.status(500).send({
       message: 'An error ocurred.',
-      error: {
+      data: {
         code: 500,
         message: errorMessage,
       },
@@ -234,56 +236,45 @@ const getBlockchain = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-const mineNextBlock = async (req: Request, res: Response): Promise<any> => {
+const createNextBlock = async (req: Request<{}, {}, CreateNextBlockRequest>, res: Response<CustomResponse<CreateNextBlockData | ErrorData>>): Promise<void> => {
   try {
-    const { nextBlockTransactions }: MineNextBlockRequest = req.body;
+    const { nextBlockTransactions } = req.body;
     const { blockchain } = global;
 
-    let broadcastMinedBlockPromise: Promise<BroadcastMinedBlockResponse>;
-    const broadcastMinedBlockPromises: Promise<BroadcastMinedBlockResponse>[] = [];
+    const nextBlock = blockchain.createNextBlock(nextBlockTransactions);
 
-    const nextBlock = blockchain.mineNextBlock(nextBlockTransactions);
-    const previousBlock = blockchain.getPreviousBlock();
+    blockchain.addBlock(nextBlock);
 
-    if (nextBlock.previousHash === previousBlock.hash) {
-      blockchain.addBlock(nextBlock);
-    } else {
-      return res.status(200).send({
-        message: 'This block is not valid.',
-        data: { lastBlockHash: previousBlock.hash, nextBlockPreviousHash: nextBlock.previousHash },
-      });
-    }
-
-    const origin = blockchain.nodes.currentNodeUrl;
+    const registerCreatedBlockPromises: Promise<CustomResponse<RegisterCreatedBlockData | ErrorData>>[] = [];
 
     for (const networkNode of blockchain.nodes.networkNodes) {
-      broadcastMinedBlockPromise = axios
-        .put<BroadcastMinedBlockResponse>(`${networkNode}/blockchain`, { nextBlock, origin })
-        .then((response: AxiosResponse<BroadcastMinedBlockResponse>) => response.data);
+      const registerCreatedBlockPromise = axios
+        .put<CustomResponse<RegisterCreatedBlockData | ErrorData>>(`${networkNode}/blockchain`, { nextBlock })
+        .then((response: AxiosResponse<CustomResponse<RegisterCreatedBlockData | ErrorData>>) => response.data);
 
-      broadcastMinedBlockPromises.push(broadcastMinedBlockPromise);
+      registerCreatedBlockPromises.push(registerCreatedBlockPromise);
     }
 
-    Promise.all(broadcastMinedBlockPromises).then((responses: BroadcastMinedBlockResponse[]) => {
-      return res.status(201).send({
-        message: 'A new block was mined.',
-        data: {
-          block: {
-            height: nextBlock.height,
-            nonce: nextBlock.nonce,
-            hash: nextBlock.hash,
-            previousHash: nextBlock.previousHash,
-            transactions: nextBlock.transactions,
-          },
+    await Promise.all(registerCreatedBlockPromises);
+
+    res.status(201).send({
+      message: 'A new block was mined.',
+      data: {
+        block: {
+          height: nextBlock.height,
+          hash: nextBlock.hash,
+          previousHash: nextBlock.previousHash,
+          transactions: nextBlock.transactions,
+          nonce: nextBlock.nonce,
         },
-      });
+      },
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
 
     res.status(500).send({
       message: 'An error ocurred.',
-      error: {
+      data: {
         code: 500,
         message: errorMessage,
       },
@@ -291,18 +282,17 @@ const mineNextBlock = async (req: Request, res: Response): Promise<any> => {
   }
 };
 
-const registerMinedBlock = async (req: Request, res: Response): Promise<any> => {
+const registerCreatedBlock = async (req: Request<{}, {}, RegisterCreatedBlockRequest>, res: Response<CustomResponse<RegisterCreatedBlockData | ErrorData>>): Promise<void> => {
   try {
-    const { nextBlock, origin }: BroadcastMinedBlockRequest = req.body;
+    const { nextBlock } = req.body;
     const { blockchain } = global;
 
     blockchain.addBlock(nextBlock);
 
-    res.status(201).send({
+    res.status(200).send({
       message: 'Registered.',
       data: {
         block: nextBlock,
-        origin,
       },
     });
   } catch (error) {
@@ -310,7 +300,7 @@ const registerMinedBlock = async (req: Request, res: Response): Promise<any> => 
 
     res.status(500).send({
       message: 'An error ocurred.',
-      error: {
+      data: {
         code: 500,
         message: errorMessage,
       },
@@ -318,12 +308,12 @@ const registerMinedBlock = async (req: Request, res: Response): Promise<any> => 
   }
 };
 
-const updateBlockchain = async (req: Request, res: Response): Promise<any> => {
+const updateBlockchain = async (req: Request<{}, {}, CreateNextBlockRequest>, res: Response): Promise<void> => {
   try {
-    const { nextBlockTransactions }: MineNextBlockRequest = req.body;
+    const { nextBlockTransactions } = req.body;
     const { blockchain } = global;
 
-    const nextBlock = blockchain.mineNextBlock(nextBlockTransactions);
+    const nextBlock = blockchain.createNextBlock(nextBlockTransactions);
 
     res.status(201).send({
       message: 'Block mined.',
@@ -336,9 +326,11 @@ const updateBlockchain = async (req: Request, res: Response): Promise<any> => {
 
     res.status(500).send({
       message: 'An error ocurred.',
-      error: {
-        code: 500,
-        message: errorMessage,
+      data: {
+        error: {
+          code: 500,
+          message: errorMessage,
+        },
       },
     });
   }
@@ -348,11 +340,11 @@ export default {
   connectNodes,
   registerNode,
   updateNetworkNodes,
-  getBlockchain,
-  registerMinedBlock,
-  mineNextBlock,
-  updateBlockchain,
   getAllPendingTransactions,
-  registerTransactionInMempool,
   sendTransactionToMempool,
+  registerTransactionInMempool,
+  getBlockchain,
+  registerCreatedBlock,
+  createNextBlock,
+  updateBlockchain,
 };

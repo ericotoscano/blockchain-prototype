@@ -8,10 +8,10 @@ export interface BlockchainType {
   reward: number;
   mempool: Transactions[];
   blocks: Blocks[];
-  mineGenesisBlock(): Blocks;
+  createGenesisBlock(): Blocks;
   addBlock(block: Blocks): void;
   getPreviousBlock(): void;
-  mineNextBlock(transactions: Transactions[]): Blocks;
+  createNextBlock(transactions: Transactions[]): Blocks;
   checkTransactionIsNotInMempool(transaction: Transactions): boolean;
   addTransactionToMempool(transaction: Transactions): void;
   getPendingTransactions(): Transactions[];

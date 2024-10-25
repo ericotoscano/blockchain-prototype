@@ -1,37 +1,56 @@
+import { Blockchain } from '../models/Blockchain';
 import { Blocks } from '../models/Blocks';
 import { Transactions } from '../models/Transactions';
-export interface RegisterNodeResponse {
+export interface MiddlewareResponse {
   message: string;
-  data?: { registeredNode: string; registeredIn: string };
-  error?: { code?: number; message?: string };
 }
-export interface UpdateNetworkNodesResponse {
+export interface CustomResponse<T> {
   message: string;
-  data?: { currentNodeUrl: string; networkNodes: string[] };
-  error?: { code?: number; message?: string };
+  data: T;
 }
-export interface ConnectNodesResponse {
-  message: string;
-  data?: { connectedTo: string[] };
-  error?: { code?: number; message?: string };
+export interface ConnectNodesData {
+  connectedTo: string[];
 }
-export interface RegisterTransactionInMempoolResponse {
-  message: string;
-  data?: { transaction: Transactions };
-  error?: { code?: number; message?: string };
+export interface RegisterNodeData {
+  registeredNode: string;
+  registeredIn: string;
 }
-export interface SendTransactionToMempoolResponse {
-  message: string;
-  data?: { transaction: { txId: string; status: string; timestamp: Date; sender: string; recipient: string; amount: number; fee: number } };
-  error?: { code?: number; message?: string };
+
+export interface UpdateNetworkNodesData {
+  currentNodeUrl: string;
+  networkNodes: string[];
 }
-export interface getAllPendingTransactionsResponse {
-  message: string;
-  data?: { pendingTransactions: Transactions[] };
-  error?: { code?: number; message?: string };
+
+export interface GetAllPendingTransactionsData {
+  pendingTransactions: Transactions[];
 }
-export interface BroadcastMinedBlockResponse {
+export interface SendTransactionToMempoolData {
+  transaction: { txId: string; status: string; timestamp: Date; sender: string; recipient: string; amount: number; fee: number };
+}
+
+export interface RegisterTransactionInMempoolData {
+  transaction: Transactions;
+}
+
+export interface GetBlockchainData {
+  blockchain: Blockchain;
+}
+
+export interface CreateNextBlockData {
+  block: {
+    height: number;
+    hash: string;
+    previousHash: string;
+    transactions: Transactions[];
+    nonce: number;
+  };
+}
+
+export interface RegisterCreatedBlockData {
+  block: Blocks;
+}
+
+export interface ErrorData {
+  code: number;
   message: string;
-  data?: { block: Blocks; from: string };
-  error?: { code?: number; message?: string };
 }
