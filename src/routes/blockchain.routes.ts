@@ -44,7 +44,17 @@ router
   .route('/')
   .get(validateBlockchain, getBlockchain)
   .post(validateBlockchain, validateTransactionsPerBlock, createNextBlock)
-  .put(validateBlockchain, validateNextBlock, validateHeightOfBlock, validateHashOfBlock, validatePreviousHashOfBlock, validateTransactionsOfBlock, validateNonceOfBlock, registerCreatedBlock)
+  .put(
+    validateBlockchain,
+    validateNextBlock,
+    validateHeightOfBlock,
+    validateNonceOfBlock,
+    validateHashOfBlock,
+    validatePreviousHashOfBlock,
+    validateTransactionsOfBlock,
+    validateNonceOfBlock,
+    registerCreatedBlock
+  )
   .patch(validateBlockchain, updateBlockchain); //consenso
 
 router
