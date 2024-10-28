@@ -1,10 +1,10 @@
 import { Blocks } from '../models/Blocks';
 import { Transactions } from '../models/Transactions';
 export interface NewNodeRequest {
-  newNodeUrl: string;
+  node: string;
 }
-export interface UpdateNetworkNodesRequest {
-  networkNodes: string[];
+export interface UpdateConnectedNodesRequest {
+  connectedNodes: string[];
 }
 export interface CreateNextBlockRequest {
   nextBlockTransactions: Transactions[];

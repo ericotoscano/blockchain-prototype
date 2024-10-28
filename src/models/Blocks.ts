@@ -1,10 +1,10 @@
-import { BlocksType, checkReturn } from '../types/blocks.types';
+import { checkReturn } from '../types/return.types';
+
 import { Transactions } from './Transactions';
-import { Blockchain } from './Blockchain';
 
 import { isValidHexString } from '../utils/time.utils';
 
-export class Blocks implements BlocksType {
+export class Blocks {
   height: number;
   nonce: number;
   hash: string;
@@ -44,7 +44,7 @@ export class Blocks implements BlocksType {
       return { result: false, message: 'The height of sent block is not the right next block height in blockchain.' };
     }
 
-    return { result: true, message: 'The height of the sent block is valid.' };
+    return { result: true, message: 'The height format of the sent block is valid.' };
   }
 
   checkNonceFormat(): checkReturn {
@@ -52,7 +52,7 @@ export class Blocks implements BlocksType {
       return { result: false, message: 'The nonce of the sent block is not a positive integer number.' };
     }
 
-    return { result: true, message: 'The nonce of the sent block is valid.' };
+    return { result: true, message: 'The nonce format of the sent block is valid.' };
   }
 
   checkHashFormat(): checkReturn {
@@ -62,7 +62,7 @@ export class Blocks implements BlocksType {
 
     //verificar se o hash bate com o hash esperado
 
-    return { result: true, message: 'The hash of the sent block is valid.' };
+    return { result: true, message: 'The hash format of the sent block is valid.' };
   }
   checkPreviousHashFormat(): checkReturn {
     if (!isValidHexString(this.previousHash)) {
@@ -73,7 +73,7 @@ export class Blocks implements BlocksType {
       return { result: false, message: 'The previous hash of the sent block and the hash of the last valid block in blockchain are not the same.' };
     }
 
-    return { result: true, message: 'The previous hash of the sent block is valid.' };
+    return { result: true, message: 'The previous hash format of the sent block is valid.' };
   }
   checkTransactionsFormat(): checkReturn {
     if (this.transactions.length === 0) {
@@ -82,6 +82,6 @@ export class Blocks implements BlocksType {
 
     //verificar se cada transação esta validada
 
-    return { result: true, message: 'The transactions of the sent block are valid.' };
+    return { result: true, message: 'The transactions format of the sent block are valid.' };
   }
 }

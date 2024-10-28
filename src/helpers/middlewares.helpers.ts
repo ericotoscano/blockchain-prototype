@@ -1,8 +1,8 @@
 import { Blocks } from '../models/Blocks';
-import { checkReturn } from '../types/blocks.types';
+
+import { checkReturn } from '../types/return.types';
 
 export const validateNextBlockFormat = (nextBlock: Blocks): checkReturn => {
-  
   const { height, nonce, hash, previousHash, transactions } = nextBlock;
 
   if (!nextBlock || typeof nextBlock !== 'object' || Array.isArray(nextBlock)) {
@@ -29,5 +29,13 @@ export const validateNextBlockFormat = (nextBlock: Blocks): checkReturn => {
     return { result: false, message: 'The transactions of the sent block is not an array or was not provided.' };
   }
 
-  return { result: true, message: 'The format of the sent block is valid.' };
+  return { result: true, message: 'The sent block format is valid.' };
+};
+
+export const validateNewNodeFormat = (node: string): checkReturn => {
+  if (!node || typeof node !== 'string') {
+    return { result: false, message: 'The node is not a string or was not provided.' };
+  }
+
+  return { result: true, message: 'The sent node format is valid.' };
 };

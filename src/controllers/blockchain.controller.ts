@@ -5,7 +5,7 @@ import '../global';
 
 import {
   NewNodeRequest,
-  UpdateNetworkNodesRequest,
+  UpdateConnectedNodesRequest,
   CreateNextBlockRequest,
   SendTransactionToMempoolRequest,
   RegisterTransactionInMempoolRequest,
@@ -20,7 +20,7 @@ import {
   GetAllPendingTransactionsData,
   ErrorData,
   RegisterNodeData,
-  UpdateNetworkNodesData,
+  UpdateConnectedNodesData,
   ConnectNodesData,
   GetBlockchainData,
   CreateNextBlockData,
@@ -30,28 +30,33 @@ import { Transactions } from '../models/Transactions';
 
 const connectNodes = async (req: Request<{}, {}, NewNodeRequest>, res: Response<CustomResponse<ConnectNodesData | ErrorData>>): Promise<void> => {
   try {
-    const { newNodeUrl } = req.body;
+    const { node } = req.body;
     const { blockchain } = global;
 
-    blockchain.nodes.addNode(newNodeUrl);
+    blockchain.addNode(node);
 
+    let registerNodePromise: Promise<CustomResponse<RegisterNodeData | ErrorData>>;
     const registerNodePromises: Promise<CustomResponse<RegisterNodeData | ErrorData>>[] = [];
 
-    for (const networkNode of blockchain.nodes.networkNodes) {
-      const registerNodePromise = axios.put<CustomResponse<RegisterNodeData | ErrorData>>(`${networkNode}/blockchain/nodes`, { newNodeUrl }).then((response) => response.data);
+    for (const connectedNode of blockchain.connectedNodes) {
+      if (node !== connectedNode) {
+        registerNodePromise = axios.put<CustomResponse<RegisterNodeData | ErrorData>>(`${connectedNode}/blockchain/nodes`, { node }).then((response) => response.data);
+      } else {
+        registerNodePromise = Promise.resolve({ message: 'Matches.', data: { registeredNode: node, registeredIn: blockchain.node } });
+      }
 
       registerNodePromises.push(registerNodePromise);
     }
 
     await Promise.all(registerNodePromises);
 
-    const networkNodes = blockchain.nodes.broadcastNodesTo(newNodeUrl);
+    const connectedNodes = blockchain.broadcastNodesTo(node);
 
-    axios.patch<CustomResponse<UpdateNetworkNodesData | ErrorData>>(`${newNodeUrl}/blockchain/nodes`, { networkNodes });
+    axios.patch<CustomResponse<UpdateConnectedNodesData | ErrorData>>(`${node}/blockchain/nodes`, { connectedNodes });
 
     res.status(201).send({
       message: 'A new node has been connected.',
-      data: { connectedTo: networkNodes.sort() },
+      data: { connectedTo: connectedNodes.sort() },
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
@@ -68,14 +73,14 @@ const connectNodes = async (req: Request<{}, {}, NewNodeRequest>, res: Response<
 
 const registerNode = async (req: Request<{}, {}, NewNodeRequest>, res: Response<CustomResponse<RegisterNodeData | ErrorData>>): Promise<void> => {
   try {
-    const { newNodeUrl } = req.body;
+    const { node } = req.body;
     const { blockchain } = global;
 
-    blockchain.nodes.addNode(newNodeUrl);
+    blockchain.addNode(node);
 
     res.status(200).send({
       message: 'Registered.',
-      data: { registeredNode: newNodeUrl, registeredIn: blockchain.nodes.currentNodeUrl },
+      data: { registeredNode: node, registeredIn: blockchain.node },
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
@@ -90,16 +95,16 @@ const registerNode = async (req: Request<{}, {}, NewNodeRequest>, res: Response<
   }
 };
 
-const updateNetworkNodes = async (req: Request<{}, {}, UpdateNetworkNodesRequest>, res: Response<CustomResponse<UpdateNetworkNodesData | ErrorData>>): Promise<void> => {
+const updateConnectedNodes = async (req: Request<{}, {}, UpdateConnectedNodesRequest>, res: Response<CustomResponse<UpdateConnectedNodesData | ErrorData>>): Promise<void> => {
   try {
-    const { networkNodes } = req.body;
+    const { connectedNodes } = req.body;
     const { blockchain } = global;
 
-    blockchain.setNetworkNodes(networkNodes);
+    blockchain.setConnectedNodes(connectedNodes);
 
     res.status(200).send({
       message: 'Updated.',
-      data: { currentNodeUrl: blockchain.nodes.currentNodeUrl, networkNodes: blockchain.nodes.networkNodes.sort() },
+      data: { node: blockchain.node, connectedNodes: blockchain.connectedNodes.sort() },
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
@@ -148,7 +153,7 @@ const sendTransactionToMempool = async (req: Request<{}, {}, SendTransactionToMe
 
     const registerTransactionPromises: Promise<CustomResponse<RegisterTransactionInMempoolData | ErrorData>>[] = [];
 
-    for (const networkNode of blockchain.nodes.networkNodes) {
+    for (const networkNode of blockchain.connectedNodes) {
       const registerTransactionPromise = axios
         .put<CustomResponse<RegisterTransactionInMempoolData | ErrorData>>(`${networkNode}/blockchain/transactions`, { transaction })
         .then((response: AxiosResponse<CustomResponse<RegisterTransactionInMempoolData | ErrorData>>) => response.data);
@@ -215,7 +220,7 @@ const getBlockchain = async (req: Request, res: Response<CustomResponse<GetBlock
   try {
     const { blockchain } = global;
 
-    blockchain.nodes.networkNodes.sort();
+    blockchain.connectedNodes.sort();
 
     res.status(200).send({
       message: 'Blockchain found.',
@@ -247,7 +252,7 @@ const createNextBlock = async (req: Request<{}, {}, CreateNextBlockRequest>, res
 
     const registerCreatedBlockPromises: Promise<CustomResponse<RegisterCreatedBlockData | ErrorData>>[] = [];
 
-    for (const networkNode of blockchain.nodes.networkNodes) {
+    for (const networkNode of blockchain.connectedNodes) {
       const registerCreatedBlockPromise = axios
         .put<CustomResponse<RegisterCreatedBlockData | ErrorData>>(`${networkNode}/blockchain`, { nextBlock })
         .then((response: AxiosResponse<CustomResponse<RegisterCreatedBlockData | ErrorData>>) => response.data);
@@ -339,7 +344,7 @@ const updateBlockchain = async (req: Request<{}, {}, CreateNextBlockRequest>, re
 export default {
   connectNodes,
   registerNode,
-  updateNetworkNodes,
+  updateConnectedNodes,
   getAllPendingTransactions,
   sendTransactionToMempool,
   registerTransactionInMempool,

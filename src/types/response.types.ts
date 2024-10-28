@@ -16,9 +16,9 @@ export interface RegisterNodeData {
   registeredIn: string;
 }
 
-export interface UpdateNetworkNodesData {
-  currentNodeUrl: string;
-  networkNodes: string[];
+export interface UpdateConnectedNodesData {
+  node: string;
+  connectedNodes: string[];
 }
 
 export interface GetAllPendingTransactionsData {

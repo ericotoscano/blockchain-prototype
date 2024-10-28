@@ -3,13 +3,12 @@ import { Router } from 'express';
 import blockchainController from '../controllers/blockchain.controller';
 
 import blockchainMiddlewares from '../middlewares/blockchain.middlewares';
-import nodesMiddlewares from '../middlewares/nodes.middlewares';
 import transactionsMiddlewares from '../middlewares/transactions.middlewares';
 
 const {
   connectNodes,
   registerNode,
-  updateNetworkNodes,
+  updateConnectedNodes,
   getAllPendingTransactions,
   sendTransactionToMempool,
   registerTransactionInMempool,
@@ -19,9 +18,20 @@ const {
   updateBlockchain,
 } = blockchainController;
 
-const { validateBlockchain, validateNextBlock, validateHeightOfBlock, validateHashOfBlock, validatePreviousHashOfBlock, validateTransactionsOfBlock, validateNonceOfBlock } = blockchainMiddlewares;
-
-const { validateNewNodeUrl, validateNewNodeConnection, validateNewNodeRegistration, validateNetworkNodesUpdate } = nodesMiddlewares;
+const {
+  validateBlockchain,
+  validateNextBlock,
+  validateHeightOfBlock,
+  validateHashOfBlock,
+  validatePreviousHashOfBlock,
+  validateTransactionsOfBlock,
+  validateNonceOfBlock,
+  validateNewNode,
+  validateNodeUrlOption,
+  validateNodeConnection,
+  validateNodeRegistration,
+  validateConnectedNodes,
+} = blockchainMiddlewares;
 
 const {
   validatePendingTransactions,
@@ -75,8 +85,8 @@ router
 
 router
   .route('/nodes')
-  .post(validateBlockchain, validateNewNodeUrl, validateNewNodeConnection, connectNodes)
-  .put(validateBlockchain, validateNewNodeUrl, validateNewNodeRegistration, registerNode)
-  .patch(validateBlockchain, validateNetworkNodesUpdate, updateNetworkNodes);
+  .post(validateBlockchain, validateNewNode, validateNodeUrlOption, validateNodeConnection, connectNodes)
+  .put(validateBlockchain, validateNewNode, validateNodeUrlOption, validateNodeRegistration, registerNode)
+  .patch(validateBlockchain, validateConnectedNodes, updateConnectedNodes);
 
 export default router;

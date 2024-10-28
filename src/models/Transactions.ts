@@ -1,7 +1,6 @@
 import { sha256 } from 'js-sha256';
 
-import { TransactionsType } from '../types/transactions.types';
-export class Transactions implements TransactionsType {
+export class Transactions {
   txId: string;
   status: string;
   timestamp: Date;
