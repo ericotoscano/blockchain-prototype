@@ -108,34 +108,43 @@ const updateConnectedNodes = async (req: Request<{}, {}, UpdateConnectedNodesReq
   }
 };
 
-const broadcastNewTransaction = async (req: Request<{}, {}, NewTransactionRequest>, res: Response<CustomResponse<NewTransactionData | ErrorData>>): Promise<void> => {
+const handleNewTransaction = async (req: Request<{}, {}, NewTransactionRequest>, res: Response<CustomResponse<NewTransactionData | ErrorData>>, isBroadcast: boolean = false): Promise<void> => {
   try {
     const { newTransaction } = req.body;
     const { blockchain } = global;
 
     blockchain.addTransactionToMempool(newTransaction);
 
-    const registerTransactionPromises: Promise<CustomResponse<NewTransactionData | ErrorData>>[] = [];
+    if (isBroadcast) {
+      const registerTransactionPromises: Promise<CustomResponse<NewTransactionData | ErrorData>>[] = [];
 
-    for (const connectedNode of blockchain.connectedNodes) {
-      const registerTransactionPromise = axios.put<CustomResponse<NewTransactionData | ErrorData>>(`${connectedNode}/blockchain/transactions`, { newTransaction }).then((response) => response.data);
+      for (const connectedNode of blockchain.connectedNodes) {
+        const registerTransactionPromise = axios.put<CustomResponse<NewTransactionData | ErrorData>>(`${connectedNode}/blockchain/transactions`, { newTransaction }).then((response) => response.data);
 
-      registerTransactionPromises.push(registerTransactionPromise);
+        registerTransactionPromises.push(registerTransactionPromise);
+      }
+
+      await Promise.all(registerTransactionPromises);
+
+      res.status(201).send({
+        message: 'A new transaction was sent to mempool.',
+        data: {
+          newTransaction,
+        },
+      });
+    } else {
+      res.status(200).send({
+        message: 'Registered.',
+        data: {
+          newTransaction,
+        },
+      });
     }
-    //futuramente, pensar em alguma checagem dessas promises(erro na requisicao de cima)
-    await Promise.all(registerTransactionPromises);
-
-    res.status(201).send({
-      message: 'A new transaction was sent to mempool.',
-      data: {
-        newTransaction,
-      },
-    });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
 
     res.status(500).send({
-      message: 'An error ocurred.',
+      message: 'An error occurred.',
       data: {
         code: 500,
         message: errorMessage,
@@ -144,30 +153,12 @@ const broadcastNewTransaction = async (req: Request<{}, {}, NewTransactionReques
   }
 };
 
-const registerNewTransaction = async (req: Request<{}, {}, NewTransactionRequest>, res: Response<CustomResponse<NewTransactionData | ErrorData>>): Promise<void> => {
-  try {
-    const { newTransaction } = req.body;
-    const { blockchain } = global;
+const broadcastNewTransaction = (req: Request<{}, {}, NewTransactionRequest>, res: Response<CustomResponse<NewTransactionData | ErrorData>>): Promise<void> => {
+  return handleNewTransaction(req, res, true);
+};
 
-    blockchain.addTransactionToMempool(newTransaction);
-
-    res.status(200).send({
-      message: 'Registered.',
-      data: {
-        newTransaction,
-      },
-    });
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
-
-    res.status(500).send({
-      message: 'An error ocurred.',
-      data: {
-        code: 500,
-        message: errorMessage,
-      },
-    });
-  }
+const registerNewTransaction = (req: Request<{}, {}, NewTransactionRequest>, res: Response<CustomResponse<NewTransactionData | ErrorData>>): Promise<void> => {
+  return handleNewTransaction(req, res, false);
 };
 
 const getAllPendingTransactions = async (req: Request, res: Response<CustomResponse<GetAllPendingTransactionsData | ErrorData>>): Promise<void> => {

@@ -19,17 +19,17 @@ const {
   updateBlockchain,
 } = blockchainController;
 
-const { validateBlockchain, validateNewNode, validateNewNodeUrlOption, validateNewNodeConnection, validateNewConnectedNodes, validatePendingTransactions } = blockchainMiddlewares;
+const { validateBlockchain, validateNewNodeData, validateNewNodeUrlOption, validateNewNodeConnection, validateNewConnectedNodes, validatePendingTransactions } = blockchainMiddlewares;
 
 const { validateNewBlock, validateNewBlockHeight, validateNewBlockNonce, validateNewBlockHash, validateNewBlockPreviousHash, validateNewBlockTransactions, validateTransactionsPerBlock } =
   blocksMiddlewares;
 
-const { validateNewTransaction, validateNewTransactionAddresses, validateNewTransactionValues, validateNewTransactionStatus, validateNewTransactionTimestamp, validateNewTransactionTxId } =
+const { validateNewTransactionData, validateNewTransactionAddresses, validateNewTransactionValues, validateNewTransactionStatus, validateNewTransactionTimestamp, validateNewTransactionTxId } =
   transactionsMiddlewares;
 
 const router: Router = Router();
 
-//organizar a rota '/' de acordo com o padrão das outras
+//organizar a rota '/' de acordo com o padrão das outras (tirar metodos check e colocar de volta nos middlewares)
 
 router
   .route('/')
@@ -43,7 +43,7 @@ router
   .get(validateBlockchain, validatePendingTransactions, getAllPendingTransactions)
   .post(
     validateBlockchain,
-    validateNewTransaction,
+    validateNewTransactionData,
     validateNewTransactionAddresses,
     validateNewTransactionValues,
     validateNewTransactionStatus,
@@ -51,13 +51,21 @@ router
     validateNewTransactionTxId,
     broadcastNewTransaction
   )
-  .put(registerNewTransaction); //criar novos middlewares para receber a transacao ja pronta e verificar
+  .put(
+    validateNewTransactionData,
+    validateNewTransactionAddresses,
+    validateNewTransactionValues,
+    validateNewTransactionStatus,
+    validateNewTransactionTimestamp,
+    validateNewTransactionTxId,
+    registerNewTransaction
+  );
 //.delete transações que forem incluidas no bloco
 
 router
   .route('/nodes')
-  .post(validateBlockchain, validateNewNode, validateNewNodeUrlOption, validateNewNodeConnection, connectNodes)
-  .put(validateBlockchain, validateNewNode, validateNewNodeUrlOption, validateNewNodeConnection, registerNewNode)
+  .post(validateBlockchain, validateNewNodeData, validateNewNodeUrlOption, validateNewNodeConnection, connectNodes)
+  .put(validateBlockchain, validateNewNodeData, validateNewNodeUrlOption, validateNewNodeConnection, registerNewNode)
   .patch(validateBlockchain, validateNewConnectedNodes, updateConnectedNodes);
 
 export default router;

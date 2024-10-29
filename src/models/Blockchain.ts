@@ -79,44 +79,6 @@ export class Blockchain {
     return nodesToBroadcast;
   }
 
-  checkNodeUrlOptionFormat(nodeUrl: string): checkReturn {
-    const nodeUrlOptions = getNodesUrlOptions();
-
-    if (!nodeUrlOptions.includes(nodeUrl)) {
-      return { result: false, message: 'The node url does not include one of the available port numbers in the .env file.' };
-    }
-
-    return { result: true, message: 'The node url format is valid.' };
-  }
-
-  checkNodeConnection(nodeUrl: string): checkReturn {
-    if (global.blockchain.connectedNodes.includes(nodeUrl)) {
-      return { result: false, message: 'The node is already connected to the target node.' };
-    }
-
-    if (global.blockchain.nodeUrl === nodeUrl) {
-      return { result: false, message: 'The node is the target node.' };
-    }
-
-    return { result: true, message: 'The node connection is valid.' };
-  }
-
-  checkConnectedNodes(connectedNodes: string[]): checkReturn {
-    const nodeUrlOptions = getNodesUrlOptions();
-
-    const invalidNodeUrl = connectedNodes.filter((connectedNodeUrl) => !nodeUrlOptions.includes(connectedNodeUrl));
-
-    if (invalidNodeUrl.length !== 0) {
-      return { result: false, message: 'The connected nodes include one or more invalid nodes.' };
-    }
-
-    if (connectedNodes.includes(global.blockchain.nodeUrl)) {
-      return { result: false, message: 'The connected nodes include the target node.' };
-    }
-
-    return { result: true, message: 'The connected nodes format are valid.' };
-  }
-
   setConnectedNodes(connectedNodes: string[]) {
     this.connectedNodes = structuredClone(connectedNodes);
   }
@@ -164,22 +126,6 @@ export class Blockchain {
 
   setTransactionsInMempool(): void {
     this.transactionsInMempool = this.mempool.length;
-  }
-
-  checkTransactionsPerBlock(nextBlockTransactions: Transactions[]): checkReturn {
-    if (nextBlockTransactions.length !== this.maxTransactionsPerBlock - 1) {
-      return { result: false, message: "Considering the miner's reward transaction, the number of next block transactions must be equal to the maximum number of transactions per block, minus one." };
-    }
-
-    return { result: true, message: 'The number of next block transactions is valid.' };
-  }
-
-  checkPendingTransactions(): checkReturn {
-    if (!this.mempool.some((transaction) => transaction.status === 'Pending')) {
-      return { result: false, message: 'There are no pending transactions on mempool.' };
-    }
-
-    return { result: true, message: 'There are pending transactions on mempool.' };
   }
 
   setReward(blockReward: number): void {

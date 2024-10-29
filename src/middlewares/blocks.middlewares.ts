@@ -154,12 +154,11 @@ const validateNewBlockTransactions = async (req: Request<{}, {}, RegisterNextBlo
 const validateTransactionsPerBlock = async (req: Request<{}, {}, BroadcastNextBlockRequest>, res: Response<MiddlewareResponse | CustomResponse<ErrorData>>, next: NextFunction): Promise<void> => {
   try {
     const { nextBlockTransactions } = req.body;
-    const { blockchain } = global;
 
-    const { result, message } = blockchain.checkTransactionsPerBlock(nextBlockTransactions);
-
-    if (!result) {
-      res.status(400).send({ message });
+    if (nextBlockTransactions.length !== global.blockchain.maxTransactionsPerBlock - 1) {
+      res.status(400).send({
+        message: "Considering the miner's reward transaction, the number of next block transactions must be equal to the maximum number of transactions per block, minus one.",
+      });
       return;
     }
 

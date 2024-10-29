@@ -1,5 +1,6 @@
 import { Blocks } from '../models/Blocks';
 import { Transactions } from '../models/Transactions';
+import { NewTransactionRequest } from '../types/request.types';
 
 import { checkReturn } from '../types/return.types';
 
@@ -41,22 +42,38 @@ export const validateNewNodeFormat = (nodeUrl: string): checkReturn => {
   return { result: true, message: 'The node url format is valid.' };
 };
 
-export const validateNewTransactionFormat = (sender: string, recipient: string, amount: number, fee: number): checkReturn => {
+export const checkNewTransactionDataFormat = (sender: string, recipient: string, amount: number, fee: number): checkReturn => {
   if (!sender || typeof sender !== 'string') {
-    return { result: false, message: 'The sender of the new transaction data is not a string or was not provided.' };
+    return { result: false, message: 'The sender is not a string or was not provided.' };
   }
 
   if (!recipient || typeof recipient !== 'string') {
-    return { result: false, message: 'The recipient of the new transaction data is not a string or was not provided.' };
+    return { result: false, message: 'The recipient is not a string or was not provided.' };
   }
 
   if (!amount || typeof amount !== 'number') {
-    return { result: false, message: 'The amount of the new transaction data is not a positive number or was not provided.' };
+    return { result: false, message: 'The amount is not a positive number or was not provided.' };
   }
 
   if (!fee || typeof fee !== 'number') {
-    return { result: false, message: 'The fee of the new transaction data is not a positive number or was not provided.' };
+    return { result: false, message: 'The fee is not a positive number or was not provided.' };
   }
 
-  return { result: true, message: 'The new transaction data format is valid.' };
+  return { result: true, message: 'The data format is valid.' };
+};
+
+export const validateNewTransactionRegisteringFormat = (newTransaction: Transactions): checkReturn => {
+  if (!newTransaction || typeof newTransaction !== 'object' || Array.isArray(newTransaction)) {
+    return { result: false, message: 'The new transaction is not valid or was not provided.' };
+  }
+
+  return { result: true, message: 'The new transaction format is valid.' };
+};
+
+export const formatNewTransactionRequest = (request: NewTransactionRequest): void => {
+  for (const key in request) {
+    if (key !== 'newTransaction') {
+      delete request[key as keyof NewTransactionRequest];
+    }
+  }
 };

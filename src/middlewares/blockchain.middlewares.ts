@@ -4,6 +4,7 @@ import { NewNodeRequest, UpdateConnectedNodesRequest } from '../types/request.ty
 import { CustomResponse, ErrorData, MiddlewareResponse } from '../types/response.types';
 
 import { validateNewNodeFormat } from '../helpers/middlewares.helpers';
+import { getNodesUrlOptions } from '../helpers/ports.helpers';
 
 const validateBlockchain = async (req: Request, res: Response<MiddlewareResponse | CustomResponse<ErrorData>>, next: NextFunction): Promise<void> => {
   try {
@@ -26,7 +27,7 @@ const validateBlockchain = async (req: Request, res: Response<MiddlewareResponse
   }
 };
 
-const validateNewNode = async (req: Request<{}, {}, NewNodeRequest>, res: Response<MiddlewareResponse | CustomResponse<ErrorData>>, next: NextFunction): Promise<void> => {
+const validateNewNodeData = async (req: Request<{}, {}, NewNodeRequest>, res: Response<MiddlewareResponse | CustomResponse<ErrorData>>, next: NextFunction): Promise<void> => {
   try {
     const { nodeUrl } = req.body;
 
@@ -57,14 +58,11 @@ const validateNewNode = async (req: Request<{}, {}, NewNodeRequest>, res: Respon
 const validateNewNodeUrlOption = async (req: Request<{}, {}, NewNodeRequest>, res: Response<MiddlewareResponse | CustomResponse<ErrorData>>, next: NextFunction): Promise<void> => {
   try {
     const { nodeUrl } = req.body;
-    const { blockchain } = global;
 
-    const { result, message } = blockchain.checkNodeUrlOptionFormat(nodeUrl);
+    const nodeUrlOptions = getNodesUrlOptions();
 
-    if (!result) {
-      res.status(400).send({
-        message,
-      });
+    if (!nodeUrlOptions.includes(nodeUrl)) {
+      res.status(400).send({ message: 'The node url does not include one of the available port numbers in the .env file.' });
       return;
     }
 
@@ -86,14 +84,14 @@ const validateNewNodeUrlOption = async (req: Request<{}, {}, NewNodeRequest>, re
 const validateNewNodeConnection = async (req: Request<{}, {}, NewNodeRequest>, res: Response<MiddlewareResponse | CustomResponse<ErrorData>>, next: NextFunction): Promise<void> => {
   try {
     const { nodeUrl } = req.body;
-    const { blockchain } = global;
 
-    const { result, message } = blockchain.checkNodeConnection(nodeUrl);
+    if (global.blockchain.connectedNodes.includes(nodeUrl)) {
+      res.status(400).send({ message: 'The node is already connected to the target node.' });
+      return;
+    }
 
-    if (!result) {
-      res.status(400).send({
-        message,
-      });
+    if (global.blockchain.nodeUrl === nodeUrl) {
+      res.status(400).send({ message: 'The node is the target node.' });
       return;
     }
 
@@ -115,14 +113,18 @@ const validateNewNodeConnection = async (req: Request<{}, {}, NewNodeRequest>, r
 const validateNewConnectedNodes = async (req: Request<{}, {}, UpdateConnectedNodesRequest>, res: Response<MiddlewareResponse | CustomResponse<ErrorData>>, next: NextFunction): Promise<void> => {
   try {
     const { connectedNodes } = req.body;
-    const { blockchain } = global;
 
-    const { result, message } = blockchain.checkConnectedNodes(connectedNodes);
+    const nodeUrlOptions = getNodesUrlOptions();
 
-    if (!result) {
-      res.status(400).send({
-        message,
-      });
+    const invalidNodeUrl = connectedNodes.filter((connectedNodeUrl) => !nodeUrlOptions.includes(connectedNodeUrl));
+
+    if (invalidNodeUrl.length !== 0) {
+      res.status(400).send({ message: 'The connected nodes include one or more invalid nodes.' });
+      return;
+    }
+
+    if (connectedNodes.includes(global.blockchain.nodeUrl)) {
+      res.status(400).send({ message: 'The connected nodes include the target node.' });
       return;
     }
 
@@ -143,12 +145,8 @@ const validateNewConnectedNodes = async (req: Request<{}, {}, UpdateConnectedNod
 
 const validatePendingTransactions = async (req: Request, res: Response<MiddlewareResponse | CustomResponse<ErrorData>>, next: NextFunction): Promise<void> => {
   try {
-    const { blockchain } = global;
-
-    const { result, message } = blockchain.checkPendingTransactions();
-
-    if (!result) {
-      res.status(400).send({ message });
+    if (!global.blockchain.mempool.some((transaction) => transaction.status === 'Pending')) {
+      res.status(400).send({ message: 'There are no pending transactions on mempool.' });
       return;
     }
 
@@ -168,7 +166,7 @@ const validatePendingTransactions = async (req: Request, res: Response<Middlewar
 
 export default {
   validateBlockchain,
-  validateNewNode,
+  validateNewNodeData,
   validateNewNodeUrlOption,
   validateNewNodeConnection,
   validateNewConnectedNodes,

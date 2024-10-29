@@ -5,22 +5,25 @@ import { Transactions } from '../models/Transactions';
 import { NewTransactionRequest } from '../types/request.types';
 import { CustomResponse, ErrorData, MiddlewareResponse } from '../types/response.types';
 
-import { validateNewTransactionFormat } from '../helpers/middlewares.helpers';
+import { formatNewTransactionRequest, checkNewTransactionDataFormat } from '../helpers/middlewares.helpers';
+import { isValidHexString, isValidTimestamp } from '../utils/validation.utils';
 
-const validateNewTransaction = async (req: Request<{}, {}, NewTransactionRequest>, res: Response<MiddlewareResponse | CustomResponse<ErrorData>>, next: NextFunction): Promise<void> => {
+const validateNewTransactionData = async (req: Request<{}, {}, NewTransactionRequest>, res: Response<MiddlewareResponse | CustomResponse<ErrorData>>, next: NextFunction): Promise<void> => {
   try {
-    const { sender, recipient, amount, fee } = req.body;
+    const { sender, recipient, amount, fee, newTransaction } = req.body;
 
-    const { result, message } = validateNewTransactionFormat(sender, recipient, amount, fee);
+    if (!newTransaction) {
+      const { result, message } = checkNewTransactionDataFormat(sender, recipient, amount, fee);
 
-    if (!result) {
-      res.status(400).send({ message });
-      return;
+      if (!result) {
+        res.status(400).send({ message });
+        return;
+      }
+
+      req.body.newTransaction = new Transactions(sender, recipient, amount, fee);
     }
 
-    const validTransaction = new Transactions(sender, recipient, amount, fee);
-
-    req.body.newTransaction = validTransaction;
+    formatNewTransactionRequest(req.body);
 
     next();
   } catch (error) {
@@ -40,10 +43,15 @@ const validateNewTransactionAddresses = async (req: Request<{}, {}, NewTransacti
   try {
     const { newTransaction } = req.body;
 
-    const { result, message } = newTransaction.checkAddressesFormat();
+    const { sender, recipient } = newTransaction;
 
-    if (!result) {
-      res.status(400).send({ message });
+    if (!isValidHexString(sender) || !isValidHexString(recipient)) {
+      res.status(400).send({ message: 'The transaction sender address or the transaction recipient address is not a valid hex string.' });
+      return;
+    }
+
+    if (sender === recipient) {
+      res.status(400).send({ message: 'The transaction sender address and the transaction recipient address are the same.' });
       return;
     }
 
@@ -65,12 +73,14 @@ const validateNewTransactionValues = async (req: Request<{}, {}, NewTransactionR
   try {
     const { newTransaction } = req.body;
 
-    const { result, message } = newTransaction.checkValuesFormat();
+    const { amount, fee } = newTransaction;
 
-    if (!result) {
-      res.status(400).send({ message });
+    if (amount < 0 || fee < 0) {
+      res.status(400).send({ message: 'The transaction amount or the transaction fee is a negative number.' });
       return;
     }
+
+    //amount e fee são valores que batem com o saldo do endereço do sender
 
     next();
   } catch (error) {
@@ -90,10 +100,15 @@ const validateNewTransactionStatus = async (req: Request<{}, {}, NewTransactionR
   try {
     const { newTransaction } = req.body;
 
-    const { result, message } = newTransaction.checkStatusFormat();
+    const { status } = newTransaction;
 
-    if (!result) {
-      res.status(400).send({ message });
+    if (!status) {
+      res.status(400).send({ message: 'The transaction status was not provided.' });
+      return;
+    }
+
+    if (status !== 'Pending') {
+      res.status(400).send({ message: "The transaction status is not valid (must be 'Pending')." });
       return;
     }
 
@@ -116,10 +131,10 @@ const validateNewTransactionTimestamp = async (req: Request<{}, {}, NewTransacti
   try {
     const { newTransaction } = req.body;
 
-    const { result, message } = newTransaction.checkTimestampFormat();
+    const { timestamp } = newTransaction;
 
-    if (!result) {
-      res.status(400).send({ message });
+    if (!timestamp || !isValidTimestamp(timestamp)) {
+      res.status(400).send({ message: 'The transaction timestamp was not provided or is not valid.' });
       return;
     }
 
@@ -142,10 +157,15 @@ const validateNewTransactionTxId = async (req: Request<{}, {}, NewTransactionReq
   try {
     const { newTransaction } = req.body;
 
-    const { result, message } = newTransaction.checkTxIdFormat();
+    const { txId } = newTransaction;
 
-    if (!result) {
-      res.status(400).send({ message });
+    if (!txId || !isValidHexString(txId)) {
+      res.status(400).send({ message: 'The transaction txId was not provided or is not valid.' });
+      return;
+    }
+
+    if (!global.blockchain.mempool.every((mempoolTransaction) => mempoolTransaction.txId !== txId)) {
+      res.status(400).send({ message: 'The transaction is already on the blockchain mempool.' });
       return;
     }
 
@@ -165,7 +185,7 @@ const validateNewTransactionTxId = async (req: Request<{}, {}, NewTransactionReq
 };
 
 export default {
-  validateNewTransaction,
+  validateNewTransactionData,
   validateNewTransactionAddresses,
   validateNewTransactionValues,
   validateNewTransactionStatus,
