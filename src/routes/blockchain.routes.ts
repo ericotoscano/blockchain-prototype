@@ -4,47 +4,28 @@ import blockchainController from '../controllers/blockchain.controller';
 
 import blockchainMiddlewares from '../middlewares/blockchain.middlewares';
 import transactionsMiddlewares from '../middlewares/transactions.middlewares';
+import blocksMiddlewares from '../middlewares/blocks.middlewares';
 
 const {
   connectNodes,
-  registerNode,
+  registerNewNode,
   updateConnectedNodes,
   getAllPendingTransactions,
-  sendTransactionToMempool,
-  registerTransactionInMempool,
+  broadcastNewTransaction,
+  registerNewTransaction,
   getBlockchain,
-  registerCreatedBlock,
-  createNextBlock,
+  registerNewBlock,
+  broadcastNextBlock,
   updateBlockchain,
 } = blockchainController;
 
-const {
-  validateBlockchain,
-  validateNextBlock,
-  validateHeightOfBlock,
-  validateHashOfBlock,
-  validatePreviousHashOfBlock,
-  validateTransactionsOfBlock,
-  validateNonceOfBlock,
-  validateNewNode,
-  validateNodeUrlOption,
-  validateNodeConnection,
-  validateNodeRegistration,
-  validateConnectedNodes,
-} = blockchainMiddlewares;
+const { validateBlockchain, validateNewNode, validateNewNodeUrlOption, validateNewNodeConnection, validateNewConnectedNodes, validatePendingTransactions } = blockchainMiddlewares;
 
-const {
-  validatePendingTransactions,
-  validateAddressesForANewTransaction,
-  validateValuesForANewTransaction,
-  validateTransaction,
-  validateAddressesOfTransaction,
-  validateValuesOfTransaction,
-  validateStatusOfTransaction,
-  validateTimestampOfTransaction,
-  validateTxIdOfTransaction,
-  validateTransactionsPerBlock,
-} = transactionsMiddlewares;
+const { validateNewBlock, validateNewBlockHeight, validateNewBlockNonce, validateNewBlockHash, validateNewBlockPreviousHash, validateNewBlockTransactions, validateTransactionsPerBlock } =
+  blocksMiddlewares;
+
+const { validateNewTransaction, validateNewTransactionAddresses, validateNewTransactionValues, validateNewTransactionStatus, validateNewTransactionTimestamp, validateNewTransactionTxId } =
+  transactionsMiddlewares;
 
 const router: Router = Router();
 
@@ -53,40 +34,30 @@ const router: Router = Router();
 router
   .route('/')
   .get(validateBlockchain, getBlockchain)
-  .post(validateBlockchain, validateTransactionsPerBlock, createNextBlock)
-  .put(
-    validateBlockchain,
-    validateNextBlock,
-    validateHeightOfBlock,
-    validateNonceOfBlock,
-    validateHashOfBlock,
-    validatePreviousHashOfBlock,
-    validateTransactionsOfBlock,
-    validateNonceOfBlock,
-    registerCreatedBlock
-  )
+  .post(validateBlockchain, validateTransactionsPerBlock, broadcastNextBlock)
+  .put(validateBlockchain, validateNewBlock, validateNewBlockHeight, validateNewBlockNonce, validateNewBlockHash, validateNewBlockPreviousHash, validateNewBlockTransactions, registerNewBlock)
   .patch(validateBlockchain, updateBlockchain); //consenso
 
 router
   .route('/transactions')
   .get(validateBlockchain, validatePendingTransactions, getAllPendingTransactions)
-  .post(validateBlockchain, validateAddressesForANewTransaction, validateValuesForANewTransaction, sendTransactionToMempool)
-  .put(
+  .post(
     validateBlockchain,
-    validateTransaction,
-    validateAddressesOfTransaction,
-    validateValuesOfTransaction,
-    validateStatusOfTransaction,
-    validateTimestampOfTransaction,
-    validateTxIdOfTransaction,
-    registerTransactionInMempool
-  );
+    validateNewTransaction,
+    validateNewTransactionAddresses,
+    validateNewTransactionValues,
+    validateNewTransactionStatus,
+    validateNewTransactionTimestamp,
+    validateNewTransactionTxId,
+    broadcastNewTransaction
+  )
+  .put(registerNewTransaction); //criar novos middlewares para receber a transacao ja pronta e verificar
 //.delete transações que forem incluidas no bloco
 
 router
   .route('/nodes')
-  .post(validateBlockchain, validateNewNode, validateNodeUrlOption, validateNodeConnection, connectNodes)
-  .put(validateBlockchain, validateNewNode, validateNodeUrlOption, validateNodeRegistration, registerNode)
-  .patch(validateBlockchain, validateConnectedNodes, updateConnectedNodes);
+  .post(validateBlockchain, validateNewNode, validateNewNodeUrlOption, validateNewNodeConnection, connectNodes)
+  .put(validateBlockchain, validateNewNode, validateNewNodeUrlOption, validateNewNodeConnection, registerNewNode)
+  .patch(validateBlockchain, validateNewConnectedNodes, updateConnectedNodes);
 
 export default router;

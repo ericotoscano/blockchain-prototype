@@ -1,23 +1,22 @@
 import { Blocks } from '../models/Blocks';
 import { Transactions } from '../models/Transactions';
 export interface NewNodeRequest {
-  node: string;
+  nodeUrl: string;
 }
 export interface UpdateConnectedNodesRequest {
   connectedNodes: string[];
 }
-export interface CreateNextBlockRequest {
+export interface RegisterNextBlockRequest {
+  nextBlock: Blocks;
+}
+export interface BroadcastNextBlockRequest {
   nextBlockTransactions: Transactions[];
 }
-export interface SendTransactionToMempoolRequest {
+
+export interface NewTransactionRequest {
   sender: string;
   recipient: string;
   amount: number;
   fee: number;
-}
-export interface RegisterTransactionInMempoolRequest {
-  transaction: Transactions;
-}
-export interface RegisterCreatedBlockRequest {
-  nextBlock: Blocks;
+  newTransaction: Transactions;
 }

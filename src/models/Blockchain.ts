@@ -8,21 +8,23 @@ import { Transactions } from './Transactions';
 import { getNodesUrlOptions } from '../helpers/ports.helpers';
 
 export class Blockchain {
-  node: string;
+  nodeUrl: string;
   connectedNodes: string[];
-  maxTransactionsPerBlock: number;
   targetDifficulty: string;
   reward: number;
+  transactionsInMempool: number;
+  maxTransactionsPerBlock: number;
   mempool: Transactions[];
   blocks: Blocks[];
 
   constructor() {
-    this.node = (process.env.BASE_URL || 'http://localhost:') + process.argv[2];
+    this.nodeUrl = (process.env.BASE_URL || 'http://localhost:') + process.argv[2];
     this.connectedNodes = [];
-    this.maxTransactionsPerBlock = 0;
     this.targetDifficulty = '';
     this.reward = 0;
     this.mempool = [];
+    this.transactionsInMempool = this.mempool.length;
+    this.maxTransactionsPerBlock = 0;
     this.blocks = [];
 
     this.setMaxTransactionsPerBlock(10);
@@ -70,69 +72,58 @@ export class Blockchain {
     this.connectedNodes.push(nodeUrl);
   }
 
-  broadcastNodesTo(node: string): string[] {
-    const otherNodes = this.connectedNodes.filter((nodeUrl) => nodeUrl !== node);
-    const nodesToBroadcast = [...otherNodes, this.node];
+  broadcastNodesTo(nodeUrl: string): string[] {
+    const otherNodes = this.connectedNodes.filter((connectedNodeUrl) => connectedNodeUrl !== nodeUrl);
+    const nodesToBroadcast = [...otherNodes, this.nodeUrl];
 
     return nodesToBroadcast;
   }
 
-  checkNodeUrlOptionFormat(node: string): checkReturn {
+  checkNodeUrlOptionFormat(nodeUrl: string): checkReturn {
     const nodeUrlOptions = getNodesUrlOptions();
 
-    if (!nodeUrlOptions.includes(node)) {
-      return { result: false, message: 'The sent node does not contain one of the available port numbers in the .env file.' };
+    if (!nodeUrlOptions.includes(nodeUrl)) {
+      return { result: false, message: 'The node url does not include one of the available port numbers in the .env file.' };
     }
 
-    return { result: true, message: 'The sent node is valid.' };
+    return { result: true, message: 'The node url format is valid.' };
   }
 
-  checkNodeConnection(node: string): checkReturn {
-    if (global.blockchain.connectedNodes.includes(node)) {
-      return { result: false, message: 'The sent node is already connected to the target node.' };
+  checkNodeConnection(nodeUrl: string): checkReturn {
+    if (global.blockchain.connectedNodes.includes(nodeUrl)) {
+      return { result: false, message: 'The node is already connected to the target node.' };
     }
 
-    if (global.blockchain.node === node) {
-      return { result: false, message: 'The sent node is the target node.' };
+    if (global.blockchain.nodeUrl === nodeUrl) {
+      return { result: false, message: 'The node is the target node.' };
     }
 
-    return { result: true, message: 'The sent node connection is valid.' };
-  }
-
-  checkNodeRegistration(node: string): checkReturn {
-    if (global.blockchain.connectedNodes.includes(node)) {
-      return { result: false, message: 'The sent node is already registered to the target node connections.' };
-    }
-
-    if (global.blockchain.node === node) {
-      return { result: false, message: 'The sent node is the target node.' };
-    }
-
-    return { result: true, message: 'The sent node registration is valid.' };
+    return { result: true, message: 'The node connection is valid.' };
   }
 
   checkConnectedNodes(connectedNodes: string[]): checkReturn {
     const nodeUrlOptions = getNodesUrlOptions();
 
-    const invalidNodeUrl = connectedNodes.filter((nodeUrl) => !nodeUrlOptions.includes(nodeUrl));
+    const invalidNodeUrl = connectedNodes.filter((connectedNodeUrl) => !nodeUrlOptions.includes(connectedNodeUrl));
 
     if (invalidNodeUrl.length !== 0) {
-      return { result: false, message: 'The sent connected nodes contain one or more invalid nodes.' };
+      return { result: false, message: 'The connected nodes include one or more invalid nodes.' };
     }
 
-    if (connectedNodes.includes(global.blockchain.node)) {
-      return { result: false, message: 'The sent connected nodes contain the target node.' };
+    if (connectedNodes.includes(global.blockchain.nodeUrl)) {
+      return { result: false, message: 'The connected nodes include the target node.' };
     }
 
-    return { result: true, message: 'The sent connected nodes is valid.' };
+    return { result: true, message: 'The connected nodes format are valid.' };
   }
 
-  checkTransactionIsNotInMempool(transaction: Transactions): boolean {
-    return this.mempool.every((mempoolTransaction: Transactions) => mempoolTransaction.txId !== transaction.txId);
+  setConnectedNodes(connectedNodes: string[]) {
+    this.connectedNodes = structuredClone(connectedNodes);
   }
 
   addTransactionToMempool(transaction: Transactions): void {
     this.mempool.push(transaction);
+    this.setTransactionsInMempool();
   }
 
   getPendingTransactions(): Transactions[] {
@@ -167,15 +158,31 @@ export class Blockchain {
     this.targetDifficulty = ZERO_STRING.repeat(numberOfZeros).concat(SIXTEEN_STRING.repeat(64 - numberOfZeros));
   }
 
-  setMaxTransactionsPerBlock(numberOfBlocks: number) {
+  setMaxTransactionsPerBlock(numberOfBlocks: number): void {
     this.maxTransactionsPerBlock = numberOfBlocks;
+  }
+
+  setTransactionsInMempool(): void {
+    this.transactionsInMempool = this.mempool.length;
+  }
+
+  checkTransactionsPerBlock(nextBlockTransactions: Transactions[]): checkReturn {
+    if (nextBlockTransactions.length !== this.maxTransactionsPerBlock - 1) {
+      return { result: false, message: "Considering the miner's reward transaction, the number of next block transactions must be equal to the maximum number of transactions per block, minus one." };
+    }
+
+    return { result: true, message: 'The number of next block transactions is valid.' };
+  }
+
+  checkPendingTransactions(): checkReturn {
+    if (!this.mempool.some((transaction) => transaction.status === 'Pending')) {
+      return { result: false, message: 'There are no pending transactions on mempool.' };
+    }
+
+    return { result: true, message: 'There are pending transactions on mempool.' };
   }
 
   setReward(blockReward: number): void {
     this.reward = blockReward;
-  }
-
-  setConnectedNodes(connectedNodes: string[]) {
-    this.connectedNodes = structuredClone(connectedNodes);
   }
 }

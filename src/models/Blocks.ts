@@ -2,7 +2,7 @@ import { checkReturn } from '../types/return.types';
 
 import { Transactions } from './Transactions';
 
-import { isValidHexString } from '../utils/time.utils';
+import { isValidHexString } from '../utils/validation.utils';
 
 export class Blocks {
   height: number;
@@ -37,51 +37,51 @@ export class Blocks {
 
   checkHeightFormat(): checkReturn {
     if (this.height < 0 || !Number.isInteger(this.height)) {
-      return { result: false, message: 'The height of the sent block is not a positive integer number.' };
+      return { result: false, message: 'The block height is a negative number or is not a integer number.' };
     }
 
     if (this.height !== global.blockchain.blocks.length) {
-      return { result: false, message: 'The height of sent block is not the right next block height in blockchain.' };
+      return { result: false, message: 'The block height is not the right next block height in blockchain.' };
     }
 
-    return { result: true, message: 'The height format of the sent block is valid.' };
+    return { result: true, message: 'The block height format is valid.' };
   }
 
   checkNonceFormat(): checkReturn {
     if (this.nonce < 0 || !Number.isInteger(this.nonce)) {
-      return { result: false, message: 'The nonce of the sent block is not a positive integer number.' };
+      return { result: false, message: 'The block nonce is a negative number or is not a integer number.' };
     }
 
-    return { result: true, message: 'The nonce format of the sent block is valid.' };
+    return { result: true, message: 'The block nonce format is valid.' };
   }
 
   checkHashFormat(): checkReturn {
     if (!isValidHexString(this.hash)) {
-      return { result: false, message: 'The hash of the sent block is not a valid hex string.' };
+      return { result: false, message: 'The block hash is not a valid hex string.' };
     }
 
     //verificar se o hash bate com o hash esperado
 
-    return { result: true, message: 'The hash format of the sent block is valid.' };
+    return { result: true, message: 'The block hash format is valid.' };
   }
   checkPreviousHashFormat(): checkReturn {
     if (!isValidHexString(this.previousHash)) {
-      return { result: false, message: 'The previous hash of the sent block is not a valid hex string.' };
+      return { result: false, message: 'The block previous hash is not a valid hex string.' };
     }
 
     if (global.blockchain.getPreviousBlock().hash !== this.previousHash) {
-      return { result: false, message: 'The previous hash of the sent block and the hash of the last valid block in blockchain are not the same.' };
+      return { result: false, message: 'The block previous hash and the last valid block hash in blockchain are not the same.' };
     }
 
-    return { result: true, message: 'The previous hash format of the sent block is valid.' };
+    return { result: true, message: 'The block previous hash format is valid.' };
   }
   checkTransactionsFormat(): checkReturn {
     if (this.transactions.length === 0) {
-      return { result: false, message: 'The transactions in the sent block is an empty array.' };
+      return { result: false, message: 'The block transactions is an empty array.' };
     }
 
     //verificar se cada transação esta validada
 
-    return { result: true, message: 'The transactions format of the sent block are valid.' };
+    return { result: true, message: 'The block transactions are valid.' };
   }
 }
