@@ -1,30 +1,36 @@
-import express, { Express, json } from 'express';
-import 'dotenv/config';
+import startServer, { setupCleanup } from './server';
+import { addPortInEnv } from './helpers/ports.helpers';
 
-import blockchainRoutes from '../src/routes/blockchain.routes';
+const main = () => {
+  const portArgument = process.argv[2];
 
-const app: Express = express();
+  try {
+    const portNumber = validatePort(portArgument);
 
-const portNumber: string = process.argv[2];
+    addPortInEnv(portNumber.toString());
 
-const portsNumbers: string[] = process.env.PORTS_NUMBERS ? process.env.PORTS_NUMBERS.split(',') : [];
+    startServer(portNumber);
 
-if (!portNumber || isNaN(Number(portNumber)) || !portsNumbers.includes(portNumber)) {
-  console.error(`[error]: Invalid port '${portNumber}'. Make sure it is specified in the .env file.`);
-  process.exit(1);
-}
+    setupCleanup(portNumber);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error(`[error]: ${error.message}`);
+    } else {
+      console.error(`[error]: Unknown error occurred.`);
+    }
 
-app.use(json());
-
-app.use('/blockchain', blockchainRoutes);
-
-const server = app.listen(portNumber, () => {
-  console.log(`[server]: Server is running at http://localhost:${portNumber}`);
-});
-
-server.on('error', (err: Error & { code?: string }) => {
-  if (err.code === 'EADDRINUSE') {
-    console.error(`[error]: The port ${portNumber} is already in use.`);
     process.exit(1);
   }
-});
+};
+
+const validatePort = (port: string): number => {
+  const portNumber = Number(port);
+
+  if (isNaN(portNumber) || portNumber <= 0) {
+    throw new Error(`The port '${port}' is not valid.`);
+  }
+
+  return portNumber;
+};
+
+main();

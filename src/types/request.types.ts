@@ -6,7 +6,7 @@ export interface NewNodeRequest {
 export interface UpdateConnectedNodesRequest {
   connectedNodes: string[];
 }
-export interface RegisterNextBlockRequest {
+export interface NextBlockRequest {
   nextBlock: Blocks;
 }
 export interface BroadcastNextBlockRequest {

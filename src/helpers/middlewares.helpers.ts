@@ -4,34 +4,34 @@ import { NewTransactionRequest } from '../types/request.types';
 
 import { checkReturn } from '../types/return.types';
 
-export const validateNewBlockFormat = (newBlock: Blocks): checkReturn => {
-  if (!newBlock || typeof newBlock !== 'object' || Array.isArray(newBlock)) {
-    return { result: false, message: 'The new block is not an object or was not provided.' };
+export const checkNextBlockDataFormat = (nextBlock: Blocks): checkReturn => {
+  if (!nextBlock || typeof nextBlock !== 'object' || Array.isArray(nextBlock)) {
+    return { result: false, message: 'The next block is not valid or was not provided.' };
   }
 
-  const { height, nonce, hash, previousHash, transactions } = newBlock;
+  const { height, nonce, hash, previousHash, transactions } = nextBlock;
 
   if (!height || typeof height !== 'number') {
-    return { result: false, message: 'The new block height is zero or was not provided.' };
+    return { result: false, message: 'The next block height is zero or was not provided.' };
   }
 
   if (!nonce || typeof nonce !== 'number') {
-    return { result: false, message: 'The new block nonce is zero or was not provided.' };
+    return { result: false, message: 'The next block nonce is zero or was not provided.' };
   }
 
   if (!hash || typeof hash !== 'string') {
-    return { result: false, message: 'The new block hash is not a string or was not provided.' };
+    return { result: false, message: 'The next block hash is not a string or was not provided.' };
   }
 
   if (!previousHash || typeof nonce !== 'number') {
-    return { result: false, message: 'The new block previous hash is not a string or was not provided.' };
+    return { result: false, message: 'The next block previous hash is not a string or was not provided.' };
   }
 
   if (!transactions || !Array.isArray(transactions)) {
-    return { result: false, message: 'The new block transactions is not an array or was not provided.' };
+    return { result: false, message: 'The next block transactions is not an array or was not provided.' };
   }
 
-  return { result: true, message: 'The new block format is valid.' };
+  return { result: true, message: 'The next block format is valid.' };
 };
 
 export const validateNewNodeFormat = (nodeUrl: string): checkReturn => {

@@ -1,46 +1,16 @@
 import { Request, Response, NextFunction } from 'express';
 
-import { Blocks } from '../models/Blocks';
-
-import { BroadcastNextBlockRequest, RegisterNextBlockRequest } from '../types/request.types';
+import { BroadcastNextBlockRequest, NextBlockRequest } from '../types/request.types';
 import { CustomResponse, ErrorData, MiddlewareResponse } from '../types/response.types';
 
-import { validateNewBlockFormat } from '../helpers/middlewares.helpers';
+import { checkNextBlockDataFormat } from '../helpers/middlewares.helpers';
+import { isValidHexString } from '../utils/validation.utils';
 
-const validateNewBlock = async (req: Request<{}, {}, RegisterNextBlockRequest>, res: Response<MiddlewareResponse | CustomResponse<ErrorData>>, next: NextFunction): Promise<void> => {
+const validateNextBlockData = async (req: Request<{}, {}, NextBlockRequest>, res: Response<MiddlewareResponse | CustomResponse<ErrorData>>, next: NextFunction): Promise<void> => {
   try {
     const { nextBlock } = req.body;
 
-    const { result, message } = validateNewBlockFormat(nextBlock);
-
-    if (!result) {
-      res.status(400).send({ message });
-      return;
-    }
-
-    const { height, nonce, hash, previousHash, transactions } = nextBlock;
-
-    const validBlock = new Blocks(height, nonce, hash, previousHash, transactions);
-
-    req.body.nextBlock = validBlock;
-
-    next();
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
-
-    res.status(500).send({
-      message: 'An error occurred.',
-      data: { code: 500, message: errorMessage },
-    });
-    return;
-  }
-};
-
-const validateNewBlockHeight = async (req: Request<{}, {}, RegisterNextBlockRequest>, res: Response<MiddlewareResponse | CustomResponse<ErrorData>>, next: NextFunction): Promise<void> => {
-  try {
-    const { nextBlock } = req.body;
-
-    const { result, message } = nextBlock.checkHeightFormat();
+    const { result, message } = checkNextBlockDataFormat(nextBlock);
 
     if (!result) {
       res.status(400).send({ message });
@@ -59,14 +29,18 @@ const validateNewBlockHeight = async (req: Request<{}, {}, RegisterNextBlockRequ
   }
 };
 
-const validateNewBlockNonce = async (req: Request<{}, {}, RegisterNextBlockRequest>, res: Response<MiddlewareResponse | CustomResponse<ErrorData>>, next: NextFunction): Promise<void> => {
+const validateNextBlockHeight = async (req: Request<{}, {}, NextBlockRequest>, res: Response<MiddlewareResponse | CustomResponse<ErrorData>>, next: NextFunction): Promise<void> => {
   try {
     const { nextBlock } = req.body;
+    const { height } = nextBlock;
 
-    const { result, message } = nextBlock.checkNonceFormat();
+    if (height < 0 || !Number.isInteger(height)) {
+      res.status(400).send({ message: 'The next block height is a negative number or is not a integer number.' });
+      return;
+    }
 
-    if (!result) {
-      res.status(400).send({ message });
+    if (height !== global.blockchain.blocks.length) {
+      res.status(400).send({ message: 'The next block height is not the right next block height in blockchain.' });
       return;
     }
 
@@ -82,14 +56,13 @@ const validateNewBlockNonce = async (req: Request<{}, {}, RegisterNextBlockReque
   }
 };
 
-const validateNewBlockHash = async (req: Request<{}, {}, RegisterNextBlockRequest>, res: Response<MiddlewareResponse | CustomResponse<ErrorData>>, next: NextFunction): Promise<void> => {
+const validateNextBlockNonce = async (req: Request<{}, {}, NextBlockRequest>, res: Response<MiddlewareResponse | CustomResponse<ErrorData>>, next: NextFunction): Promise<void> => {
   try {
     const { nextBlock } = req.body;
+    const { nonce } = nextBlock;
 
-    const { result, message } = nextBlock.checkHashFormat();
-
-    if (!result) {
-      res.status(400).send({ message });
+    if (nonce < 0 || !Number.isInteger(nonce)) {
+      res.status(400).send({ message: 'The next block nonce is a negative number or is not a integer number.' });
       return;
     }
 
@@ -105,14 +78,42 @@ const validateNewBlockHash = async (req: Request<{}, {}, RegisterNextBlockReques
   }
 };
 
-const validateNewBlockPreviousHash = async (req: Request<{}, {}, RegisterNextBlockRequest>, res: Response<MiddlewareResponse | CustomResponse<ErrorData>>, next: NextFunction): Promise<void> => {
+const validateNextBlockHash = async (req: Request<{}, {}, NextBlockRequest>, res: Response<MiddlewareResponse | CustomResponse<ErrorData>>, next: NextFunction): Promise<void> => {
   try {
     const { nextBlock } = req.body;
+    const { hash } = nextBlock;
 
-    const { result, message } = nextBlock.checkPreviousHashFormat();
+    if (!isValidHexString(hash)) {
+      res.status(400).send({ message: 'The next block hash is not a valid hex string.' });
+      return;
+    }
 
-    if (!result) {
-      res.status(400).send({ message });
+    //verificar se o hash bate com o hash esperado
+
+    next();
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
+
+    res.status(500).send({
+      message: 'An error occurred.',
+      data: { code: 500, message: errorMessage },
+    });
+    return;
+  }
+};
+
+const validateNextBlockPreviousHash = async (req: Request<{}, {}, NextBlockRequest>, res: Response<MiddlewareResponse | CustomResponse<ErrorData>>, next: NextFunction): Promise<void> => {
+  try {
+    const { nextBlock } = req.body;
+    const { previousHash } = nextBlock;
+
+    if (!isValidHexString(previousHash)) {
+      res.status(400).send({ message: 'The next block previous hash is not a valid hex string.' });
+      return;
+    }
+
+    if (global.blockchain.getPreviousBlock().hash !== previousHash) {
+      res.status(400).send({ message: 'The next block previous hash and the last valid block hash in blockchain are not the same.' });
       return;
     }
 
@@ -128,14 +129,42 @@ const validateNewBlockPreviousHash = async (req: Request<{}, {}, RegisterNextBlo
   }
 };
 
-const validateNewBlockTransactions = async (req: Request<{}, {}, RegisterNextBlockRequest>, res: Response<MiddlewareResponse | CustomResponse<ErrorData>>, next: NextFunction): Promise<void> => {
+const validateNextBlockTransactions = async (req: Request<{}, {}, NextBlockRequest>, res: Response<MiddlewareResponse | CustomResponse<ErrorData>>, next: NextFunction): Promise<void> => {
   try {
     const { nextBlock } = req.body;
+    const { transactions } = nextBlock;
 
-    const { result, message } = nextBlock.checkTransactionsFormat();
+    if (transactions.length === 0) {
+      res.status(400).send({ message: 'The next block transactions is an empty array.' });
+      return;
+    }
 
-    if (!result) {
-      res.status(400).send({ message });
+    //verificar se cada transação esta validada
+
+    next();
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
+
+    res.status(500).send({
+      message: 'An error occurred.',
+      data: { code: 500, message: errorMessage },
+    });
+    return;
+  }
+};
+
+const validateTransactionsId = async (req: Request<{}, {}, BroadcastNextBlockRequest>, res: Response<MiddlewareResponse | CustomResponse<ErrorData>>, next: NextFunction): Promise<void> => {
+  try {
+    const { nextBlockTransactions } = req.body;
+
+    const notInMempool = nextBlockTransactions.filter((transaction) => !global.blockchain.mempool.some((mempoolTransaction) => mempoolTransaction.txId === transaction.txId));
+
+    if (notInMempool.length > 0) {
+      const transactionIds = notInMempool.map((transaction) => transaction.txId).join(', ');
+
+      res.status(400).send({
+        message: `The following txId's of the next block transactions are not included in mempool: ${transactionIds}.`,
+      });
       return;
     }
 
@@ -145,7 +174,40 @@ const validateNewBlockTransactions = async (req: Request<{}, {}, RegisterNextBlo
 
     res.status(500).send({
       message: 'An error occurred.',
-      data: { code: 500, message: errorMessage },
+      data: {
+        code: 500,
+        message: errorMessage,
+      },
+    });
+    return;
+  }
+};
+
+const validateTransactionsStatus = async (req: Request<{}, {}, BroadcastNextBlockRequest>, res: Response<MiddlewareResponse | CustomResponse<ErrorData>>, next: NextFunction): Promise<void> => {
+  try {
+    const { nextBlockTransactions } = req.body;
+
+    const notPendingStatus = nextBlockTransactions.filter((transaction) => transaction.status !== 'Pending');
+
+    if (notPendingStatus.length > 0) {
+      const transactionIds = notPendingStatus.map((transaction) => transaction.txId).join(', ');
+
+      res.status(400).send({
+        message: `The following txId's of the next block transactions are not with 'Pending' status: ${transactionIds}.`,
+      });
+      return;
+    }
+
+    next();
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
+
+    res.status(500).send({
+      message: 'An error occurred.',
+      data: {
+        code: 500,
+        message: errorMessage,
+      },
     });
     return;
   }
@@ -178,11 +240,13 @@ const validateTransactionsPerBlock = async (req: Request<{}, {}, BroadcastNextBl
 };
 
 export default {
-  validateNewBlock,
-  validateNewBlockHeight,
-  validateNewBlockNonce,
-  validateNewBlockHash,
-  validateNewBlockPreviousHash,
-  validateNewBlockTransactions,
+  validateNextBlockData,
+  validateNextBlockHeight,
+  validateNextBlockNonce,
+  validateNextBlockHash,
+  validateNextBlockPreviousHash,
+  validateNextBlockTransactions,
+  validateTransactionsId,
+  validateTransactionsStatus,
   validateTransactionsPerBlock,
 };

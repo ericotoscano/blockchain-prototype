@@ -14,28 +14,44 @@ const {
   broadcastNewTransaction,
   registerNewTransaction,
   getBlockchain,
-  registerNewBlock,
+  registerNextBlock,
   broadcastNextBlock,
   updateBlockchain,
 } = blockchainController;
 
 const { validateBlockchain, validateNewNodeData, validateNewNodeUrlOption, validateNewNodeConnection, validateNewConnectedNodes, validatePendingTransactions } = blockchainMiddlewares;
 
-const { validateNewBlock, validateNewBlockHeight, validateNewBlockNonce, validateNewBlockHash, validateNewBlockPreviousHash, validateNewBlockTransactions, validateTransactionsPerBlock } =
-  blocksMiddlewares;
+const {
+  validateNextBlockData,
+  validateNextBlockHeight,
+  validateNextBlockNonce,
+  validateNextBlockHash,
+  validateNextBlockPreviousHash,
+  validateNextBlockTransactions,
+  validateTransactionsId,
+  validateTransactionsStatus,
+  validateTransactionsPerBlock,
+} = blocksMiddlewares;
 
 const { validateNewTransactionData, validateNewTransactionAddresses, validateNewTransactionValues, validateNewTransactionStatus, validateNewTransactionTimestamp, validateNewTransactionTxId } =
   transactionsMiddlewares;
 
 const router: Router = Router();
 
-//organizar a rota '/' de acordo com o padrão das outras (tirar metodos check e colocar de volta nos middlewares)
-
 router
   .route('/')
   .get(validateBlockchain, getBlockchain)
-  .post(validateBlockchain, validateTransactionsPerBlock, broadcastNextBlock)
-  .put(validateBlockchain, validateNewBlock, validateNewBlockHeight, validateNewBlockNonce, validateNewBlockHash, validateNewBlockPreviousHash, validateNewBlockTransactions, registerNewBlock)
+  .post(validateBlockchain, validateTransactionsId, validateTransactionsStatus, validateTransactionsPerBlock, broadcastNextBlock)
+  .put(
+    validateBlockchain,
+    validateNextBlockData,
+    validateNextBlockHeight,
+    validateNextBlockNonce,
+    validateNextBlockHash,
+    validateNextBlockPreviousHash,
+    validateNextBlockTransactions,
+    registerNextBlock
+  )
   .patch(validateBlockchain, updateBlockchain); //consenso
 
 router

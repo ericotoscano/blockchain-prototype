@@ -1,11 +1,7 @@
 import { sha256 } from 'js-sha256';
 
-import { checkReturn } from '../types/return.types';
-
 import { Blocks } from './Blocks';
 import { Transactions } from './Transactions';
-
-import { getNodesUrlOptions } from '../helpers/ports.helpers';
 
 export class Blockchain {
   nodeUrl: string;
@@ -58,7 +54,6 @@ export class Blockchain {
     });
 
     block.addRewardTransaction();
-
     let previousBlock = this.getPreviousBlock();
 
     block.height = this.blocks.length;

@@ -1,9 +1,5 @@
 import { sha256 } from 'js-sha256';
 
-import { checkReturn } from '../types/return.types';
-
-import { isValidHexString, isValidTimestamp } from '../utils/validation.utils';
-
 export class Transactions {
   txId: string;
   status: string;
