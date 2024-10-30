@@ -1,73 +1,31 @@
-import * as fs from 'fs';
-import * as path from 'path';
+import 'dotenv/config';
 
 export const getNodesUrlOptions = (): string[] => {
-  const portsNumbers: string[] = process.env.PORTS_NUMBERS ? process.env.PORTS_NUMBERS.split(',') : [];
+  const availablePorts: string[] = process.env.AVAILABLE_PORTS ? process.env.AVAILABLE_PORTS.split(',') : [];
 
   let nodeUrlOptions: string[] = [];
 
-  for (const port of portsNumbers) {
+  for (const port of availablePorts) {
     nodeUrlOptions.push(`${process.env.BASE_URL}${port}`);
   }
 
   return nodeUrlOptions;
 };
 
-export const addPortInEnv = (portNumber: string): void => {
-  const envFilePath = path.join(__dirname, '../../.env');
+export const checkAvailablePortsInEnv = (port: string): void => {
+  let availablePorts: string[] = process.env.AVAILABLE_PORTS ? process.env.AVAILABLE_PORTS.split(',') : [];
 
-  let envContent = '';
-  let runningPorts: string[] = [];
-
-  if (fs.existsSync(envFilePath)) {
-    envContent = fs.readFileSync(envFilePath, 'utf-8');
-    const portsLine = envContent.split('\n').find((line) => line.startsWith('RUNNING_PORTS='));
-    if (portsLine) {
-      runningPorts = portsLine
-        .replace('RUNNING_PORTS=', '')
-        .split(',')
-        .map((port) => port.trim())
-        .filter(Boolean);
-    }
+  if (!availablePorts.includes(port)) {
+    throw new Error(`The port '${port}' is not an available port in .env file.`);
   }
-
-  if (!runningPorts.includes(portNumber)) {
-    runningPorts.push(portNumber);
-  }
-
-  const updatedPortsLine = `RUNNING_PORTS=${runningPorts.join(',')}`;
-
-  const updatedEnvContent = envContent
-    .split('\n')
-    .map((line) => (line.startsWith('RUNNING_PORTS=') ? updatedPortsLine : line))
-    .join('\n');
-
-  fs.writeFileSync(envFilePath, updatedEnvContent, 'utf-8');
 };
 
-export const removePortFromEnv = (portNumber: string): void => {
-  const envFilePath = path.join(__dirname, '../../.env');
+export const validatePort = (port: string): number => {
+  const portNumber = Number(port);
 
-  let envContent = '';
-  let runningPorts: string[] = [];
-
-  if (fs.existsSync(envFilePath)) {
-    envContent = fs.readFileSync(envFilePath, 'utf-8');
-    
-    const portsLine = envContent.split('\n').find(line => line.startsWith('RUNNING_PORTS='));
-    
-    if (portsLine) {
-      runningPorts = portsLine.replace('RUNNING_PORTS=', '').split(',').map(port => port.trim()).filter(Boolean);
-    }
+  if (isNaN(portNumber) || portNumber <= 0) {
+    throw new Error(`The port '${port}' is not valid.`);
   }
 
-  runningPorts = runningPorts.filter(port => port !== portNumber);
-
-  const updatedPortsLine = `RUNNING_PORTS=${runningPorts.join(',')}`;
-
-  const updatedEnvContent = envContent.split('\n').map(line => 
-    line.startsWith('RUNNING_PORTS=') ? updatedPortsLine : line
-  ).join('\n');
-
-  fs.writeFileSync(envFilePath, updatedEnvContent, 'utf-8');
+  return portNumber;
 };

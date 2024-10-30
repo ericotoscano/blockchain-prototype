@@ -1,10 +1,9 @@
 import createApp from './app';
-import { removePortFromEnv } from './helpers/ports.helpers';
 import { Server } from 'http';
 
-const startServer = (port: number): Server => {
+export const startServer = (port: number): Server => {
   const app = createApp();
-  
+
   const server = app.listen(port, () => {
     console.log(`[server]: Server is running at http://localhost:${port}`);
   });
@@ -12,6 +11,7 @@ const startServer = (port: number): Server => {
   server.on('error', (err: Error & { code?: string }) => {
     if (err.code === 'EADDRINUSE') {
       console.error(`[error]: The port ${port} is already in use.`);
+
       process.exit(1);
     }
   });
@@ -19,21 +19,14 @@ const startServer = (port: number): Server => {
   return server;
 };
 
-export const setupCleanup = (port: number): void => {
-  let cleanupDone = false;
-
+export const setupCleanup = (server: Server): void => {
   const cleanup = () => {
-    if (!cleanupDone) {
-      removePortFromEnv(port.toString());
-  
-      console.log(`[server]: Port ${port} removed from RUNNING_PORTS.`);
-  
-      cleanupDone = true;
-    }
+    server.close(() => {
+      console.log('[server]: Server has been shut down.');
+      process.exit(0);
+    });
   };
 
   process.on('SIGINT', cleanup);
   process.on('exit', cleanup);
 };
-
-export default startServer;

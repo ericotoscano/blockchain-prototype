@@ -62,7 +62,7 @@ const validateNewNodeUrlOption = async (req: Request<{}, {}, NewNodeRequest>, re
     const nodeUrlOptions = getNodesUrlOptions();
 
     if (!nodeUrlOptions.includes(nodeUrl)) {
-      res.status(400).send({ message: 'The node url does not include one of the available port numbers in the .env file.' });
+      res.status(400).send({ message: 'The node url does not include one of the available ports in the .env file.' });
       return;
     }
 

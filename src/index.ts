@@ -1,5 +1,5 @@
-import startServer, { setupCleanup } from './server';
-import { addPortInEnv } from './helpers/ports.helpers';
+import { startServer, setupCleanup } from './server';
+import { validatePort, checkAvailablePortsInEnv } from './helpers/ports.helpers';
 
 const main = () => {
   const portArgument = process.argv[2];
@@ -7,11 +7,12 @@ const main = () => {
   try {
     const portNumber = validatePort(portArgument);
 
-    addPortInEnv(portNumber.toString());
+    checkAvailablePortsInEnv(portNumber.toString());
 
-    startServer(portNumber);
+    const server = startServer(portNumber);
 
-    setupCleanup(portNumber);
+    setupCleanup(server);
+
   } catch (error: unknown) {
     if (error instanceof Error) {
       console.error(`[error]: ${error.message}`);
@@ -21,16 +22,6 @@ const main = () => {
 
     process.exit(1);
   }
-};
-
-const validatePort = (port: string): number => {
-  const portNumber = Number(port);
-
-  if (isNaN(portNumber) || portNumber <= 0) {
-    throw new Error(`The port '${port}' is not valid.`);
-  }
-
-  return portNumber;
 };
 
 main();
