@@ -26,7 +26,7 @@ export class Blocks {
   addRewardTransaction(): void {
     const allFees = this.transactions.reduce((sum, transaction) => sum + transaction.fee, 0);
 
-    const rewardTransaction = new Transactions('Block Reward', 'Miner Address', blockchain.reward + allFees, 0);
+    const rewardTransaction = new Transactions('Reward', global.blockchain.nodeAddress, global.blockchain.reward + allFees, 0);
 
     this.transactions.unshift(rewardTransaction);
   }

@@ -6,7 +6,7 @@ import { NewTransactionRequest } from '../types/request.types';
 import { CustomResponse, ErrorData, MiddlewareResponse } from '../types/response.types';
 
 import { formatNewTransactionRequest, checkNewTransactionDataFormat } from '../helpers/middlewares.helpers';
-import { isValidHexString, isValidTimestamp } from '../utils/validation.utils';
+import { isValidHex40String, isValidHex64String, isValidTimestamp } from '../utils/validation.utils';
 
 const validateNewTransactionData = async (req: Request<{}, {}, NewTransactionRequest>, res: Response<MiddlewareResponse | CustomResponse<ErrorData>>, next: NextFunction): Promise<void> => {
   try {
@@ -45,13 +45,23 @@ const validateNewTransactionAddresses = async (req: Request<{}, {}, NewTransacti
 
     const { sender, recipient } = newTransaction;
 
-    if (!isValidHexString(sender) || !isValidHexString(recipient)) {
+    if (!isValidHex40String(sender) || !isValidHex40String(recipient)) {
       res.status(400).send({ message: 'The transaction sender address or the transaction recipient address is not a valid hex string.' });
       return;
     }
 
     if (sender === recipient) {
       res.status(400).send({ message: 'The transaction sender address and the transaction recipient address are the same.' });
+      return;
+    }
+
+    if (blockchain.getNode(sender).address === '' && blockchain.getUser(sender).address === '') {
+      res.status(400).send({ message: 'The transaction sender address is not a blockchain registered user or a blockchain registered node.' });
+      return;
+    }
+
+    if (blockchain.getNode(recipient).address === '' && blockchain.getUser(recipient).address === '') {
+      res.status(400).send({ message: 'The transaction recipient address is not a blockchain registered user or a blockchain registered node.' });
       return;
     }
 
@@ -73,14 +83,20 @@ const validateNewTransactionValues = async (req: Request<{}, {}, NewTransactionR
   try {
     const { newTransaction } = req.body;
 
-    const { amount, fee } = newTransaction;
+    const { sender, amount, fee } = newTransaction;
 
     if (amount < 0 || fee < 0) {
       res.status(400).send({ message: 'The transaction amount or the transaction fee is a negative number.' });
       return;
     }
 
-    //amount e fee são valores que batem com o saldo do endereço do sender
+    const value = amount + fee;
+    const senderBalance = blockchain.getBalance(sender);
+
+    if (senderBalance < value) {
+      res.status(400).send({ message: `The sender's balance (${senderBalance}) is less than the transaction value (amount + fee = ${value}).` });
+      return;
+    }
 
     next();
   } catch (error) {
@@ -159,7 +175,7 @@ const validateNewTransactionTxId = async (req: Request<{}, {}, NewTransactionReq
 
     const { txId } = newTransaction;
 
-    if (!txId || !isValidHexString(txId)) {
+    if (!txId || !isValidHex64String(txId)) {
       res.status(400).send({ message: 'The transaction txId was not provided or is not valid.' });
       return;
     }

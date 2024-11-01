@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 
-import { NewNodeRequest, UpdateConnectedNodesRequest } from '../types/request.types';
+import { NewNodeRequest, SendNextBlockRequest, UpdateConnectedNodesRequest } from '../types/request.types';
 import { CustomResponse, ErrorData, MiddlewareResponse } from '../types/response.types';
 
 import { validateNewNodeFormat } from '../helpers/middlewares.helpers';
@@ -8,10 +8,8 @@ import { getNodesUrlOptions } from '../helpers/ports.helpers';
 
 const validateBlockchain = async (req: Request, res: Response<MiddlewareResponse | CustomResponse<ErrorData>>, next: NextFunction): Promise<void> => {
   try {
-    const { blockchain } = global;
-
     if (!blockchain) {
-      res.status(404).send({ message: 'There is no blockchain created yet.' });
+      res.status(404).send({ message: 'There is no blockchain.' });
       return;
     }
 
@@ -85,12 +83,12 @@ const validateNewNodeConnection = async (req: Request<{}, {}, NewNodeRequest>, r
   try {
     const { nodeUrl } = req.body;
 
-    if (global.blockchain.connectedNodes.includes(nodeUrl)) {
+    if (blockchain.connectedNodes.includes(nodeUrl)) {
       res.status(400).send({ message: 'The node is already connected to the target node.' });
       return;
     }
 
-    if (global.blockchain.nodeUrl === nodeUrl) {
+    if (blockchain.nodeUrl === nodeUrl) {
       res.status(400).send({ message: 'The node is the target node.' });
       return;
     }
@@ -123,7 +121,7 @@ const validateNewConnectedNodes = async (req: Request<{}, {}, UpdateConnectedNod
       return;
     }
 
-    if (connectedNodes.includes(global.blockchain.nodeUrl)) {
+    if (connectedNodes.includes(blockchain.nodeUrl)) {
       res.status(400).send({ message: 'The connected nodes include the target node.' });
       return;
     }
@@ -143,9 +141,37 @@ const validateNewConnectedNodes = async (req: Request<{}, {}, UpdateConnectedNod
   }
 };
 
+const validateFeeFormat = async (req: Request<{}, {}, SendNextBlockRequest>, res: Response<MiddlewareResponse | CustomResponse<ErrorData>>, next: NextFunction): Promise<void> => {
+  try {
+    const { minFee } = req.body;
+
+    if (!minFee || typeof minFee !== 'number') {
+      res.status(400).send({ message: 'The minFee is not a positive number or was not provided.' });
+      return;
+    }
+
+    if (minFee < 0) {
+      res.status(400).send({ message: 'The minFee is a negative number.' });
+      return;
+    }
+
+    next();
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
+
+    res.status(500).send({
+      message: 'An error occurred.',
+      data: {
+        code: 500,
+        message: errorMessage,
+      },
+    });
+  }
+};
+
 const validatePendingTransactions = async (req: Request, res: Response<MiddlewareResponse | CustomResponse<ErrorData>>, next: NextFunction): Promise<void> => {
   try {
-    if (!global.blockchain.mempool.some((transaction) => transaction.status === 'Pending')) {
+    if (blockchain.mempool.every((transaction) => transaction.status !== 'Pending')) {
       res.status(400).send({ message: 'There are no pending transactions on mempool.' });
       return;
     }
@@ -170,5 +196,6 @@ export default {
   validateNewNodeUrlOption,
   validateNewNodeConnection,
   validateNewConnectedNodes,
+  validateFeeFormat,
   validatePendingTransactions,
 };

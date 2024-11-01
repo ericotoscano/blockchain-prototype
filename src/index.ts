@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { startServer, setupCleanup } from './server';
 import { validatePort, checkAvailablePortsInEnv } from './helpers/ports.helpers';
 
@@ -12,7 +13,6 @@ const main = () => {
     const server = startServer(portNumber);
 
     setupCleanup(server);
-
   } catch (error: unknown) {
     if (error instanceof Error) {
       console.error(`[error]: ${error.message}`);

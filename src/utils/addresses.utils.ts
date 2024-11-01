@@ -1,14 +1,28 @@
+import { sha256 } from 'js-sha256';
+import { ec as EC } from 'elliptic';
+import * as crypto from 'crypto';
 
-import * as Bitcore from 'bitcore-lib';
+const ec = new EC('secp256k1');
 
-export const generateAddress = (): string => {
-  const privateKey = new Bitcore.PrivateKey();
+export const generateNodeAddress = (port: string): string => {
+  const originHash = sha256(port);
 
-  const address = privateKey.toAddress();
+  const key = ec.keyFromPrivate(originHash);
 
-  return address.toString();
+  const publicKey = key.getPublic('hex');
+  const publicKeyBuffer = Buffer.from(publicKey, 'hex');
+
+  const hash = crypto.createHash('sha256').update(publicKeyBuffer).digest();
+  const address = crypto.createHash('ripemd160').update(hash).digest('hex');
+
+  return address;
 };
 
-const bitcoinAddress = generateAddress();
-console.log('Endereço Bitcoin:', bitcoinAddress);
+export const verifyAddress = (publicKey: string, expectedAddress: string): boolean => {
+  const publicKeyBuffer = Buffer.from(publicKey, 'hex');
 
+  const hash = crypto.createHash('sha256').update(publicKeyBuffer).digest();
+  const address = crypto.createHash('ripemd160').update(hash).digest('hex');
+
+  return address === expectedAddress;
+};

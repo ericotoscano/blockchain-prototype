@@ -6,20 +6,10 @@ import blockchainMiddlewares from '../middlewares/blockchain.middlewares';
 import transactionsMiddlewares from '../middlewares/transactions.middlewares';
 import blocksMiddlewares from '../middlewares/blocks.middlewares';
 
-const {
-  connectNodes,
-  registerNewNode,
-  updateConnectedNodes,
-  getAllPendingTransactions,
-  broadcastNewTransaction,
-  registerNewTransaction,
-  getBlockchain,
-  registerNextBlock,
-  broadcastNextBlock,
-  updateBlockchain,
-} = blockchainController;
+const { getBlockchain, sendNextBlock, updateBlockchain, connectNodes, registerNewNode, updateConnectedNodes, broadcastNewTransaction, registerNewTransaction } = blockchainController;
 
-const { validateBlockchain, validateNewNodeData, validateNewNodeUrlOption, validateNewNodeConnection, validateNewConnectedNodes, validatePendingTransactions } = blockchainMiddlewares;
+const { validateBlockchain, validateNewNodeData, validateNewNodeUrlOption, validateNewNodeConnection, validateNewConnectedNodes, validateFeeFormat, validatePendingTransactions } =
+  blockchainMiddlewares;
 
 const {
   validateNextBlockData,
@@ -28,7 +18,7 @@ const {
   validateNextBlockHash,
   validateNextBlockPreviousHash,
   validateNextBlockTransactions,
-  validateTransactionsId,
+  validateTransactionsIds,
   validateTransactionsStatus,
   validateTransactionsPerBlock,
 } = blocksMiddlewares;
@@ -38,11 +28,12 @@ const { validateNewTransactionData, validateNewTransactionAddresses, validateNew
 
 const router: Router = Router();
 
+router.route('/').get(validateBlockchain, getBlockchain).put(validateBlockchain, updateBlockchain); //consenso
+
 router
-  .route('/')
-  .get(validateBlockchain, getBlockchain)
-  .post(validateBlockchain, validateTransactionsId, validateTransactionsStatus, validateTransactionsPerBlock, broadcastNextBlock)
-  .put(
+  .route('/next-block')
+  .post(validateBlockchain, validateFeeFormat, validatePendingTransactions, sendNextBlock)
+  .patch(
     validateBlockchain,
     validateNextBlockData,
     validateNextBlockHeight,
@@ -50,13 +41,20 @@ router
     validateNextBlockHash,
     validateNextBlockPreviousHash,
     validateNextBlockTransactions,
-    registerNextBlock
-  )
-  .patch(validateBlockchain, updateBlockchain); //consenso
+    validateTransactionsIds,
+    validateTransactionsStatus,
+    validateTransactionsPerBlock,
+    updateBlockchain
+  );
+
+router
+  .route('/nodes')
+  .post(validateBlockchain, validateNewNodeData, validateNewNodeUrlOption, validateNewNodeConnection, connectNodes)
+  .put(validateBlockchain, validateNewNodeData, validateNewNodeUrlOption, validateNewNodeConnection, registerNewNode)
+  .patch(validateBlockchain, validateNewConnectedNodes, updateConnectedNodes);
 
 router
   .route('/transactions')
-  .get(validateBlockchain, validatePendingTransactions, getAllPendingTransactions)
   .post(
     validateBlockchain,
     validateNewTransactionData,
@@ -76,12 +74,5 @@ router
     validateNewTransactionTxId,
     registerNewTransaction
   );
-//.delete transações que forem incluidas no bloco
-
-router
-  .route('/nodes')
-  .post(validateBlockchain, validateNewNodeData, validateNewNodeUrlOption, validateNewNodeConnection, connectNodes)
-  .put(validateBlockchain, validateNewNodeData, validateNewNodeUrlOption, validateNewNodeConnection, registerNewNode)
-  .patch(validateBlockchain, validateNewConnectedNodes, updateConnectedNodes);
 
 export default router;

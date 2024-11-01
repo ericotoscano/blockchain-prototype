@@ -9,31 +9,34 @@ export interface CustomResponse<T> {
   data: T;
 }
 
-export interface RegisterNodeData {
-  registeredNode: string;
-  registeredIn: string;
-}
-export interface ConnectNodesData {
-  connectedTo: string[];
-}
-
-export interface UpdateConnectedNodesData {
-  nodeUrl: string;
-  connectedNodes: string[];
-}
 export interface NewTransactionData {
   newTransaction: Transactions;
 }
-export interface GetAllPendingTransactionsData {
-  pendingTransactions: Transactions[];
+
+export interface RemoveTransactionsData {
+  txIds: string[];
+}
+
+export interface GetBlockchainData {
+  blockchain: Blockchain;
 }
 
 export interface NextBlockData {
   nextBlock: Blocks;
 }
 
-export interface GetBlockchainData {
-  blockchain: Blockchain;
+export interface ConnectNodesData {
+  connectedTo: string[];
+}
+
+export interface RegisterNodeData {
+  registeredNode: string;
+  registeredIn: string;
+}
+
+export interface UpdateConnectedNodesData {
+  nodeUrl: string;
+  connectedNodes: string[];
 }
 
 export interface ErrorData {
