@@ -1,4 +1,5 @@
 import express, { Express, json } from 'express';
+
 import blockchainRoutes from './routes/blockchain.routes';
 
 const createApp = (): Express => {

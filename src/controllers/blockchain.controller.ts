@@ -10,7 +10,7 @@ import {
   NewTransactionData,
   NextBlockData,
   ErrorData,
-  RegisterNodeData,
+  AddNewNodeData,
   UpdateConnectedNodesData,
   ConnectNodesData,
   GetBlockchainData,
@@ -19,8 +19,6 @@ import {
 
 const getBlockchain = async (req: Request, res: Response<CustomResponse<GetBlockchainData | ErrorData>>): Promise<void> => {
   try {
-    const { blockchain } = global;
-
     blockchain.connectedNodes.sort();
 
     res.status(200).send({
@@ -86,14 +84,14 @@ const sendNextBlock = async (req: Request<{}, {}, SendNextBlockRequest>, res: Re
   }
 };
 
-const updateBlockchain = async (req: Request<{}, {}, UpdateBlockchainRequest>, res: Response<CustomResponse<NextBlockData | ErrorData>>): Promise<void> => {
+const addNextBlock = async (req: Request<{}, {}, UpdateBlockchainRequest>, res: Response<CustomResponse<NextBlockData | ErrorData>>): Promise<void> => {
   try {
     const { nextBlock } = req.body;
 
     blockchain.addBlock(nextBlock);
 
     res.status(200).send({
-      message: 'Updated.',
+      message: 'Next block added.',
       data: {
         nextBlock,
       },
@@ -111,34 +109,34 @@ const updateBlockchain = async (req: Request<{}, {}, UpdateBlockchainRequest>, r
   }
 };
 
-const connectNodes = async (req: Request<{}, {}, NewNodeRequest>, res: Response<CustomResponse<ConnectNodesData | ErrorData>>): Promise<void> => {
+const sendNewNode = async (req: Request<{}, {}, NewNodeRequest>, res: Response<CustomResponse<ConnectNodesData | ErrorData>>): Promise<void> => {
   try {
     const { nodeUrl } = req.body;
-    const { blockchain } = global;
 
     blockchain.addNode(nodeUrl);
 
-    let registerNodePromise: Promise<CustomResponse<RegisterNodeData | ErrorData>>;
-    const registerNodePromises: Promise<CustomResponse<RegisterNodeData | ErrorData>>[] = [];
+    let addNewNodePromise: Promise<CustomResponse<AddNewNodeData | ErrorData>>;
+    
+    const addNewNodePromises: Promise<CustomResponse<AddNewNodeData | ErrorData>>[] = [];
 
     for (const connectedNodeUrl of blockchain.connectedNodes) {
       if (nodeUrl !== connectedNodeUrl) {
-        registerNodePromise = axios.put<CustomResponse<RegisterNodeData | ErrorData>>(`${connectedNodeUrl}/blockchain/nodes`, { nodeUrl }).then((response) => response.data);
+        addNewNodePromise = axios.patch<CustomResponse<AddNewNodeData | ErrorData>>(`${connectedNodeUrl}/blockchain/nodes`, { nodeUrl }).then((response) => response.data);
       } else {
-        registerNodePromise = Promise.resolve({ message: 'Matches.', data: { registeredNode: nodeUrl, registeredIn: blockchain.nodeUrl } });
+        addNewNodePromise = Promise.resolve({ message: 'No added: same node.', data: { addedNode: nodeUrl, addedIn: blockchain.nodeUrl } });
       }
 
-      registerNodePromises.push(registerNodePromise);
+      addNewNodePromises.push(addNewNodePromise);
     }
 
-    await Promise.all(registerNodePromises);
+    await Promise.all(addNewNodePromises);
 
     const connectedNodes = blockchain.broadcastNodesTo(nodeUrl);
 
-    axios.patch<CustomResponse<UpdateConnectedNodesData | ErrorData>>(`${nodeUrl}/blockchain/nodes`, { connectedNodes });
+    axios.put<CustomResponse<UpdateConnectedNodesData | ErrorData>>(`${nodeUrl}/blockchain/nodes`, { connectedNodes });
 
     res.status(201).send({
-      message: 'A new nodeUrl has been connected.',
+      message: 'A new node has been connected.',
       data: { connectedTo: connectedNodes.sort() },
     });
   } catch (error) {
@@ -154,16 +152,15 @@ const connectNodes = async (req: Request<{}, {}, NewNodeRequest>, res: Response<
   }
 };
 
-const registerNewNode = async (req: Request<{}, {}, NewNodeRequest>, res: Response<CustomResponse<RegisterNodeData | ErrorData>>): Promise<void> => {
+const addNewNode = async (req: Request<{}, {}, NewNodeRequest>, res: Response<CustomResponse<AddNewNodeData | ErrorData>>): Promise<void> => {
   try {
     const { nodeUrl } = req.body;
-    const { blockchain } = global;
 
     blockchain.addNode(nodeUrl);
 
     res.status(200).send({
-      message: 'Registered.',
-      data: { registeredNode: nodeUrl, registeredIn: blockchain.nodeUrl },
+      message: 'New node added.',
+      data: { addedNode: nodeUrl, addedIn: blockchain.nodeUrl },
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
@@ -181,12 +178,11 @@ const registerNewNode = async (req: Request<{}, {}, NewNodeRequest>, res: Respon
 const updateConnectedNodes = async (req: Request<{}, {}, UpdateConnectedNodesRequest>, res: Response<CustomResponse<UpdateConnectedNodesData | ErrorData>>): Promise<void> => {
   try {
     const { connectedNodes } = req.body;
-    const { blockchain } = global;
 
     blockchain.setConnectedNodes(connectedNodes);
 
     res.status(200).send({
-      message: 'Updated.',
+      message: 'Connected nodes updated.',
       data: { nodeUrl: blockchain.nodeUrl, connectedNodes: blockchain.connectedNodes.sort() },
     });
   } catch (error) {
@@ -201,25 +197,25 @@ const updateConnectedNodes = async (req: Request<{}, {}, UpdateConnectedNodesReq
     });
   }
 };
-
-const broadcastNewTransaction = async (req: Request<{}, {}, NewTransactionRequest>, res: Response<CustomResponse<NewTransactionData | ErrorData>>): Promise<void> => {
+//ver se consegue criar o transaction object depois, como foi feito com o next-block e o minFee enviado
+const sendNewTransaction = async (req: Request<{}, {}, NewTransactionRequest>, res: Response<CustomResponse<NewTransactionData | ErrorData>>): Promise<void> => {
   try {
     const { newTransaction } = req.body;
 
     blockchain.addTransactionToMempool(newTransaction);
 
-    const registerTransactionPromises: Promise<CustomResponse<NewTransactionData | ErrorData>>[] = [];
+    const addTransactionPromises: Promise<CustomResponse<NewTransactionData | ErrorData>>[] = [];
 
     for (const connectedNode of blockchain.connectedNodes) {
-      const registerTransactionPromise = axios.put<CustomResponse<NewTransactionData | ErrorData>>(`${connectedNode}/blockchain/transactions`, { newTransaction }).then((response) => response.data);
+      const addTransactionPromise = axios.put<CustomResponse<NewTransactionData | ErrorData>>(`${connectedNode}/blockchain/transactions`, { newTransaction }).then((response) => response.data);
 
-      registerTransactionPromises.push(registerTransactionPromise);
+      addTransactionPromises.push(addTransactionPromise);
     }
 
-    await Promise.all(registerTransactionPromises);
+    await Promise.all(addTransactionPromises);
 
     res.status(201).send({
-      message: "The new transaction was registered in the node's mempool and sent to the connected node's mempool.",
+      message: "The new transaction was added in the node's mempool and sent to the connected node's mempool.",
       data: {
         newTransaction,
       },
@@ -237,14 +233,14 @@ const broadcastNewTransaction = async (req: Request<{}, {}, NewTransactionReques
   }
 };
 
-const registerNewTransaction = async (req: Request<{}, {}, NewTransactionRequest>, res: Response<CustomResponse<NewTransactionData | ErrorData>>): Promise<void> => {
+const addNewTransaction = async (req: Request<{}, {}, NewTransactionRequest>, res: Response<CustomResponse<NewTransactionData | ErrorData>>): Promise<void> => {
   try {
     const { newTransaction } = req.body;
 
     blockchain.addTransactionToMempool(newTransaction);
 
     res.status(200).send({
-      message: 'Registered.',
+      message: 'New transaction added.',
       data: {
         newTransaction,
       },
@@ -265,10 +261,10 @@ const registerNewTransaction = async (req: Request<{}, {}, NewTransactionRequest
 export default {
   getBlockchain,
   sendNextBlock,
-  updateBlockchain,
-  connectNodes,
-  registerNewNode,
+  addNextBlock,
+  sendNewNode,
+  addNewNode,
   updateConnectedNodes,
-  broadcastNewTransaction,
-  registerNewTransaction,
+  sendNewTransaction,
+  addNewTransaction,
 };

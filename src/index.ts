@@ -1,5 +1,7 @@
 import 'dotenv/config';
+
 import { startServer, setupCleanup } from './server';
+
 import { validatePort, checkAvailablePortsInEnv } from './helpers/ports.helpers';
 
 const main = () => {

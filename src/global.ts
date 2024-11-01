@@ -1,5 +1,6 @@
-import { Blockchain } from './models/Blockchain';
 import 'dotenv/config';
+
+import { Blockchain } from './models/Blockchain';
 declare global {
   var blockchain: Blockchain;
 }

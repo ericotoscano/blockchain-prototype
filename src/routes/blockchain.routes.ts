@@ -6,7 +6,7 @@ import blockchainMiddlewares from '../middlewares/blockchain.middlewares';
 import transactionsMiddlewares from '../middlewares/transactions.middlewares';
 import blocksMiddlewares from '../middlewares/blocks.middlewares';
 
-const { getBlockchain, sendNextBlock, updateBlockchain, connectNodes, registerNewNode, updateConnectedNodes, broadcastNewTransaction, registerNewTransaction } = blockchainController;
+const { getBlockchain, sendNextBlock, addNextBlock, sendNewNode, addNewNode, updateConnectedNodes, sendNewTransaction, addNewTransaction } = blockchainController;
 
 const { validateBlockchain, validateNewNodeData, validateNewNodeUrlOption, validateNewNodeConnection, validateNewConnectedNodes, validateFeeFormat, validatePendingTransactions } =
   blockchainMiddlewares;
@@ -28,7 +28,7 @@ const { validateNewTransactionData, validateNewTransactionAddresses, validateNew
 
 const router: Router = Router();
 
-router.route('/').get(validateBlockchain, getBlockchain).put(validateBlockchain, updateBlockchain); //consenso
+router.route('/').get(validateBlockchain, getBlockchain);
 
 router
   .route('/next-block')
@@ -44,14 +44,14 @@ router
     validateTransactionsIds,
     validateTransactionsStatus,
     validateTransactionsPerBlock,
-    updateBlockchain
+    addNextBlock
   );
 
 router
   .route('/nodes')
-  .post(validateBlockchain, validateNewNodeData, validateNewNodeUrlOption, validateNewNodeConnection, connectNodes)
-  .put(validateBlockchain, validateNewNodeData, validateNewNodeUrlOption, validateNewNodeConnection, registerNewNode)
-  .patch(validateBlockchain, validateNewConnectedNodes, updateConnectedNodes);
+  .post(validateBlockchain, validateNewNodeData, validateNewNodeUrlOption, validateNewNodeConnection, sendNewNode)
+  .patch(validateBlockchain, validateNewNodeData, validateNewNodeUrlOption, validateNewNodeConnection, addNewNode)
+  .put(validateBlockchain, validateNewConnectedNodes, updateConnectedNodes);
 
 router
   .route('/transactions')
@@ -63,16 +63,16 @@ router
     validateNewTransactionStatus,
     validateNewTransactionTimestamp,
     validateNewTransactionTxId,
-    broadcastNewTransaction
+    sendNewTransaction
   )
-  .put(
+  .patch(
     validateNewTransactionData,
     validateNewTransactionAddresses,
     validateNewTransactionValues,
     validateNewTransactionStatus,
     validateNewTransactionTimestamp,
     validateNewTransactionTxId,
-    registerNewTransaction
+    addNewTransaction
   );
 
 export default router;

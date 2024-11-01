@@ -1,5 +1,6 @@
-import createApp from './app';
 import { Server } from 'http';
+
+import createApp from './app';
 
 export const startServer = (port: number): Server => {
   const app = createApp();

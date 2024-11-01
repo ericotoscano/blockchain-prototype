@@ -29,9 +29,9 @@ export interface ConnectNodesData {
   connectedTo: string[];
 }
 
-export interface RegisterNodeData {
-  registeredNode: string;
-  registeredIn: string;
+export interface AddNewNodeData {
+  addedNode: string;
+  addedIn: string;
 }
 
 export interface UpdateConnectedNodesData {
