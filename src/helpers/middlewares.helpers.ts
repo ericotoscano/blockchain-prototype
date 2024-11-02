@@ -1,6 +1,5 @@
 import { Blocks } from '../models/Blocks';
 import { Transactions } from '../models/Transactions';
-import { NewTransactionRequest } from '../types/request.types';
 
 import { checkReturn } from '../types/return.types';
 
@@ -34,7 +33,7 @@ export const checkNextBlockDataFormat = (nextBlock: Blocks): checkReturn => {
   return { result: true, message: 'The next block format is valid.' };
 };
 
-export const validateNewNodeFormat = (nodeUrl: string): checkReturn => {
+export const checkNewNodeFormat = (nodeUrl: string): checkReturn => {
   if (!nodeUrl || typeof nodeUrl !== 'string') {
     return { result: false, message: 'The node url is not a string or was not provided.' };
   }
@@ -62,18 +61,10 @@ export const checkNewTransactionDataFormat = (sender: string, recipient: string,
   return { result: true, message: 'The data format is valid.' };
 };
 
-export const validateNewTransactionRegisteringFormat = (newTransaction: Transactions): checkReturn => {
+export const checkNewTransactionFormat = (newTransaction: Transactions): checkReturn => {
   if (!newTransaction || typeof newTransaction !== 'object' || Array.isArray(newTransaction)) {
     return { result: false, message: 'The new transaction is not valid or was not provided.' };
   }
 
   return { result: true, message: 'The new transaction format is valid.' };
-};
-
-export const formatNewTransactionRequest = (request: NewTransactionRequest): void => {
-  for (const key in request) {
-    if (key !== 'newTransaction') {
-      delete request[key as keyof NewTransactionRequest];
-    }
-  }
 };

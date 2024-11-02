@@ -1,9 +1,18 @@
-import { Request, Response } from 'express';
-import axios from 'axios';
+import { Request, Response } from "express";
+import axios from "axios";
 
-import '../global';
+import "../global";
 
-import { SendNextBlockRequest, UpdateBlockchainRequest, NewNodeRequest, UpdateConnectedNodesRequest, NewTransactionRequest, RemoveTransactionRequest } from '../types/request.types';
+import { Transactions } from "../models/Transactions";
+
+import {
+  SendNextBlockRequest,
+  UpdateBlockchainRequest,
+  SendNewNodeRequest,
+  UpdateConnectedNodesRequest,
+  SendNewTransactionRequest,
+  AddNewTransactionRequest,
+} from "../types/request.types";
 
 import {
   CustomResponse,
@@ -15,23 +24,27 @@ import {
   ConnectNodesData,
   GetBlockchainData,
   RemoveTransactionsData,
-} from '../types/response.types';
+} from "../types/response.types";
 
-const getBlockchain = async (req: Request, res: Response<CustomResponse<GetBlockchainData | ErrorData>>): Promise<void> => {
+const getBlockchain = async (
+  req: Request,
+  res: Response<CustomResponse<GetBlockchainData | ErrorData>>
+): Promise<void> => {
   try {
     blockchain.connectedNodes.sort();
 
     res.status(200).send({
-      message: 'The blockchain has been found.',
+      message: "The blockchain has been found.",
       data: {
         blockchain,
       },
     });
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
+    const errorMessage =
+      error instanceof Error ? error.message : "Unexpected error.";
 
     res.status(500).send({
-      message: 'An error ocurred.',
+      message: "An error ocurred.",
       data: {
         code: 500,
         message: errorMessage,
@@ -40,14 +53,27 @@ const getBlockchain = async (req: Request, res: Response<CustomResponse<GetBlock
   }
 };
 
-const sendNextBlock = async (req: Request<{}, {}, SendNextBlockRequest>, res: Response<CustomResponse<NextBlockData | RemoveTransactionsData | ErrorData>>): Promise<void> => {
+const sendNextBlock = async (
+  req: Request<{}, {}, SendNextBlockRequest>,
+  res: Response<
+    CustomResponse<NextBlockData | RemoveTransactionsData | ErrorData>
+  >
+): Promise<void> => {
   try {
     const { minFee } = req.body;
 
-    const nextBlockTransactions = blockchain.getNextBlockTransactionsByFee(minFee);
+    const nextBlockTransactions =
+      blockchain.getNextBlockTransactionsByFee(minFee);
 
     if (nextBlockTransactions.length === 0) {
-      res.status(400).send({ message: 'An error ocurred.', data: { code: 101, message: 'There are no pending transactions in the mempool with a fee greater than or equal to the minimum fee.' } });
+      res.status(400).send({
+        message: "An error ocurred.",
+        data: {
+          code: 101,
+          message:
+            "There are no pending transactions in the mempool with a fee greater than or equal to the minimum fee.",
+        },
+      });
       return;
     }
 
@@ -55,10 +81,17 @@ const sendNextBlock = async (req: Request<{}, {}, SendNextBlockRequest>, res: Re
 
     blockchain.addBlock(nextBlock);
 
-    const updateBlockchainPromises: Promise<CustomResponse<NextBlockData | ErrorData>>[] = [];
+    const updateBlockchainPromises: Promise<
+      CustomResponse<NextBlockData | ErrorData>
+    >[] = [];
 
     for (const connectedNode of blockchain.connectedNodes) {
-      const updateBlockchainPromise = axios.patch<CustomResponse<NextBlockData | ErrorData>>(`${connectedNode}/blockchain/next-block`, { nextBlock }).then((response) => response.data);
+      const updateBlockchainPromise = axios
+        .patch<CustomResponse<NextBlockData | ErrorData>>(
+          `${connectedNode}/blockchain/next-block`,
+          { nextBlock }
+        )
+        .then((response) => response.data);
 
       updateBlockchainPromises.push(updateBlockchainPromise);
     }
@@ -66,16 +99,18 @@ const sendNextBlock = async (req: Request<{}, {}, SendNextBlockRequest>, res: Re
     await Promise.all(updateBlockchainPromises);
 
     res.status(201).send({
-      message: 'The next block was mined by the node and sent to his connected nodes.',
+      message:
+        "The next block was mined by the node and sent to his connected nodes.",
       data: {
         nextBlock,
       },
     });
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
+    const errorMessage =
+      error instanceof Error ? error.message : "Unexpected error.";
 
     res.status(500).send({
-      message: 'An error ocurred.',
+      message: "An error ocurred.",
       data: {
         code: 500,
         message: errorMessage,
@@ -84,23 +119,27 @@ const sendNextBlock = async (req: Request<{}, {}, SendNextBlockRequest>, res: Re
   }
 };
 
-const addNextBlock = async (req: Request<{}, {}, UpdateBlockchainRequest>, res: Response<CustomResponse<NextBlockData | ErrorData>>): Promise<void> => {
+const addNextBlock = async (
+  req: Request<{}, {}, UpdateBlockchainRequest>,
+  res: Response<CustomResponse<NextBlockData | ErrorData>>
+): Promise<void> => {
   try {
     const { nextBlock } = req.body;
 
     blockchain.addBlock(nextBlock);
 
     res.status(200).send({
-      message: 'Next block added.',
+      message: "Next block added.",
       data: {
         nextBlock,
       },
     });
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
+    const errorMessage =
+      error instanceof Error ? error.message : "Unexpected error.";
 
     res.status(500).send({
-      message: 'An error ocurred.',
+      message: "An error ocurred.",
       data: {
         code: 500,
         message: errorMessage,
@@ -109,21 +148,34 @@ const addNextBlock = async (req: Request<{}, {}, UpdateBlockchainRequest>, res: 
   }
 };
 
-const sendNewNode = async (req: Request<{}, {}, NewNodeRequest>, res: Response<CustomResponse<ConnectNodesData | ErrorData>>): Promise<void> => {
+const sendNewNode = async (
+  req: Request<{}, {}, SendNewNodeRequest>,
+  res: Response<CustomResponse<ConnectNodesData | ErrorData>>
+): Promise<void> => {
   try {
     const { nodeUrl } = req.body;
 
     blockchain.addNode(nodeUrl);
 
     let addNewNodePromise: Promise<CustomResponse<AddNewNodeData | ErrorData>>;
-    
-    const addNewNodePromises: Promise<CustomResponse<AddNewNodeData | ErrorData>>[] = [];
+
+    const addNewNodePromises: Promise<
+      CustomResponse<AddNewNodeData | ErrorData>
+    >[] = [];
 
     for (const connectedNodeUrl of blockchain.connectedNodes) {
       if (nodeUrl !== connectedNodeUrl) {
-        addNewNodePromise = axios.patch<CustomResponse<AddNewNodeData | ErrorData>>(`${connectedNodeUrl}/blockchain/nodes`, { nodeUrl }).then((response) => response.data);
+        addNewNodePromise = axios
+          .patch<CustomResponse<AddNewNodeData | ErrorData>>(
+            `${connectedNodeUrl}/blockchain/nodes`,
+            { nodeUrl }
+          )
+          .then((response) => response.data);
       } else {
-        addNewNodePromise = Promise.resolve({ message: 'No added: same node.', data: { addedNode: nodeUrl, addedIn: blockchain.nodeUrl } });
+        addNewNodePromise = Promise.resolve({
+          message: "No added: same node.",
+          data: { addedNode: nodeUrl, addedIn: blockchain.nodeUrl },
+        });
       }
 
       addNewNodePromises.push(addNewNodePromise);
@@ -133,17 +185,21 @@ const sendNewNode = async (req: Request<{}, {}, NewNodeRequest>, res: Response<C
 
     const connectedNodes = blockchain.broadcastNodesTo(nodeUrl);
 
-    axios.put<CustomResponse<UpdateConnectedNodesData | ErrorData>>(`${nodeUrl}/blockchain/nodes`, { connectedNodes });
+    axios.put<CustomResponse<UpdateConnectedNodesData | ErrorData>>(
+      `${nodeUrl}/blockchain/nodes`,
+      { connectedNodes }
+    );
 
     res.status(201).send({
-      message: 'A new node has been connected.',
+      message: "A new node has been connected.",
       data: { connectedTo: connectedNodes.sort() },
     });
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
+    const errorMessage =
+      error instanceof Error ? error.message : "Unexpected error.";
 
     res.status(500).send({
-      message: 'An error occurred.',
+      message: "An error occurred.",
       data: {
         code: 500,
         message: errorMessage,
@@ -152,21 +208,25 @@ const sendNewNode = async (req: Request<{}, {}, NewNodeRequest>, res: Response<C
   }
 };
 
-const addNewNode = async (req: Request<{}, {}, NewNodeRequest>, res: Response<CustomResponse<AddNewNodeData | ErrorData>>): Promise<void> => {
+const addNewNode = async (
+  req: Request<{}, {}, SendNewNodeRequest>,
+  res: Response<CustomResponse<AddNewNodeData | ErrorData>>
+): Promise<void> => {
   try {
     const { nodeUrl } = req.body;
 
     blockchain.addNode(nodeUrl);
 
     res.status(200).send({
-      message: 'New node added.',
+      message: "New node added.",
       data: { addedNode: nodeUrl, addedIn: blockchain.nodeUrl },
     });
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
+    const errorMessage =
+      error instanceof Error ? error.message : "Unexpected error.";
 
     res.status(500).send({
-      message: 'An error occurred.',
+      message: "An error occurred.",
       data: {
         code: 500,
         message: errorMessage,
@@ -175,21 +235,28 @@ const addNewNode = async (req: Request<{}, {}, NewNodeRequest>, res: Response<Cu
   }
 };
 
-const updateConnectedNodes = async (req: Request<{}, {}, UpdateConnectedNodesRequest>, res: Response<CustomResponse<UpdateConnectedNodesData | ErrorData>>): Promise<void> => {
+const updateConnectedNodes = async (
+  req: Request<{}, {}, UpdateConnectedNodesRequest>,
+  res: Response<CustomResponse<UpdateConnectedNodesData | ErrorData>>
+): Promise<void> => {
   try {
     const { connectedNodes } = req.body;
 
     blockchain.setConnectedNodes(connectedNodes);
 
     res.status(200).send({
-      message: 'Connected nodes updated.',
-      data: { nodeUrl: blockchain.nodeUrl, connectedNodes: blockchain.connectedNodes.sort() },
+      message: "Connected nodes updated.",
+      data: {
+        nodeUrl: blockchain.nodeUrl,
+        connectedNodes: blockchain.connectedNodes.sort(),
+      },
     });
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
+    const errorMessage =
+      error instanceof Error ? error.message : "Unexpected error.";
 
     res.status(500).send({
-      message: 'An error occurred.',
+      message: "An error occurred.",
       data: {
         code: 500,
         message: errorMessage,
@@ -197,17 +264,46 @@ const updateConnectedNodes = async (req: Request<{}, {}, UpdateConnectedNodesReq
     });
   }
 };
-//ver se consegue criar o transaction object depois, como foi feito com o next-block e o minFee enviado
-const sendNewTransaction = async (req: Request<{}, {}, NewTransactionRequest>, res: Response<CustomResponse<NewTransactionData | ErrorData>>): Promise<void> => {
+
+const sendNewTransaction = async (
+  req: Request<{}, {}, SendNewTransactionRequest>,
+  res: Response<CustomResponse<NewTransactionData | ErrorData>>
+): Promise<void> => {
   try {
-    const { newTransaction } = req.body;
+    const { sender, recipient, amount, fee } = req.body;
+
+    const newTransaction = new Transactions(sender, recipient, amount, fee);
+
+    const { txId } = newTransaction;
+
+    if (
+      !blockchain.mempool.every(
+        (mempoolTransaction) => mempoolTransaction.txId !== txId
+      )
+    ) {
+      res.status(400).send({
+        message: "An error ocurred.",
+        data: {
+          code: 201,
+          message: "The new transaction is already on the blockchain mempool.",
+        },
+      });
+      return;
+    }
 
     blockchain.addTransactionToMempool(newTransaction);
 
-    const addTransactionPromises: Promise<CustomResponse<NewTransactionData | ErrorData>>[] = [];
+    const addTransactionPromises: Promise<
+      CustomResponse<NewTransactionData | ErrorData>
+    >[] = [];
 
     for (const connectedNode of blockchain.connectedNodes) {
-      const addTransactionPromise = axios.put<CustomResponse<NewTransactionData | ErrorData>>(`${connectedNode}/blockchain/transactions`, { newTransaction }).then((response) => response.data);
+      const addTransactionPromise = axios
+        .patch<CustomResponse<NewTransactionData | ErrorData>>(
+          `${connectedNode}/blockchain/transactions`,
+          { newTransaction }
+        )
+        .then((response) => response.data);
 
       addTransactionPromises.push(addTransactionPromise);
     }
@@ -215,16 +311,18 @@ const sendNewTransaction = async (req: Request<{}, {}, NewTransactionRequest>, r
     await Promise.all(addTransactionPromises);
 
     res.status(201).send({
-      message: "The new transaction was added in the node's mempool and sent to the connected node's mempool.",
+      message:
+        "The new transaction was added in the node's mempool and sent to the connected node's mempool.",
       data: {
         newTransaction,
       },
     });
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
+    const errorMessage =
+      error instanceof Error ? error.message : "Unexpected error.";
 
     res.status(500).send({
-      message: 'An error occurred.',
+      message: "An error occurred.",
       data: {
         code: 500,
         message: errorMessage,
@@ -233,23 +331,27 @@ const sendNewTransaction = async (req: Request<{}, {}, NewTransactionRequest>, r
   }
 };
 
-const addNewTransaction = async (req: Request<{}, {}, NewTransactionRequest>, res: Response<CustomResponse<NewTransactionData | ErrorData>>): Promise<void> => {
+const addNewTransaction = async (
+  req: Request<{}, {}, AddNewTransactionRequest>,
+  res: Response<CustomResponse<NewTransactionData | ErrorData>>
+): Promise<void> => {
   try {
     const { newTransaction } = req.body;
 
     blockchain.addTransactionToMempool(newTransaction);
 
     res.status(200).send({
-      message: 'New transaction added.',
+      message: "New transaction added.",
       data: {
         newTransaction,
       },
     });
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
+    const errorMessage =
+      error instanceof Error ? error.message : "Unexpected error.";
 
     res.status(500).send({
-      message: 'An error occurred.',
+      message: "An error occurred.",
       data: {
         code: 500,
         message: errorMessage,

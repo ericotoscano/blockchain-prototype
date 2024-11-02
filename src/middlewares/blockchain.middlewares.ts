@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 
-import { NewNodeRequest, SendNextBlockRequest, UpdateConnectedNodesRequest } from '../types/request.types';
+import { SendNewNodeRequest, SendNextBlockRequest, UpdateConnectedNodesRequest } from '../types/request.types';
 import { CustomResponse, ErrorData, MiddlewareResponse } from '../types/response.types';
 
-import { validateNewNodeFormat } from '../helpers/middlewares.helpers';
+import { checkNewNodeFormat } from '../helpers/middlewares.helpers';
 import { getNodesUrlOptions } from '../helpers/ports.helpers';
 
 const validateBlockchain = async (req: Request, res: Response<MiddlewareResponse | CustomResponse<ErrorData>>, next: NextFunction): Promise<void> => {
@@ -25,11 +25,11 @@ const validateBlockchain = async (req: Request, res: Response<MiddlewareResponse
   }
 };
 
-const validateNewNodeData = async (req: Request<{}, {}, NewNodeRequest>, res: Response<MiddlewareResponse | CustomResponse<ErrorData>>, next: NextFunction): Promise<void> => {
+const validateNewNodeData = async (req: Request<{}, {}, SendNewNodeRequest>, res: Response<MiddlewareResponse | CustomResponse<ErrorData>>, next: NextFunction): Promise<void> => {
   try {
     const { nodeUrl } = req.body;
 
-    const { result, message } = validateNewNodeFormat(nodeUrl);
+    const { result, message } = checkNewNodeFormat(nodeUrl);
 
     if (!result) {
       res.status(400).send({
@@ -53,7 +53,7 @@ const validateNewNodeData = async (req: Request<{}, {}, NewNodeRequest>, res: Re
   }
 };
 
-const validateNewNodeUrlOption = async (req: Request<{}, {}, NewNodeRequest>, res: Response<MiddlewareResponse | CustomResponse<ErrorData>>, next: NextFunction): Promise<void> => {
+const validateNewNodeUrlOption = async (req: Request<{}, {}, SendNewNodeRequest>, res: Response<MiddlewareResponse | CustomResponse<ErrorData>>, next: NextFunction): Promise<void> => {
   try {
     const { nodeUrl } = req.body;
 
@@ -79,7 +79,7 @@ const validateNewNodeUrlOption = async (req: Request<{}, {}, NewNodeRequest>, re
   }
 };
 
-const validateNewNodeConnection = async (req: Request<{}, {}, NewNodeRequest>, res: Response<MiddlewareResponse | CustomResponse<ErrorData>>, next: NextFunction): Promise<void> => {
+const validateNewNodeConnection = async (req: Request<{}, {}, SendNewNodeRequest>, res: Response<MiddlewareResponse | CustomResponse<ErrorData>>, next: NextFunction): Promise<void> => {
   try {
     const { nodeUrl } = req.body;
 

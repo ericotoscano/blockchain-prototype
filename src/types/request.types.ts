@@ -1,5 +1,5 @@
-import { Blocks } from '../models/Blocks';
-import { Transactions } from '../models/Transactions';
+import { Blocks } from "../models/Blocks";
+import { Transactions } from "../models/Transactions";
 
 export interface SendNextBlockRequest {
   minFee: number;
@@ -9,7 +9,7 @@ export interface UpdateBlockchainRequest {
   nextBlock: Blocks;
 }
 
-export interface NewNodeRequest {
+export interface SendNewNodeRequest {
   nodeUrl: string;
 }
 
@@ -17,14 +17,13 @@ export interface UpdateConnectedNodesRequest {
   connectedNodes: string[];
 }
 
-export interface NewTransactionRequest {
+export interface SendNewTransactionRequest {
   sender: string;
   recipient: string;
   amount: number;
   fee: number;
-  newTransaction: Transactions;
 }
 
-export interface RemoveTransactionRequest {
-  txIds: string[];
+export interface AddNewTransactionRequest {
+  newTransaction: Transactions;
 }
