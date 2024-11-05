@@ -1,19 +1,22 @@
 import { Request, Response, NextFunction } from 'express';
 
-import { UpdateBlockchainRequest } from '../types/request.types';
-import { CustomResponse, ErrorData, MiddlewareResponse } from '../types/response.types';
+import { NextBlockPatchRequest } from '../types/request.types';
+import { CustomResponse, ErrorDataResponse } from '../types/response.types';
 
 import { checkNextBlockDataFormat } from '../helpers/middlewares.helpers';
 import { isValidHex64String } from '../utils/validation.utils';
 
-const validateNextBlockData = async (req: Request<{}, {}, UpdateBlockchainRequest>, res: Response<MiddlewareResponse | CustomResponse<ErrorData>>, next: NextFunction): Promise<void> => {
+const checkNextBlockData = async (req: Request<{}, {}, NextBlockPatchRequest>, res: Response<CustomResponse<ErrorDataResponse>>, next: NextFunction): Promise<void> => {
   try {
     const { nextBlock } = req.body;
 
     const { result, message } = checkNextBlockDataFormat(nextBlock);
 
     if (!result) {
-      res.status(400).send({ message });
+      res.status(400).send({
+        message: 'Client Error',
+        data: { code: 11, message },
+      });
       return;
     }
 
@@ -29,18 +32,18 @@ const validateNextBlockData = async (req: Request<{}, {}, UpdateBlockchainReques
   }
 };
 
-const validateNextBlockHeight = async (req: Request<{}, {}, UpdateBlockchainRequest>, res: Response<MiddlewareResponse | CustomResponse<ErrorData>>, next: NextFunction): Promise<void> => {
+const checkNextBlockHeight = async (req: Request<{}, {}, NextBlockPatchRequest>, res: Response<CustomResponse<ErrorDataResponse>>, next: NextFunction): Promise<void> => {
   try {
     const { nextBlock } = req.body;
     const { height } = nextBlock;
 
     if (height < 0 || !Number.isInteger(height)) {
-      res.status(400).send({ message: 'The next block height is a negative number or is not a integer number.' });
+      res.status(400).send({ message: 'Client Error', data: { code: 10, message: 'The next block height is a negative number or is not a integer number.' } });
       return;
     }
 
     if (height !== blockchain.blocks.length) {
-      res.status(400).send({ message: 'The next block height is not the right next block height in blockchain.' });
+      res.status(400).send({ message: 'Client Error', data: { code: 10, message: 'The next block height is not the right next block height in blockchain.' } });
       return;
     }
 
@@ -56,13 +59,13 @@ const validateNextBlockHeight = async (req: Request<{}, {}, UpdateBlockchainRequ
   }
 };
 
-const validateNextBlockNonce = async (req: Request<{}, {}, UpdateBlockchainRequest>, res: Response<MiddlewareResponse | CustomResponse<ErrorData>>, next: NextFunction): Promise<void> => {
+const checkNextBlockNonce = async (req: Request<{}, {}, NextBlockPatchRequest>, res: Response<CustomResponse<ErrorDataResponse>>, next: NextFunction): Promise<void> => {
   try {
     const { nextBlock } = req.body;
     const { nonce } = nextBlock;
 
     if (nonce < 0 || !Number.isInteger(nonce)) {
-      res.status(400).send({ message: 'The next block nonce is a negative number or is not a integer number.' });
+      res.status(400).send({ message: 'Client Error', data: { code: 10, message: 'The next block nonce is a negative number or is not a integer number.' } });
       return;
     }
 
@@ -78,13 +81,13 @@ const validateNextBlockNonce = async (req: Request<{}, {}, UpdateBlockchainReque
   }
 };
 
-const validateNextBlockHash = async (req: Request<{}, {}, UpdateBlockchainRequest>, res: Response<MiddlewareResponse | CustomResponse<ErrorData>>, next: NextFunction): Promise<void> => {
+const checkNextBlockHash = async (req: Request<{}, {}, NextBlockPatchRequest>, res: Response<CustomResponse<ErrorDataResponse>>, next: NextFunction): Promise<void> => {
   try {
     const { nextBlock } = req.body;
     const { hash } = nextBlock;
 
     if (!isValidHex64String(hash)) {
-      res.status(400).send({ message: 'The next block hash is not a valid hex string.' });
+      res.status(400).send({ message: 'Client Error', data: { code: 10, message: 'The next block hash is not a valid hex string.' } });
       return;
     }
 
@@ -102,18 +105,18 @@ const validateNextBlockHash = async (req: Request<{}, {}, UpdateBlockchainReques
   }
 };
 
-const validateNextBlockPreviousHash = async (req: Request<{}, {}, UpdateBlockchainRequest>, res: Response<MiddlewareResponse | CustomResponse<ErrorData>>, next: NextFunction): Promise<void> => {
+const checkNextBlockPreviousHash = async (req: Request<{}, {}, NextBlockPatchRequest>, res: Response<CustomResponse<ErrorDataResponse>>, next: NextFunction): Promise<void> => {
   try {
     const { nextBlock } = req.body;
     const { previousHash } = nextBlock;
 
     if (!isValidHex64String(previousHash)) {
-      res.status(400).send({ message: 'The next block previous hash is not a valid hex string.' });
+      res.status(400).send({ message: 'Client Error', data: { code: 10, message: 'The next block previous hash is not a valid hex string.' } });
       return;
     }
 
     if (blockchain.getPreviousBlock().hash !== previousHash) {
-      res.status(400).send({ message: 'The next block previous hash and the last valid block hash in blockchain are not the same.' });
+      res.status(400).send({ message: 'Client Error', data: { code: 10, message: 'The next block previous hash and the last valid block hash in blockchain are not the same.' } });
       return;
     }
 
@@ -129,13 +132,13 @@ const validateNextBlockPreviousHash = async (req: Request<{}, {}, UpdateBlockcha
   }
 };
 
-const validateNextBlockTransactions = async (req: Request<{}, {}, UpdateBlockchainRequest>, res: Response<MiddlewareResponse | CustomResponse<ErrorData>>, next: NextFunction): Promise<void> => {
+const checkNextBlockTransactions = async (req: Request<{}, {}, NextBlockPatchRequest>, res: Response<CustomResponse<ErrorDataResponse>>, next: NextFunction): Promise<void> => {
   try {
     const { nextBlock } = req.body;
     const { transactions } = nextBlock;
 
     if (transactions.length === 0) {
-      res.status(400).send({ message: 'The next block transactions is an empty array.' });
+      res.status(400).send({ message: 'Client Error', data: { code: 10, message: 'The next block transactions is an empty array.' } });
       return;
     }
 
@@ -150,8 +153,8 @@ const validateNextBlockTransactions = async (req: Request<{}, {}, UpdateBlockcha
     return;
   }
 };
-
-const validateTransactionsIds = async (req: Request<{}, {}, UpdateBlockchainRequest>, res: Response<MiddlewareResponse | CustomResponse<ErrorData>>, next: NextFunction): Promise<void> => {
+/* 
+const validateTransactionsIds = async (req: Request<{}, {}, NextBlockPatchRequest>, res: Response<CustomResponse<ErrorDataResponse>>, next: NextFunction): Promise<void> => {
   try {
     const { nextBlock } = req.body;
     const { transactions } = nextBlock;
@@ -161,9 +164,8 @@ const validateTransactionsIds = async (req: Request<{}, {}, UpdateBlockchainRequ
     if (notInMempool.some((transaction) => transaction.sender !== 'Reward')) {
       const transactionIds = notInMempool.map((transaction) => transaction.txId).join(', ');
 
-      res.status(400).send({
-        message: `The following txId's of the next block transactions are not included in mempool: ${transactionIds}.`,
-      });
+      res.status(400).send({ message: 'Client Error', data: { code: 10, message: `The following txId's of the next block transactions are not included in mempool: ${transactionIds}.`,
+      }});
       return;
     }
 
@@ -182,7 +184,7 @@ const validateTransactionsIds = async (req: Request<{}, {}, UpdateBlockchainRequ
   }
 };
 
-const validateTransactionsStatus = async (req: Request<{}, {}, UpdateBlockchainRequest>, res: Response<MiddlewareResponse | CustomResponse<ErrorData>>, next: NextFunction): Promise<void> => {
+const validateTransactionsStatus = async (req: Request<{}, {}, NextBlockPatchRequest>, res: Response<CustomResponse | <ErrorDataResponse>>, next: NextFunction): Promise<void> => {
   try {
     const { nextBlock } = req.body;
     const { transactions } = nextBlock;
@@ -211,17 +213,20 @@ const validateTransactionsStatus = async (req: Request<{}, {}, UpdateBlockchainR
     });
     return;
   }
-};
+}; */
 
-const validateTransactionsPerBlock = async (req: Request<{}, {}, UpdateBlockchainRequest>, res: Response<MiddlewareResponse | CustomResponse<ErrorData>>, next: NextFunction): Promise<void> => {
+const checkTransactionsPerBlock = async (req: Request<{}, {}, NextBlockPatchRequest>, res: Response<CustomResponse<ErrorDataResponse>>, next: NextFunction): Promise<void> => {
   try {
     const { nextBlock } = req.body;
     const { transactions } = nextBlock;
 
     if (transactions.length > blockchain.maxTransactionsPerBlock - 1) {
-      res.status(400).send({
-        message: "Considering the miner's reward transaction, the number of next block transactions must be equal to the maximum number of transactions per block, minus one.",
-      });
+      res
+        .status(400)
+        .send({
+          message: 'Client Error',
+          data: { code: 10, message: "Considering the miner's reward transaction, the number of next block transactions must be equal to the maximum number of transactions per block, minus one." },
+        });
       return;
     }
 
@@ -241,13 +246,13 @@ const validateTransactionsPerBlock = async (req: Request<{}, {}, UpdateBlockchai
 };
 
 export default {
-  validateNextBlockData,
-  validateNextBlockHeight,
-  validateNextBlockNonce,
-  validateNextBlockHash,
-  validateNextBlockPreviousHash,
-  validateNextBlockTransactions,
-  validateTransactionsIds,
-  validateTransactionsStatus,
-  validateTransactionsPerBlock,
+  checkNextBlockData,
+  checkNextBlockHeight,
+  checkNextBlockNonce,
+  checkNextBlockHash,
+  checkNextBlockPreviousHash,
+  checkNextBlockTransactions,
+  /*   validateTransactionsIds,
+  validateTransactionsStatus, */
+  checkTransactionsPerBlock,
 };

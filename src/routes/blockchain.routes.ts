@@ -1,97 +1,54 @@
-import { Router } from "express";
+import { Router } from 'express';
 
-import blockchainController from "../controllers/blockchain.controller";
+import blockchainController from '../controllers/blockchain.controller';
 
-import blockchainMiddlewares from "../middlewares/blockchain.middlewares";
-import transactionsMiddlewares from "../middlewares/transactions.middlewares";
-import blocksMiddlewares from "../middlewares/blocks.middlewares";
+import blockchainMiddlewares from '../middlewares/blockchain.middlewares';
+import transactionsMiddlewares from '../middlewares/transaction.middlewares';
+import blocksMiddlewares from '../middlewares/block.middlewares';
 
-const {
-  getBlockchain,
-  sendNextBlock,
-  addNextBlock,
-  sendNewNode,
-  addNewNode,
-  updateConnectedNodes,
-  sendNewTransaction,
-  addNewTransaction,
-} = blockchainController;
+const { getBlockchain, sendNextBlock, addNextBlock, sendNewNode, addNewNode, updateConnectedNodes, sendNewTransaction, addNewTransaction } = blockchainController;
+
+const { checkBlockchain, checkNewNodeData, checkNewNodeUrlOption, checkNewNodeConnection, checkNewConnectedNodes, checkFeeFormat, checkPendingTransactions } =
+  blockchainMiddlewares;
 
 const {
-  validateBlockchain,
-  validateNewNodeData,
-  validateNewNodeUrlOption,
-  validateNewNodeConnection,
-  validateNewConnectedNodes,
-  validateFeeFormat,
-  validatePendingTransactions,
-} = blockchainMiddlewares;
-
-const {
-  validateNextBlockData,
-  validateNextBlockHeight,
-  validateNextBlockNonce,
-  validateNextBlockHash,
-  validateNextBlockPreviousHash,
-  validateNextBlockTransactions,
-  validateTransactionsIds,
-  validateTransactionsStatus,
-  validateTransactionsPerBlock,
+  checkNextBlockData,
+  checkNextBlockHeight,
+  checkNextBlockNonce,
+  checkNextBlockHash,
+  checkNextBlockPreviousHash,
+  checkNextBlockTransactions,
+  /*   validateTransactionsIds,
+  validateTransactionsStatus, */
+  checkTransactionsPerBlock,
 } = blocksMiddlewares;
 
-const {
-  validateNewTransactionData,
-  validateNewTransactionAddresses,
-  validateNewTransactionValues,
-} = transactionsMiddlewares;
+const { checkNewTransactionData, checkNewTransactionAddresses, checkNewTransactionValues } = transactionsMiddlewares;
 
 const router: Router = Router();
 
-router.route("/").get(validateBlockchain, getBlockchain);
+router.route('/').get(checkBlockchain, getBlockchain);
+
+router.route('/next-block').post(checkBlockchain, checkFeeFormat, checkPendingTransactions, sendNextBlock).patch(
+  checkBlockchain,
+  checkNextBlockData,
+  checkNextBlockHeight,
+  checkNextBlockNonce,
+  checkNextBlockHash,
+  checkNextBlockPreviousHash,
+  checkNextBlockTransactions,
+  /*     validateTransactionsIds,
+    validateTransactionsStatus, */
+  checkTransactionsPerBlock,
+  addNextBlock
+);
 
 router
-  .route("/next-block")
-  .post(
-    validateBlockchain,
-    validateFeeFormat,
-    validatePendingTransactions,
-    sendNextBlock
-  )
-  .patch(
-    validateBlockchain,
-    validateNextBlockData,
-    validateNextBlockHeight,
-    validateNextBlockNonce,
-    validateNextBlockHash,
-    validateNextBlockPreviousHash,
-    validateNextBlockTransactions,
-    validateTransactionsIds,
-    validateTransactionsStatus,
-    validateTransactionsPerBlock,
-    addNextBlock
-  );
+  .route('/nodes')
+  .post(checkBlockchain, checkNewNodeData, checkNewNodeUrlOption, checkNewNodeConnection, sendNewNode)
+  .patch(checkBlockchain, addNewNode)
+  .put(checkBlockchain, checkNewConnectedNodes, updateConnectedNodes);
 
-router
-  .route("/nodes")
-  .post(
-    validateBlockchain,
-    validateNewNodeData,
-    validateNewNodeUrlOption,
-    validateNewNodeConnection,
-    sendNewNode
-  )
-  .patch(validateBlockchain, addNewNode)
-  .put(validateBlockchain, validateNewConnectedNodes, updateConnectedNodes);
-
-router
-  .route("/transactions")
-  .post(
-    validateBlockchain,
-    validateNewTransactionData,
-    validateNewTransactionAddresses,
-    validateNewTransactionValues,
-    sendNewTransaction
-  )
-  .patch(addNewTransaction);
+router.route('/transactions').post(checkBlockchain, checkNewTransactionData, checkNewTransactionAddresses, checkNewTransactionValues, sendNewTransaction).patch(addNewTransaction);
 
 export default router;

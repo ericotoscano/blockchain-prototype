@@ -1,9 +1,8 @@
 import { sha256 } from 'js-sha256';
 
-export class Transactions {
+export class Transaction {
   txId: string;
   status: string;
-  timestamp: Date;
   sender: string;
   recipient: string;
   amount: number;
@@ -15,12 +14,11 @@ export class Transactions {
     this.amount = amount;
     this.fee = fee;
     this.status = 'Pending';
-    this.timestamp = new Date();
     this.txId = this.createTxId();
   }
 
   getData(): string {
-    return this.timestamp.toString() + this.status + this.sender + this.recipient + this.amount.toString() + this.fee.toString();
+    return this.status + this.sender + this.recipient + this.amount.toString() + this.fee.toString();
   }
 
   createTxId(): string {

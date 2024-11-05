@@ -1,29 +1,28 @@
-import { Blocks } from "../models/Blocks";
-import { Transactions } from "../models/Transactions";
+import { BlockData, TransactionData } from './data.types';
 
-export interface SendNextBlockRequest {
+export interface NextBlockPostRequest {
   minFee: number;
 }
 
-export interface UpdateBlockchainRequest {
-  nextBlock: Blocks;
+export interface NextBlockPatchRequest {
+  nextBlock: BlockData;
 }
 
-export interface SendNewNodeRequest {
+export interface NodesPostRequest {
   nodeUrl: string;
 }
 
-export interface UpdateConnectedNodesRequest {
+export interface NodesPutRequest {
   connectedNodes: string[];
 }
 
-export interface SendNewTransactionRequest {
+export interface TransactionsPostRequest {
   sender: string;
   recipient: string;
   amount: number;
   fee: number;
 }
 
-export interface AddNewTransactionRequest {
-  newTransaction: Transactions;
+export interface TransactionsPatchRequest {
+  newTransaction: TransactionData;
 }

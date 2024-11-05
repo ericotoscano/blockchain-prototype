@@ -1,45 +1,37 @@
-import { Blockchain } from '../models/Blockchain';
-import { Blocks } from '../models/Blocks';
-import { Transactions } from '../models/Transactions';
-export interface MiddlewareResponse {
-  message: string;
-}
+import { BlockData, BlockchainData, TransactionData } from './data.types';
+
 export interface CustomResponse<T> {
   message: string;
   data: T;
 }
 
-export interface NewTransactionData {
-  newTransaction: Transactions;
+export interface ErrorDataResponse {
+  code: number;
+  message: string;
 }
 
-export interface RemoveTransactionsData {
-  txIds: string[];
+export interface BlockchainDataGetResponse {
+  blockchain: BlockchainData;
 }
 
-export interface GetBlockchainData {
-  blockchain: Blockchain;
+export interface NextBlockDataPostResponse {
+  nextBlock: BlockData;
 }
 
-export interface NextBlockData {
-  nextBlock: Blocks;
+export interface TransactionsPostResponseData {
+  newTransaction: TransactionData;
 }
 
-export interface ConnectNodesData {
+export interface NodesDataPostResponse {
   connectedTo: string[];
 }
 
-export interface AddNewNodeData {
+export interface NodesDataPatchResponse {
   addedNode: string;
   addedIn: string;
 }
 
-export interface UpdateConnectedNodesData {
+export interface NodesDataPutResponse {
   nodeUrl: string;
   connectedNodes: string[];
-}
-
-export interface ErrorData {
-  code: number;
-  message: string;
 }

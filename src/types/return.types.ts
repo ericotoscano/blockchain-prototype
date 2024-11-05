@@ -1,4 +1,4 @@
-export interface checkReturn {
+export interface CheckReturn {
   result: boolean;
   message: string;
 }
