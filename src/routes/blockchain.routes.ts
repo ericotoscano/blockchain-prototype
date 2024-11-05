@@ -8,8 +8,7 @@ import blocksMiddlewares from '../middlewares/block.middlewares';
 
 const { getBlockchain, sendNextBlock, addNextBlock, sendNewNode, addNewNode, updateConnectedNodes, sendNewTransaction, addNewTransaction } = blockchainController;
 
-const { checkBlockchain, checkNewNodeData, checkNewNodeUrlOption, checkNewNodeConnection, checkNewConnectedNodes, checkFeeFormat, checkPendingTransactions } =
-  blockchainMiddlewares;
+const { checkBlockchain, checkFeeFormat, checkPendingTransactions, checkNewNodeData, checkNewNodeUrlOption, checkNewNodeConnection, checkNewConnectedNodes } = blockchainMiddlewares;
 
 const {
   checkNextBlockData,
@@ -23,25 +22,26 @@ const {
   checkTransactionsPerBlock,
 } = blocksMiddlewares;
 
-const { checkNewTransactionData, checkNewTransactionAddresses, checkNewTransactionValues } = transactionsMiddlewares;
+const { checkNewTransactionData, checkNewTransaction, checkNewTransactionAddresses, checkNewTransactionValues, checkNewTransactionStatus, checkNewTransactionTimestamp, checkNewTransactionTxId } =
+  transactionsMiddlewares;
 
 const router: Router = Router();
 
-router.route('/').get(checkBlockchain, getBlockchain);
-
-router.route('/next-block').post(checkBlockchain, checkFeeFormat, checkPendingTransactions, sendNextBlock).patch(
+router.route('/').get(checkBlockchain, getBlockchain).patch(
   checkBlockchain,
   checkNextBlockData,
   checkNextBlockHeight,
   checkNextBlockNonce,
   checkNextBlockHash,
-  checkNextBlockPreviousHash,
+  /*checkNextBlockPreviousHash,
   checkNextBlockTransactions,
-  /*     validateTransactionsIds,
-    validateTransactionsStatus, */
-  checkTransactionsPerBlock,
+  validateTransactionsIds,
+  validateTransactionsStatus, 
+  checkTransactionsPerBlock,*/
   addNextBlock
 );
+
+router.route('/next-block').post(checkBlockchain, checkFeeFormat, checkPendingTransactions, sendNextBlock);
 
 router
   .route('/nodes')
@@ -49,6 +49,9 @@ router
   .patch(checkBlockchain, addNewNode)
   .put(checkBlockchain, checkNewConnectedNodes, updateConnectedNodes);
 
-router.route('/transactions').post(checkBlockchain, checkNewTransactionData, checkNewTransactionAddresses, checkNewTransactionValues, sendNewTransaction).patch(addNewTransaction);
+router
+  .route('/transactions')
+  .post(checkBlockchain, checkNewTransactionData, checkNewTransactionAddresses, checkNewTransactionValues, sendNewTransaction)
+  .patch(checkBlockchain, checkNewTransaction, checkNewTransactionStatus, checkNewTransactionTimestamp, checkNewTransactionTxId, addNewTransaction);
 
 export default router;

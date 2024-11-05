@@ -7,6 +7,7 @@ export class Transaction {
   recipient: string;
   amount: number;
   fee: number;
+  timestamp: Date;
 
   constructor(sender: string, recipient: string, amount: number, fee: number) {
     this.sender = sender;
@@ -14,11 +15,12 @@ export class Transaction {
     this.amount = amount;
     this.fee = fee;
     this.status = 'Pending';
+    this.timestamp = new Date();
     this.txId = this.createTxId();
   }
 
   getData(): string {
-    return this.status + this.sender + this.recipient + this.amount.toString() + this.fee.toString();
+    return `${this.status}${this.sender}${this.recipient}${this.amount.toString()}${this.fee.toString()}${this.timestamp}`;
   }
 
   createTxId(): string {

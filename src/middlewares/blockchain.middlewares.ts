@@ -9,7 +9,7 @@ import { getNodesUrlOptions } from '../helpers/ports.helpers';
 const checkBlockchain = async (req: Request, res: Response<CustomResponse<ErrorDataResponse>>, next: NextFunction): Promise<void> => {
   try {
     if (!blockchain) {
-      res.status(404).send({ message: 'Client Error', data: { code: 10, message: 'There is no blockchain.' } });
+      res.status(404).send({ message: 'Blockchain Not Found Error', data: { code: 10, message: 'There is no blockchain.' } });
       return;
     }
 
@@ -18,10 +18,59 @@ const checkBlockchain = async (req: Request, res: Response<CustomResponse<ErrorD
     const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
 
     res.status(500).send({
-      message: 'An error occurred.',
-      data: { code: 500, message: errorMessage },
+      message: 'Server Error',
+      data: { code: 50, message: errorMessage },
     });
     return;
+  }
+};
+
+const checkFeeFormat = async (req: Request<{}, {}, NextBlockPostRequest>, res: Response<CustomResponse<ErrorDataResponse>>, next: NextFunction): Promise<void> => {
+  try {
+    const { minFee } = req.body;
+
+    if (!minFee || typeof minFee !== 'number') {
+      res.status(400).send({ message: 'Next Block Request Body Error', data: { code: 20, message: 'The minFee is not a positive number or was not provided.' } });
+      return;
+    }
+
+    if (minFee < 0) {
+      res.status(400).send({ message: 'Next Block Request Body Error', data: { code: 21, message: 'The minFee is a negative number.' } });
+      return;
+    }
+
+    next();
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
+
+    res.status(500).send({
+      message: 'Server Error',
+      data: {
+        code: 50,
+        message: errorMessage,
+      },
+    });
+  }
+};
+
+const checkPendingTransactions = async (req: Request, res: Response<CustomResponse<ErrorDataResponse>>, next: NextFunction): Promise<void> => {
+  try {
+    if (global.blockchain.mempool.every((mempoolTransaction) => mempoolTransaction.status !== 'Pending')) {
+      res.status(400).send({ message: 'Transactions Not Found Error', data: { code: 10, message: 'There are no pending transactions on mempool.' } });
+      return;
+    }
+
+    next();
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
+
+    res.status(500).send({
+      message: 'Server Error',
+      data: {
+        code: 50,
+        message: errorMessage,
+      },
+    });
   }
 };
 
@@ -33,8 +82,8 @@ const checkNewNodeData = async (req: Request<{}, {}, NodesPostRequest>, res: Res
 
     if (!result) {
       res.status(400).send({
-        message: 'Client Error',
-        data: { code: 11, message },
+        message: 'Node Request Body Error',
+        data: { code: 30, message },
       });
       return;
     }
@@ -44,9 +93,9 @@ const checkNewNodeData = async (req: Request<{}, {}, NodesPostRequest>, res: Res
     const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
 
     res.status(500).send({
-      message: 'An error occurred.',
+      message: 'Server Error',
       data: {
-        code: 500,
+        code: 50,
         message: errorMessage,
       },
     });
@@ -61,7 +110,7 @@ const checkNewNodeUrlOption = async (req: Request<{}, {}, NodesPostRequest>, res
     const nodeUrlOptions = getNodesUrlOptions();
 
     if (!nodeUrlOptions.includes(nodeUrl)) {
-      res.status(400).send({ message: 'Client Error', data: { code: 10, message: 'The node url does not include one of the available ports in the .env file.' } });
+      res.status(404).send({ message: 'Node Not Found Error', data: { code: 31, message: 'The node url does not include one of the available ports in the .env file.' } });
       return;
     }
 
@@ -70,9 +119,9 @@ const checkNewNodeUrlOption = async (req: Request<{}, {}, NodesPostRequest>, res
     const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
 
     res.status(500).send({
-      message: 'An error occurred.',
+      message: 'Server Error',
       data: {
-        code: 500,
+        code: 50,
         message: errorMessage,
       },
     });
@@ -84,13 +133,13 @@ const checkNewNodeConnection = async (req: Request<{}, {}, NodesPostRequest>, re
   try {
     const { nodeUrl } = req.body;
 
-    if (blockchain.connectedNodes.includes(nodeUrl)) {
-      res.status(400).send({ message: 'Client Error', data: { code: 10, message: 'The node is already connected to the target node.' } });
+    if (global.blockchain.connectedNodes.includes(nodeUrl)) {
+      res.status(400).send({ message: 'Node Request Body Error', data: { code: 32, message: 'The node is already connected to the target node.' } });
       return;
     }
 
-    if (blockchain.nodeUrl === nodeUrl) {
-      res.status(400).send({ message: 'Client Error', data: { code: 10, message: 'The node is the target node.' } });
+    if (global.blockchain.nodeUrl === nodeUrl) {
+      res.status(400).send({ message: 'Nodes Request Body Error', data: { code: 33, message: 'The node is the target node.' } });
       return;
     }
 
@@ -99,9 +148,9 @@ const checkNewNodeConnection = async (req: Request<{}, {}, NodesPostRequest>, re
     const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
 
     res.status(500).send({
-      message: 'An error occurred.',
+      message: 'Server Error',
       data: {
-        code: 500,
+        code: 50,
         message: errorMessage,
       },
     });
@@ -118,12 +167,12 @@ const checkNewConnectedNodes = async (req: Request<{}, {}, NodesPutRequest>, res
     const invalidNodeUrl = connectedNodes.filter((connectedNodeUrl) => !nodeUrlOptions.includes(connectedNodeUrl));
 
     if (invalidNodeUrl.length !== 0) {
-      res.status(400).send({ message: 'Client Error', data: { code: 10, message: 'The connected nodes include one or more invalid nodes.' } });
+      res.status(400).send({ message: 'Node Request Body Error', data: { code: 34, message: 'The connected nodes include one or more invalid nodes.' } });
       return;
     }
 
     if (connectedNodes.includes(blockchain.nodeUrl)) {
-      res.status(400).send({ message: 'Client Error', data: { code: 10, message: 'The connected nodes include the target node.' } });
+      res.status(400).send({ message: 'Node Request Body Error', data: { code: 35, message: 'The connected nodes include the target node.' } });
       return;
     }
 
@@ -132,9 +181,9 @@ const checkNewConnectedNodes = async (req: Request<{}, {}, NodesPutRequest>, res
     const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
 
     res.status(500).send({
-      message: 'An error occurred.',
+      message: 'Server Error',
       data: {
-        code: 500,
+        code: 50,
         message: errorMessage,
       },
     });
@@ -142,61 +191,12 @@ const checkNewConnectedNodes = async (req: Request<{}, {}, NodesPutRequest>, res
   }
 };
 
-const checkFeeFormat = async (req: Request<{}, {}, NextBlockPostRequest>, res: Response<CustomResponse<ErrorDataResponse>>, next: NextFunction): Promise<void> => {
-  try {
-    const { minFee } = req.body;
-
-    if (!minFee || typeof minFee !== 'number') {
-      res.status(400).send({ message: 'Client Error', data: { code: 10, message: 'The minFee is not a positive number or was not provided.' } });
-      return;
-    }
-
-    if (minFee < 0) {
-      res.status(400).send({ message: 'Client Error', data: { code: 10, message: 'The minFee is a negative number.' } });
-      return;
-    }
-
-    next();
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
-
-    res.status(500).send({
-      message: 'An error occurred.',
-      data: {
-        code: 500,
-        message: errorMessage,
-      },
-    });
-  }
-};
-
-const checkPendingTransactions = async (req: Request, res: Response<CustomResponse<ErrorDataResponse>>, next: NextFunction): Promise<void> => {
-  try {
-    if (blockchain.mempool.every((transaction) => transaction.status !== 'Pending')) {
-      res.status(400).send({ message: 'Client Error', data: { code: 10, message: 'There are no pending transactions on mempool.' } });
-      return;
-    }
-
-    next();
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
-
-    res.status(500).send({
-      message: 'An error occurred.',
-      data: {
-        code: 500,
-        message: errorMessage,
-      },
-    });
-  }
-};
-
 export default {
   checkBlockchain,
+  checkFeeFormat,
+  checkPendingTransactions,
   checkNewNodeData,
   checkNewNodeUrlOption,
   checkNewNodeConnection,
   checkNewConnectedNodes,
-  checkFeeFormat,
-  checkPendingTransactions,
 };

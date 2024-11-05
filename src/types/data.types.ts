@@ -23,4 +23,5 @@ export interface TransactionData {
   recipient: string;
   amount: number;
   fee: number;
+  timestamp: Date;
 }

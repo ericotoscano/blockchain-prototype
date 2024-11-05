@@ -1,3 +1,4 @@
+import { sha256 } from 'js-sha256';
 import { Request, Response, NextFunction } from 'express';
 
 import { NextBlockPatchRequest } from '../types/request.types';
@@ -14,7 +15,7 @@ const checkNextBlockData = async (req: Request<{}, {}, NextBlockPatchRequest>, r
 
     if (!result) {
       res.status(400).send({
-        message: 'Client Error',
+        message: 'Next Block Request Body Error',
         data: { code: 11, message },
       });
       return;
@@ -25,8 +26,8 @@ const checkNextBlockData = async (req: Request<{}, {}, NextBlockPatchRequest>, r
     const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
 
     res.status(500).send({
-      message: 'An error occurred.',
-      data: { code: 500, message: errorMessage },
+      message: 'Server Error',
+      data: { code: 50, message: errorMessage },
     });
     return;
   }
@@ -38,12 +39,7 @@ const checkNextBlockHeight = async (req: Request<{}, {}, NextBlockPatchRequest>,
     const { height } = nextBlock;
 
     if (height < 0 || !Number.isInteger(height)) {
-      res.status(400).send({ message: 'Client Error', data: { code: 10, message: 'The next block height is a negative number or is not a integer number.' } });
-      return;
-    }
-
-    if (height !== blockchain.blocks.length) {
-      res.status(400).send({ message: 'Client Error', data: { code: 10, message: 'The next block height is not the right next block height in blockchain.' } });
+      res.status(400).send({ message: 'Next Block Request Body Error', data: { code: 10, message: 'The next block height is a negative number or is not a integer number.' } });
       return;
     }
 
@@ -52,8 +48,8 @@ const checkNextBlockHeight = async (req: Request<{}, {}, NextBlockPatchRequest>,
     const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
 
     res.status(500).send({
-      message: 'An error occurred.',
-      data: { code: 500, message: errorMessage },
+      message: 'Server Error',
+      data: { code: 50, message: errorMessage },
     });
     return;
   }
@@ -65,7 +61,7 @@ const checkNextBlockNonce = async (req: Request<{}, {}, NextBlockPatchRequest>, 
     const { nonce } = nextBlock;
 
     if (nonce < 0 || !Number.isInteger(nonce)) {
-      res.status(400).send({ message: 'Client Error', data: { code: 10, message: 'The next block nonce is a negative number or is not a integer number.' } });
+      res.status(400).send({ message: 'Next Block Request Body Error', data: { code: 10, message: 'The next block nonce is a negative number or is not a integer number.' } });
       return;
     }
 
@@ -74,8 +70,8 @@ const checkNextBlockNonce = async (req: Request<{}, {}, NextBlockPatchRequest>, 
     const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
 
     res.status(500).send({
-      message: 'An error occurred.',
-      data: { code: 500, message: errorMessage },
+      message: 'Server Error',
+      data: { code: 50, message: errorMessage },
     });
     return;
   }
@@ -84,22 +80,34 @@ const checkNextBlockNonce = async (req: Request<{}, {}, NextBlockPatchRequest>, 
 const checkNextBlockHash = async (req: Request<{}, {}, NextBlockPatchRequest>, res: Response<CustomResponse<ErrorDataResponse>>, next: NextFunction): Promise<void> => {
   try {
     const { nextBlock } = req.body;
-    const { hash } = nextBlock;
+    const { height, nonce, hash, previousHash, transactions } = nextBlock;
 
     if (!isValidHex64String(hash)) {
-      res.status(400).send({ message: 'Client Error', data: { code: 10, message: 'The next block hash is not a valid hex string.' } });
+      res.status(400).send({ message: 'Blockchain Request Body Error', data: { code: 10, message: 'The next block hash is not a valid hex string.' } });
       return;
     }
 
-    //verificar se o hash bate com o hash esperado
+    const expectedHash = sha256(`${height}${nonce}${previousHash}${JSON.stringify(transactions)}`);
 
+    if (BigInt('0x' + expectedHash) >= BigInt('0x' + global.blockchain.targetDifficulty)) {
+      res.status(400).send({ message: 'Blockchain Request Body Error', data: { code: 10, message: 'The block hash does not meet the required difficulty.' } });
+    }
+
+    if (expectedHash !== hash) {
+      res.status(400).send({ message: 'Blockchain Request Body Error', data: { code: 10, message: 'The block hash does not match with the expected hash.' } });
+    }
+
+    if (global.blockchain.getPreviousBlock().hash !== previousHash) {
+      res.status(400).send({ message: 'Blockchain Request Body Error', data: { code: 10, message: 'The next block previous hash does not match with the previous block hash.' } });
+      return;
+    }
     next();
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
 
     res.status(500).send({
-      message: 'An error occurred.',
-      data: { code: 500, message: errorMessage },
+      message: 'Server Error',
+      data: { code: 50, message: errorMessage },
     });
     return;
   }
@@ -111,12 +119,12 @@ const checkNextBlockPreviousHash = async (req: Request<{}, {}, NextBlockPatchReq
     const { previousHash } = nextBlock;
 
     if (!isValidHex64String(previousHash)) {
-      res.status(400).send({ message: 'Client Error', data: { code: 10, message: 'The next block previous hash is not a valid hex string.' } });
+      res.status(400).send({ message: 'Next Block Request Body Error', data: { code: 10, message: 'The next block previous hash is not a valid hex string.' } });
       return;
     }
 
     if (blockchain.getPreviousBlock().hash !== previousHash) {
-      res.status(400).send({ message: 'Client Error', data: { code: 10, message: 'The next block previous hash and the last valid block hash in blockchain are not the same.' } });
+      res.status(400).send({ message: 'Next Block Request Body Error', data: { code: 10, message: 'The next block previous hash and the last valid block hash in blockchain are not the same.' } });
       return;
     }
 
@@ -125,8 +133,8 @@ const checkNextBlockPreviousHash = async (req: Request<{}, {}, NextBlockPatchReq
     const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
 
     res.status(500).send({
-      message: 'An error occurred.',
-      data: { code: 500, message: errorMessage },
+      message: 'Server Error',
+      data: { code: 50, message: errorMessage },
     });
     return;
   }
@@ -138,7 +146,7 @@ const checkNextBlockTransactions = async (req: Request<{}, {}, NextBlockPatchReq
     const { transactions } = nextBlock;
 
     if (transactions.length === 0) {
-      res.status(400).send({ message: 'Client Error', data: { code: 10, message: 'The next block transactions is an empty array.' } });
+      res.status(400).send({ message: 'Next Block Request Body Error', data: { code: 10, message: 'The next block transactions is an empty array.' } });
       return;
     }
 
@@ -147,8 +155,8 @@ const checkNextBlockTransactions = async (req: Request<{}, {}, NextBlockPatchReq
     const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
 
     res.status(500).send({
-      message: 'An error occurred.',
-      data: { code: 500, message: errorMessage },
+      message: 'Server Error',
+      data: { code: 50, message: errorMessage },
     });
     return;
   }
@@ -174,9 +182,9 @@ const validateTransactionsIds = async (req: Request<{}, {}, NextBlockPatchReques
     const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
 
     res.status(500).send({
-      message: 'An error occurred.',
+      message: 'Server Error',
       data: {
-        code: 500,
+        code: 50,
         message: errorMessage,
       },
     });
@@ -205,9 +213,9 @@ const validateTransactionsStatus = async (req: Request<{}, {}, NextBlockPatchReq
     const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
 
     res.status(500).send({
-      message: 'An error occurred.',
+      message: 'Server Error',
       data: {
-        code: 500,
+        code: 50,
         message: errorMessage,
       },
     });
@@ -221,12 +229,10 @@ const checkTransactionsPerBlock = async (req: Request<{}, {}, NextBlockPatchRequ
     const { transactions } = nextBlock;
 
     if (transactions.length > blockchain.maxTransactionsPerBlock - 1) {
-      res
-        .status(400)
-        .send({
-          message: 'Client Error',
-          data: { code: 10, message: "Considering the miner's reward transaction, the number of next block transactions must be equal to the maximum number of transactions per block, minus one." },
-        });
+      res.status(400).send({
+        message: 'Next Block Request Body Error',
+        data: { code: 10, message: "Considering the miner's reward transaction, the number of next block transactions must be equal to the maximum number of transactions per block, minus one." },
+      });
       return;
     }
 
@@ -235,9 +241,9 @@ const checkTransactionsPerBlock = async (req: Request<{}, {}, NextBlockPatchRequ
     const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
 
     res.status(500).send({
-      message: 'An error occurred.',
+      message: 'Server Error',
       data: {
-        code: 500,
+        code: 50,
         message: errorMessage,
       },
     });

@@ -32,9 +32,9 @@ const getBlockchain = async (req: Request, res: Response<CustomResponse<Blockcha
     const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
 
     res.status(500).send({
-      message: 'An error ocurred.',
+      message: 'Server Error',
       data: {
-        code: 500,
+        code: 50,
         message: errorMessage,
       },
     });
@@ -49,7 +49,7 @@ const sendNextBlock = async (req: Request<{}, {}, NextBlockPostRequest>, res: Re
 
     if (nextBlockTransactions.length === 0) {
       res.status(400).send({
-        message: 'An error ocurred.',
+        message: 'Server Error',
         data: {
           code: 101,
           message: 'There are no pending transactions in the mempool with a fee greater than or equal to the minimum fee.',
@@ -65,9 +65,7 @@ const sendNextBlock = async (req: Request<{}, {}, NextBlockPostRequest>, res: Re
     const updateBlockchainPromises: Promise<CustomResponse<NextBlockDataPostResponse | ErrorDataResponse>>[] = [];
 
     for (const connectedNode of blockchain.connectedNodes) {
-      const updateBlockchainPromise = axios
-        .patch<CustomResponse<NextBlockDataPostResponse | ErrorDataResponse>>(`${connectedNode}/blockchain/next-block`, { nextBlock })
-        .then((response) => response.data);
+      const updateBlockchainPromise = axios.patch<CustomResponse<NextBlockDataPostResponse | ErrorDataResponse>>(`${connectedNode}/blockchain`, { nextBlock }).then((response) => response.data);
 
       updateBlockchainPromises.push(updateBlockchainPromise);
     }
@@ -84,9 +82,9 @@ const sendNextBlock = async (req: Request<{}, {}, NextBlockPostRequest>, res: Re
     const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
 
     res.status(500).send({
-      message: 'An error ocurred.',
+      message: 'Server Error',
       data: {
-        code: 500,
+        code: 50,
         message: errorMessage,
       },
     });
@@ -97,11 +95,7 @@ const addNextBlock = async (req: Request<{}, {}, NextBlockPatchRequest>, res: Re
   try {
     const { nextBlock } = req.body;
 
-    const { transactions } = nextBlock;
-
-    const checkedNextBlock = blockchain.createNextBlock(transactions);
-
-    blockchain.addBlock(checkedNextBlock);
+    blockchain.addBlock(nextBlock);
 
     res.status(200).send({
       message: 'Next block added.',
@@ -113,9 +107,9 @@ const addNextBlock = async (req: Request<{}, {}, NextBlockPatchRequest>, res: Re
     const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
 
     res.status(500).send({
-      message: 'An error ocurred.',
+      message: 'Server Error',
       data: {
-        code: 500,
+        code: 50,
         message: errorMessage,
       },
     });
@@ -137,8 +131,8 @@ const sendNewNode = async (req: Request<{}, {}, NodesPostRequest>, res: Response
         addNewNodePromise = axios.patch<CustomResponse<NodesDataPatchResponse | ErrorDataResponse>>(`${connectedNodeUrl}/blockchain/nodes`, { nodeUrl }).then((response) => response.data);
       } else {
         addNewNodePromise = Promise.resolve({
-          message: 'No added: same node.',
-          data: { addedNode: nodeUrl, addedIn: blockchain.nodeUrl },
+          message: ' Error',
+          data: { code: 928, message: 'No added: same node.' },
         });
       }
 
@@ -159,9 +153,9 @@ const sendNewNode = async (req: Request<{}, {}, NodesPostRequest>, res: Response
     const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
 
     res.status(500).send({
-      message: 'An error occurred.',
+      message: 'Server Error',
       data: {
-        code: 500,
+        code: 50,
         message: errorMessage,
       },
     });
@@ -182,9 +176,9 @@ const addNewNode = async (req: Request<{}, {}, NodesPostRequest>, res: Response<
     const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
 
     res.status(500).send({
-      message: 'An error occurred.',
+      message: 'Server Error',
       data: {
-        code: 500,
+        code: 50,
         message: errorMessage,
       },
     });
@@ -208,9 +202,9 @@ const updateConnectedNodes = async (req: Request<{}, {}, NodesPutRequest>, res: 
     const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
 
     res.status(500).send({
-      message: 'An error occurred.',
+      message: 'Server Error',
       data: {
-        code: 500,
+        code: 50,
         message: errorMessage,
       },
     });
@@ -227,7 +221,7 @@ const sendNewTransaction = async (req: Request<{}, {}, TransactionsPostRequest>,
 
     if (!blockchain.mempool.every((mempoolTransaction) => mempoolTransaction.txId !== txId)) {
       res.status(400).send({
-        message: 'An error ocurred.',
+        message: 'Server Error',
         data: {
           code: 201,
           message: 'The new transaction is already on the blockchain mempool.',
@@ -260,9 +254,9 @@ const sendNewTransaction = async (req: Request<{}, {}, TransactionsPostRequest>,
     const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
 
     res.status(500).send({
-      message: 'An error occurred.',
+      message: 'Server Error',
       data: {
-        code: 500,
+        code: 50,
         message: errorMessage,
       },
     });
@@ -285,9 +279,9 @@ const addNewTransaction = async (req: Request<{}, {}, TransactionsPatchRequest>,
     const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
 
     res.status(500).send({
-      message: 'An error occurred.',
+      message: 'Server Error',
       data: {
-        code: 500,
+        code: 50,
         message: errorMessage,
       },
     });

@@ -1,3 +1,5 @@
+
+
 import { BlockData, TransactionData } from '../types/data.types';
 
 import { CheckReturn } from '../types/return.types';
@@ -65,5 +67,5 @@ export const checkNewTransactionDataFormat = (sender: string, recipient: string,
     return { result: false, message: 'The fee is not a positive number or was not provided.' };
   }
 
-  return { result: true, message: 'The data format is valid.' };
+  return { result: true, message: 'The new transaction data format is valid.' };
 };
