@@ -4,7 +4,7 @@ import { NodesPostRequest, NodesPutRequest } from '../types/request.types';
 import { CustomResponse, ErrorDataResponse } from '../types/response.types';
 import { CheckerFunction } from '../types/check.types';
 
-import { checkNewNodeFormat, checkNewNodeUrlOption, checkNewNodeConnections, checkNewConnectedNodes, checkNewConnectedNodesFormat } from '../helpers/middlewares.helpers';
+import { checkNewNodeFormat, checkNewNodeUrlOption, checkNewNodeConnections, checkNewConnectedNodes, checkNewConnectedNodesFormat } from '../helpers/nodes.middlewares.helpers';
 import { checkAll } from '../helpers/checkers.helpers';
 
 const checkNewNodeData = async (req: Request<{}, {}, NodesPostRequest>, res: Response<CustomResponse<ErrorDataResponse>>, next: NextFunction): Promise<void> => {

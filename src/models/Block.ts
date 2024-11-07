@@ -40,7 +40,7 @@ export class Block {
   addRewardTransaction(reward: number, nodeAddress: string): void {
     const totalFees = this.transactions.reduce((sum, transaction) => sum + transaction.fee, 0);
 
-    const rewardTransaction = new Transaction('Reward', nodeAddress, reward + totalFees, 0);
+    const rewardTransaction = new Transaction('0'.repeat(40), nodeAddress, reward + totalFees, 0);
 
     this.transactions.unshift(rewardTransaction);
   }

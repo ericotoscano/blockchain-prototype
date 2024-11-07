@@ -4,7 +4,7 @@ import { NextBlockPostRequest } from '../types/request.types';
 import { CustomResponse, ErrorDataResponse } from '../types/response.types';
 import { CheckerFunction } from '../types/check.types';
 
-import { checkMinFeeFormat, checkMempoolPendingTransactions } from '../helpers/middlewares.helpers';
+import { checkMinFeeFormat, checkMempoolPendingTransactions } from '../helpers/blocks.middlewares.helpers';
 import { checkAll } from '../helpers/checkers.helpers';
 
 const checkSendNextBlockData = async (req: Request<{}, {}, NextBlockPostRequest>, res: Response<CustomResponse<ErrorDataResponse>>, next: NextFunction): Promise<void> => {

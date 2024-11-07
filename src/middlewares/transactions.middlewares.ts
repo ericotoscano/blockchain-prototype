@@ -11,7 +11,7 @@ import {
   checkNewTransactionStatus,
   checkNewTransactionTimestamp,
   checkNewTransactionTxId,
-} from '../helpers/middlewares.helpers';
+} from '../helpers/transactions.middlewares.helpers';
 import { checkAll } from '../helpers/checkers.helpers';
 
 const checkSendNewTransactionData = async (req: Request<{}, {}, TransactionsPostRequest>, res: Response<CustomResponse<ErrorDataResponse>>, next: NextFunction): Promise<void> => {
@@ -19,7 +19,11 @@ const checkSendNewTransactionData = async (req: Request<{}, {}, TransactionsPost
     const { newPreTransaction } = req.body;
     const { sender, recipient, amount, fee } = newPreTransaction;
 
-    const checkers: CheckerFunction[] = [() => checkNewPreTransactionFormat(newPreTransaction), () => checkNewPreTransactionAddresses(sender, recipient), () => checkNewPreTransactionValues(amount, fee)];
+    const checkers: CheckerFunction[] = [
+      () => checkNewPreTransactionFormat(newPreTransaction),
+      () => checkNewPreTransactionAddresses(sender, recipient),
+      () => checkNewPreTransactionValues(amount, fee),
+    ];
 
     const { result, message } = checkAll(checkers);
 

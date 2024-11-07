@@ -12,7 +12,7 @@ import {
   checkNextBlockHash,
   checkNextBlockPreviousHash,
   checkNextBlockTransactions,
-} from '../helpers/middlewares.helpers';
+} from '../helpers/blockchain.middlewares.helpers';
 import { checkAll } from '../helpers/checkers.helpers';
 
 const checkBlockchainData = async (req: Request, res: Response<CustomResponse<ErrorDataResponse>>, next: NextFunction): Promise<void> => {
