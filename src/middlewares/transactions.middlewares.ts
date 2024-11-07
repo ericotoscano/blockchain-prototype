@@ -2,20 +2,31 @@ import { Request, Response, NextFunction } from 'express';
 
 import { TransactionsPostRequest, TransactionsPatchRequest } from '../types/request.types';
 import { CustomResponse, ErrorDataResponse } from '../types/response.types';
+import { CheckerFunction } from '../types/check.types';
 
-import { checkNewTransactionDataFormat, checkNewTransactionFormat } from '../helpers/middlewares.helpers';
-import { isValidTimestamp, isValidHex64String, isValidHex40String } from '../utils/validation.utils';
+import {
+  checkNewPreTransactionFormat,
+  checkNewPreTransactionAddresses,
+  checkNewPreTransactionValues,
+  checkNewTransactionStatus,
+  checkNewTransactionTimestamp,
+  checkNewTransactionTxId,
+} from '../helpers/middlewares.helpers';
+import { checkAll } from '../helpers/checkers.helpers';
 
-const checkNewTransactionData = async (req: Request<{}, {}, TransactionsPostRequest>, res: Response<CustomResponse<ErrorDataResponse>>, next: NextFunction): Promise<void> => {
+const checkSendNewTransactionData = async (req: Request<{}, {}, TransactionsPostRequest>, res: Response<CustomResponse<ErrorDataResponse>>, next: NextFunction): Promise<void> => {
   try {
-    const { sender, recipient, amount, fee } = req.body;
+    const { newPreTransaction } = req.body;
+    const { sender, recipient, amount, fee } = newPreTransaction;
 
-    const { result, message } = checkNewTransactionDataFormat(sender, recipient, amount, fee);
+    const checkers: CheckerFunction[] = [() => checkNewPreTransactionFormat(newPreTransaction), () => checkNewPreTransactionAddresses(sender, recipient), () => checkNewPreTransactionValues(amount, fee)];
+
+    const { result, message } = checkAll(checkers);
 
     if (!result) {
       res.status(400).send({
-        message: 'Transaction Request Body Error',
-        data: { code: 11, message },
+        message: 'New Transaction Error',
+        data: { code: 40, message },
       });
       return;
     }
@@ -35,16 +46,19 @@ const checkNewTransactionData = async (req: Request<{}, {}, TransactionsPostRequ
   }
 };
 
-const checkNewTransaction = async (req: Request<{}, {}, TransactionsPatchRequest>, res: Response<CustomResponse<ErrorDataResponse>>, next: NextFunction): Promise<void> => {
+const checkAddNewTransactionData = async (req: Request<{}, {}, TransactionsPatchRequest>, res: Response<CustomResponse<ErrorDataResponse>>, next: NextFunction): Promise<void> => {
   try {
     const { newTransaction } = req.body;
+    const { status, timestamp, txId } = newTransaction;
 
-    const { result, message } = checkNewTransactionFormat(newTransaction);
+    const checkers: CheckerFunction[] = [() => checkNewTransactionStatus(status), () => checkNewTransactionTimestamp(timestamp), () => checkNewTransactionTxId(txId)];
+
+    const { result, message } = checkAll(checkers);
 
     if (!result) {
       res.status(400).send({
-        message: 'Transaction Request Body Error',
-        data: { code: 11, message },
+        message: 'New Transaction Error',
+        data: { code: 40, message },
       });
       return;
     }
@@ -61,174 +75,10 @@ const checkNewTransaction = async (req: Request<{}, {}, TransactionsPatchRequest
       },
     });
     return;
-  }
-};
-
-const checkNewTransactionAddresses = async (req: Request<{}, {}, TransactionsPostRequest>, res: Response<CustomResponse<ErrorDataResponse>>, next: NextFunction): Promise<void> => {
-  try {
-    const { sender, recipient } = req.body;
-
-    if (!isValidHex40String(sender) || !isValidHex40String(recipient)) {
-      res
-        .status(400)
-        .send({ message: 'Transaction Request Body Error', data: { code: 10, message: 'The transaction sender address or the transaction recipient address is not a valid hex 40 string.' } });
-      return;
-    }
-
-    if (sender === recipient) {
-      res.status(400).send({ message: 'Transaction Request Body Error', data: { code: 10, message: 'The transaction sender address and the transaction recipient address are the same.' } });
-      return;
-    }
-    next();
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
-
-    res.status(500).send({
-      message: 'Server Error',
-      data: {
-        code: 50,
-        message: errorMessage,
-      },
-    });
-    return;
-  }
-};
-
-const checkNewTransactionValues = async (req: Request<{}, {}, TransactionsPostRequest>, res: Response<CustomResponse<ErrorDataResponse>>, next: NextFunction): Promise<void> => {
-  try {
-    const { amount, fee } = req.body;
-
-    if (amount < 0 || fee < 0) {
-      res.status(400).send({ message: 'Transaction Request Body Error', data: { code: 10, message: 'The transaction amount or the transaction fee is a negative number.' } });
-      return;
-    }
-
-    next();
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
-
-    res.status(500).send({
-      message: 'Server Error',
-      data: {
-        code: 50,
-        message: errorMessage,
-      },
-    });
-    return;
-  }
-};
-
-const checkNewTransactionStatus = async (req: Request<{}, {}, TransactionsPatchRequest>, res: Response<CustomResponse<ErrorDataResponse>>, next: NextFunction): Promise<void> => {
-  try {
-    const { newTransaction } = req.body;
-
-    const { status } = newTransaction;
-
-    if (!status || status !== 'Pending') {
-      res.status(400).send({ message: 'Transaction Request Body Error', data: { code: 10, message: "The transaction status was not provided or is not valid(should be 'Pending')." } });
-      return;
-    }
-
-    next();
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
-
-    res.status(500).send({
-      message: 'Server Error',
-      data: {
-        code: 50,
-        message: errorMessage,
-      },
-    });
-    return;
-  }
-};
-
-const checkNewTransactionTimestamp = async (req: Request<{}, {}, TransactionsPatchRequest>, res: Response<CustomResponse<ErrorDataResponse>>, next: NextFunction): Promise<void> => {
-  try {
-    const { newTransaction } = req.body;
-
-    const { timestamp } = newTransaction;
-
-    if (!timestamp || !isValidTimestamp(timestamp)) {
-      res.status(400).send({ message: 'Transaction Request Body Error', data: { code: 10, message: 'The transaction timestamp was not provided or is not valid.' } });
-      return;
-    }
-
-    next();
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
-
-    res.status(500).send({
-      message: 'Server Error',
-      data: {
-        code: 50,
-        message: errorMessage,
-      },
-    });
-    return;
-  }
-};
-
-const checkNewTransactionTxId = async (req: Request<{}, {}, TransactionsPatchRequest>, res: Response<CustomResponse<ErrorDataResponse>>, next: NextFunction): Promise<void> => {
-  try {
-    const { newTransaction } = req.body;
-
-    const { txId } = newTransaction;
-
-    if (!txId || !isValidHex64String(txId)) {
-      res.status(400).send({ message: 'Transaction Request Body Error', data: { code: 10, message: 'The transaction txId was not provided or is not valid.' } });
-      return;
-    }
-
-    if (!global.blockchain.mempool.every((mempoolTransaction) => mempoolTransaction.txId !== txId)) {
-      res.status(400).send({ message: 'Transaction Request Body Error', data: { code: 10, message: 'The transaction is already on the blockchain mempool.' } });
-      return;
-    }
-
-    next();
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
-
-    res.status(500).send({
-      message: 'Server Error',
-      data: {
-        code: 50,
-        message: errorMessage,
-      },
-    });
-    return;
-  }
-};
-
-const checkMempoolPendingTransactions = async (req: Request, res: Response<CustomResponse<ErrorDataResponse>>, next: NextFunction): Promise<void> => {
-  try {
-    if (global.blockchain.mempool.every((mempoolTransaction) => mempoolTransaction.status !== 'Pending')) {
-      res.status(400).send({ message: 'Transactions Not Found Error', data: { code: 10, message: 'There are no pending transactions on mempool.' } });
-      return;
-    }
-
-    next();
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
-
-    res.status(500).send({
-      message: 'Server Error',
-      data: {
-        code: 50,
-        message: errorMessage,
-      },
-    });
   }
 };
 
 export default {
-  checkNewTransactionData,
-  checkNewTransaction,
-  checkNewTransactionAddresses,
-  checkNewTransactionValues,
-  checkNewTransactionStatus,
-  checkNewTransactionTimestamp,
-  checkNewTransactionTxId,
-  checkMempoolPendingTransactions,
+  checkSendNewTransactionData,
+  checkAddNewTransactionData,
 };

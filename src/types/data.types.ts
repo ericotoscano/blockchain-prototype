@@ -16,12 +16,15 @@ export interface BlockData {
   transactions: TransactionData[];
 }
 
-export interface TransactionData {
+export interface TransactionData extends PreTransactionData {
   txId: string;
   status: string;
+  timestamp: Date;
+}
+
+export interface PreTransactionData {
   sender: string;
   recipient: string;
   amount: number;
   fee: number;
-  timestamp: Date;
 }

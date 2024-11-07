@@ -5,7 +5,7 @@ import '../global';
 
 import { Transaction } from '../models/Transaction';
 
-import { NextBlockPostRequest, NextBlockPatchRequest, NodesPostRequest, NodesPutRequest, TransactionsPostRequest, TransactionsPatchRequest } from '../types/request.types';
+import { NextBlockPostRequest, BlockchainPatchRequest, NodesPostRequest, NodesPutRequest, TransactionsPostRequest, TransactionsPatchRequest } from '../types/request.types';
 
 import {
   CustomResponse,
@@ -49,7 +49,7 @@ const sendNextBlock = async (req: Request<{}, {}, NextBlockPostRequest>, res: Re
 
     if (nextBlockTransactions.length === 0) {
       res.status(400).send({
-        message: 'Server Error',
+        message: 'Next Block Error',
         data: {
           code: 101,
           message: 'There are no pending transactions in the mempool with a fee greater than or equal to the minimum fee.',
@@ -91,9 +91,10 @@ const sendNextBlock = async (req: Request<{}, {}, NextBlockPostRequest>, res: Re
   }
 };
 
-const addNextBlock = async (req: Request<{}, {}, NextBlockPatchRequest>, res: Response<CustomResponse<NextBlockDataPostResponse | ErrorDataResponse>>): Promise<void> => {
+const addNextBlock = async (req: Request<{}, {}, BlockchainPatchRequest>, res: Response<CustomResponse<NextBlockDataPostResponse | ErrorDataResponse>>): Promise<void> => {
   try {
     const { nextBlock } = req.body;
+    console.log(nextBlock);
 
     blockchain.addBlock(nextBlock);
 
@@ -213,7 +214,8 @@ const updateConnectedNodes = async (req: Request<{}, {}, NodesPutRequest>, res: 
 
 const sendNewTransaction = async (req: Request<{}, {}, TransactionsPostRequest>, res: Response<CustomResponse<TransactionsPostResponseData | ErrorDataResponse>>): Promise<void> => {
   try {
-    const { sender, recipient, amount, fee } = req.body;
+    const { newPreTransaction } = req.body;
+    const { sender, recipient, amount, fee } = newPreTransaction;
 
     const newTransaction = new Transaction(sender, recipient, amount, fee);
 
@@ -221,9 +223,9 @@ const sendNewTransaction = async (req: Request<{}, {}, TransactionsPostRequest>,
 
     if (!blockchain.mempool.every((mempoolTransaction) => mempoolTransaction.txId !== txId)) {
       res.status(400).send({
-        message: 'Server Error',
+        message: 'New Transaction Error',
         data: {
-          code: 201,
+          code: 40,
           message: 'The new transaction is already on the blockchain mempool.',
         },
       });

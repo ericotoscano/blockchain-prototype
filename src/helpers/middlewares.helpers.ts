@@ -1,38 +1,11 @@
 import { sha256 } from 'js-sha256';
 
-import { BlockchainData, BlockData, TransactionData } from '../types/data.types';
-import { CheckReturn } from '../types/check.types';
+import { BlockchainData, BlockData, PreTransactionData, TransactionData } from '../types/data.types';
+import { CheckerFunction, CheckReturn } from '../types/check.types';
 
-import { getNodesUrlOptions } from '../helpers/ports.helpers';
-import { isValidHex64String } from '../utils/validation.utils';
-
-export const checkNewTransactionDataFormat = (sender: string, recipient: string, amount: number, fee: number): CheckReturn => {
-  if (!sender || typeof sender !== 'string') {
-    return { result: false, message: 'The sender is not a string or was not provided.' };
-  }
-
-  if (!recipient || typeof recipient !== 'string') {
-    return { result: false, message: 'The recipient is not a string or was not provided.' };
-  }
-
-  if (!amount || typeof amount !== 'number') {
-    return { result: false, message: 'The amount is not a positive number or was not provided.' };
-  }
-
-  if (!fee || typeof fee !== 'number') {
-    return { result: false, message: 'The fee is not a positive number or was not provided.' };
-  }
-
-  return { result: true, message: 'The new transaction data format is valid.' };
-};
-
-export const checkNewTransactionFormat = (newTransaction: TransactionData): CheckReturn => {
-  if (!newTransaction || typeof newTransaction !== 'object' || Array.isArray(newTransaction)) {
-    return { result: false, message: 'The new transaction is not valid or was not provided.' };
-  }
-
-  return { result: true, message: 'The new transaction format is valid.' };
-};
+import { checkNodeUrl } from '../helpers/ports.helpers';
+import { checkAll } from './checkers.helpers';
+import { isValidTimestamp, isValidHex40String, isValidHex64String } from '../utils/validation.utils';
 
 export const checkBlockchainFormat = (blockchain: BlockchainData): CheckReturn => {
   if (!blockchain || typeof blockchain !== 'object' || Array.isArray(blockchain)) {
@@ -51,36 +24,24 @@ export const checkNextBlockFormat = (nextBlock: BlockData): CheckReturn => {
 };
 
 export const checkNextBlockHeigth = (height: number): CheckReturn => {
-  if (!height || typeof height !== 'number') {
-    return { result: false, message: 'The next block height is zero or was not provided.' };
-  }
-
-  if (height < 0 || !Number.isInteger(height)) {
-    return { result: false, message: 'The next block height is a negative number or is not a integer number.' };
+  if (!height || height < 0 || !Number.isInteger(height) || typeof height !== 'number') {
+    return { result: false, message: 'The next block height is not a positive integer number or was not provided.' };
   }
 
   return { result: true, message: 'The next block height is valid.' };
 };
 
 export const checkNextBlockNonce = (nonce: number): CheckReturn => {
-  if (!nonce || typeof nonce !== 'number') {
-    return { result: false, message: 'The next block nonce is zero or was not provided.' };
-  }
-
-  if (nonce < 0 || !Number.isInteger(nonce)) {
-    return { result: false, message: 'The next block nonce is a negative number or is not a integer number.' };
+  if (!nonce || nonce < 0 || !Number.isInteger(nonce) || typeof nonce !== 'number') {
+    return { result: false, message: 'The next block nonce is not a positive integer number or was not provided.' };
   }
 
   return { result: true, message: 'The next block nonce is valid.' };
 };
 
 export const checkNextBlockHash = (height: number, nonce: number, hash: string, previousHash: string, transactions: TransactionData[]): CheckReturn => {
-  if (!hash || typeof hash !== 'string') {
-    return { result: false, message: 'The next block hash is not a string or was not provided.' };
-  }
-
-  if (!isValidHex64String(hash)) {
-    return { result: false, message: 'The next block hash is not a valid hex string.' };
+  if (!hash || !isValidHex64String(hash)) {
+    return { result: false, message: 'The next block hash is not an hex 64 string or was not provided.' };
   }
 
   const expectedHash = sha256(`${height}${nonce}${previousHash}${JSON.stringify(transactions)}`);
@@ -97,12 +58,8 @@ export const checkNextBlockHash = (height: number, nonce: number, hash: string, 
 };
 
 export const checkNextBlockPreviousHash = (previousHash: string): CheckReturn => {
-  if (!previousHash || typeof previousHash !== 'string') {
-    return { result: false, message: 'The next block previous hash is not a string or was not provided.' };
-  }
-
-  if (!isValidHex64String(previousHash)) {
-    return { result: false, message: 'The next block previous hash is not a valid hex string.' };
+  if (!previousHash || !isValidHex64String(previousHash)) {
+    return { result: false, message: 'The next block previous hash is not an hex 64 string or was not provided.' };
   }
 
   if (global.blockchain.getPreviousBlock().hash !== previousHash) {
@@ -117,40 +74,52 @@ export const checkNextBlockTransactions = (transactions: TransactionData[]): Che
     return { result: false, message: 'The next block transactions is not an array or was not provided.' };
   }
 
-  if (transactions.length === 0) {
-    return { result: false, message: 'The next block transactions is an empty array.' };
+  const transactionsCheckers: CheckerFunction[] = [() => checkNextBlockTransactionsLength(transactions)];
+
+  const { result, message } = checkAll(transactionsCheckers);
+
+  if (!result) {
+    return { result, message };
   }
 
-  const allConfirmedTransactions = global.blockchain.getConfirmedTransactions();
+  for (const newTransaction of transactions) {
+    const { sender, recipient, amount, fee, status, timestamp, txId } = newTransaction;
+    //criar funcoes especificas para checar as transacoes do next block, por conta do reward transaction
+    const checkers: CheckerFunction[] = [
+      () => checkNextBlockNewTransactionsFormat(newTransaction),
+      //COMECAR DAQUI E LEMBRAR DA REWARD TRANSACTION
+      //() => checkNewTransactionAddresses(sender, recipient),
+      //() => checkNewTransactionValues(amount, fee),
+      () => checkNewTransactionStatus(status),
+      () => checkNewTransactionTimestamp(timestamp),
+      () => checkNewTransactionTxId(txId), //no next block, ele vai estar no mempool ainda (erro)
+      () => checkNewTransactionDuplicity(newTransaction),
+    ];
 
-  const hasDuplicateTransactions = transactions.some((transaction) => allConfirmedTransactions.some((confirmedTransaction) => transaction.txId === confirmedTransaction.txId));
+    const { result, message } = checkAll(checkers);
 
-  if (hasDuplicateTransactions) {
-    return {
-      result: false,
-      message: `The next block transactions contain duplicate txId's with previously confirmed transactions.`,
-    };
-  }
-
-  const notPendingStatus = transactions.filter((transaction) => transaction.status !== 'Pending');
-
-  if (notPendingStatus.length > 0) {
-    const transactionIds = notPendingStatus.map((transaction) => transaction.txId).join(', ');
-
-    return {
-      result: false,
-      message: `The following txId's of the next block transactions are not with 'Pending' status: ${transactionIds}.`,
-    };
-  }
-
-  if (transactions.length > blockchain.maxTransactionsPerBlock - 1) {
-    return {
-      result: false,
-      message: "Considering the miner's reward transaction, the number of next block transactions must be equal to the maximum number of transactions per block, minus one.",
-    };
+    if (!result) {
+      return { result, message };
+    }
   }
 
   return { result: true, message: 'The next block transactions are valid.' };
+};
+
+export const checkMinFeeFormat = (minFee: number): CheckReturn => {
+  if (!minFee || minFee < 0 || typeof minFee !== 'number') {
+    return { result: false, message: 'The minFee is not a positive number or was not provided.' };
+  }
+
+  return { result: true, message: 'The minimun fee is valid.' };
+};
+
+export const checkMempoolPendingTransactions = () => {
+  if (global.blockchain.mempool.every((mempoolTransaction) => mempoolTransaction.status !== 'Pending')) {
+    return { result: false, message: 'There are no pending transactions on mempool.' };
+  }
+
+  return { result: true, message: 'There are pending transactions on mempool.' };
 };
 
 export const checkNewNodeFormat = (nodeUrl: string): CheckReturn => {
@@ -162,9 +131,7 @@ export const checkNewNodeFormat = (nodeUrl: string): CheckReturn => {
 };
 
 export const checkNewNodeUrlOption = (newNodeUrl: string): CheckReturn => {
-  const nodeUrlOptions = getNodesUrlOptions();
-
-  if (!nodeUrlOptions.includes(newNodeUrl)) {
+  if (!checkNodeUrl(newNodeUrl)) {
     return { result: false, message: 'The new node url does not include one of the available ports in the .env file.' };
   }
 
@@ -192,9 +159,7 @@ export const checkNewConnectedNodesFormat = (connectedNodes: string[]): CheckRet
 };
 
 export const checkNewConnectedNodes = (connectedNodes: string[]): CheckReturn => {
-  const nodeUrlOptions = getNodesUrlOptions();
-
-  const invalidNodeUrl = connectedNodes.filter((connectedNodeUrl) => !nodeUrlOptions.includes(connectedNodeUrl));
+  const invalidNodeUrl = connectedNodes.filter((connectedNodeUrl) => !checkNodeUrl(connectedNodeUrl));
 
   if (invalidNodeUrl.length !== 0) {
     return { result: false, message: 'The connected nodes include one or more invalid nodes.' };
@@ -205,4 +170,103 @@ export const checkNewConnectedNodes = (connectedNodes: string[]): CheckReturn =>
   }
 
   return { result: true, message: 'The new connected nodes are valid.' };
+};
+
+export const checkNewPreTransactionFormat = (newPreTransaction: PreTransactionData): CheckReturn => {
+  if (!newPreTransaction || typeof newPreTransaction !== 'object' || Array.isArray(newPreTransaction)) {
+    return { result: false, message: 'The new transaction is not valid or was not provided.' };
+  }
+  return { result: true, message: 'The new transaction format is valid.' };
+};
+
+export const checkNewPreTransactionAddresses = (sender: string, recipient: string): CheckReturn => {
+  if (!sender || !isValidHex40String(sender)) {
+    return { result: false, message: 'The new transaction sender is not an hex 40 string or was not provided.' };
+  }
+
+  if (!recipient || !isValidHex40String(recipient)) {
+    return { result: false, message: 'The new transaction recipient is not an hex 40 string or was not provided.' };
+  }
+
+  if (sender === recipient) {
+    return { result: false, message: 'The new transaction has matching sender and recipient address.' };
+  }
+
+  return { result: true, message: 'The new transaction addresses are valid.' };
+};
+
+export const checkNewPreTransactionValues = (amount: number, fee: number): CheckReturn => {
+  if (!amount || amount < 0 || typeof amount !== 'number') {
+    return { result: false, message: 'The new transaction amount is not a positive number or was not provided.' };
+  }
+
+  if (!fee || fee < 0 || typeof fee !== 'number') {
+    return { result: false, message: 'The new transaction fee is not a positive number or was not provided.' };
+  }
+
+  return { result: true, message: 'The new transaction values are valid.' };
+};
+
+export const checkNewTransactionStatus = (status: string): CheckReturn => {
+  if (!status || status !== 'Pending') {
+    return { result: false, message: "The new transaction status was not provided or is not 'Pending'." };
+  }
+  return { result: true, message: 'The new transaction status is valid.' };
+};
+
+export const checkNewTransactionTimestamp = (timestamp: Date): CheckReturn => {
+  if (!timestamp || !isValidTimestamp(timestamp)) {
+    return { result: false, message: 'The new transaction timestamp was not provided or is not valid.' };
+  }
+
+  return { result: true, message: 'The new transaction timestamp is valid.' };
+};
+
+export const checkNewTransactionTxId = (txId: string): CheckReturn => {
+  if (!txId || !isValidHex64String(txId)) {
+    return { result: false, message: 'The new transaction txId was not provided or is not valid.' };
+  }
+
+  if (!global.blockchain.mempool.every((mempoolTransaction) => mempoolTransaction.txId !== txId)) {
+    return { result: false, message: 'The new transaction is already on the blockchain mempool.' };
+  }
+
+  return { result: true, message: 'The new transaction txId is valid.' };
+};
+
+export const checkNextBlockNewTransactionsFormat = (newTransaction: TransactionData): CheckReturn => {
+  if (!newTransaction || typeof newTransaction !== 'object' || Array.isArray(newTransaction)) {
+    return { result: false, message: 'Some of transactions in next block is not valid or was not provided.' };
+  }
+  return { result: true, message: 'All next block transactions format is valid.' };
+};
+
+export const checkNextBlockTransactionsLength = (transactions: TransactionData[]): CheckReturn => {
+  if (transactions.length === 0) {
+    return { result: false, message: 'The next block transactions is an empty array.' };
+  }
+
+  if (transactions.length > blockchain.maxTransactionsPerBlock - 1) {
+    return {
+      result: false,
+      message: "Considering the miner's reward transaction, the number of next block transactions must be equal to the maximum number of transactions per block, minus one.",
+    };
+  }
+
+  return { result: true, message: 'The transactions length is valid.' };
+};
+
+export const checkNewTransactionDuplicity = (newTransaction: TransactionData): CheckReturn => {
+  const allConfirmedTransactions = global.blockchain.getConfirmedTransactions();
+
+  const hasDuplicateTransactions = allConfirmedTransactions.some((confirmedTransaction) => confirmedTransaction.txId === newTransaction.txId);
+
+  if (hasDuplicateTransactions) {
+    return {
+      result: false,
+      message: `Some of the next block new transactions has the same txId of a confirmed transaction in blockchain.`,
+    };
+  }
+
+  return { result: true, message: 'The new transaction uniqueness is valid.' };
 };

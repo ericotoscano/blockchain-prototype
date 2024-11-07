@@ -1,4 +1,4 @@
-export const getNodesUrlOptions = (): string[] => {
+export const checkNodeUrl = (newNodeUrl: string): boolean => {
   const availablePorts = process.env.AVAILABLE_PORTS ? process.env.AVAILABLE_PORTS.split(',') : ['3000', '3001', '3002', '3003', '3004'];
 
   const baseUrl = process.env.BASE_URL || 'http://localhost:';
@@ -13,7 +13,7 @@ export const getNodesUrlOptions = (): string[] => {
     nodeUrlOptions.push(`${baseUrl}${port}`);
   }
 
-  return nodeUrlOptions;
+  return nodeUrlOptions.includes(newNodeUrl);
 };
 
 export const checkAvailablePortsInEnv = (port: string): void => {

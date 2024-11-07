@@ -38,7 +38,7 @@ const checkNewNodeData = async (req: Request<{}, {}, NodesPostRequest>, res: Res
   }
 };
 
-const checkNewConnectedNodesData = async (req: Request<{}, {}, NodesPutRequest>, res: Response<CustomResponse<ErrorDataResponse>>, next: NextFunction): Promise<void> => {
+const checkConnectedNodesData = async (req: Request<{}, {}, NodesPutRequest>, res: Response<CustomResponse<ErrorDataResponse>>, next: NextFunction): Promise<void> => {
   try {
     const { connectedNodes } = req.body;
 
@@ -71,5 +71,5 @@ const checkNewConnectedNodesData = async (req: Request<{}, {}, NodesPutRequest>,
 
 export default {
   checkNewNodeData,
-  checkNewConnectedNodesData,
+  checkConnectedNodesData,
 };
