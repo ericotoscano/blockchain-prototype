@@ -1,37 +1,37 @@
 import { BlockData, BlockchainData, TransactionData } from './data.types';
 
-export interface CustomResponse<T> {
+export type CustomResponse<T> = {
   message: string;
   data: T;
 }
 
-export interface ErrorDataResponse {
+export type ErrorDataResponse = {
   code: number;
   message: string;
 }
 
-export interface BlockchainDataGetResponse {
+export type BlockchainDataGetResponse = {
   blockchain: BlockchainData;
 }
 
-export interface NextBlockDataPostResponse {
+export type NextBlockDataPostResponse = {
   nextBlock: BlockData;
 }
 
-export interface TransactionsPostResponseData {
+export type TransactionsPostResponseData = {
   newTransaction: TransactionData;
 }
 
-export interface NodesDataPostResponse {
+export type NodesDataPostResponse = {
   connectedTo: string[];
 }
 
-export interface NodesDataPatchResponse {
+export type NodesDataPatchResponse = {
   addedNode: string;
   addedIn: string;
 }
 
-export interface NodesDataPutResponse {
+export type NodesDataPutResponse = {
   nodeUrl: string;
   connectedNodes: string[];
 }

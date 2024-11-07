@@ -201,6 +201,27 @@ const checkNewTransactionTxId = async (req: Request<{}, {}, TransactionsPatchReq
   }
 };
 
+const checkMempoolPendingTransactions = async (req: Request, res: Response<CustomResponse<ErrorDataResponse>>, next: NextFunction): Promise<void> => {
+  try {
+    if (global.blockchain.mempool.every((mempoolTransaction) => mempoolTransaction.status !== 'Pending')) {
+      res.status(400).send({ message: 'Transactions Not Found Error', data: { code: 10, message: 'There are no pending transactions on mempool.' } });
+      return;
+    }
+
+    next();
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
+
+    res.status(500).send({
+      message: 'Server Error',
+      data: {
+        code: 50,
+        message: errorMessage,
+      },
+    });
+  }
+};
+
 export default {
   checkNewTransactionData,
   checkNewTransaction,
@@ -209,4 +230,5 @@ export default {
   checkNewTransactionStatus,
   checkNewTransactionTimestamp,
   checkNewTransactionTxId,
+  checkMempoolPendingTransactions,
 };

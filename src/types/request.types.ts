@@ -1,28 +1,28 @@
 import { BlockData, TransactionData } from './data.types';
 
-export interface NextBlockPostRequest {
+export type NextBlockPostRequest = {
   minFee: number;
-}
+};
 
-export interface NextBlockPatchRequest {
+export type NextBlockPatchRequest = {
   nextBlock: BlockData;
-}
+};
 
-export interface NodesPostRequest {
+export type NodesPostRequest = {
   nodeUrl: string;
-}
+};
 
-export interface NodesPutRequest {
+export type NodesPutRequest = {
   connectedNodes: string[];
-}
+};
 
-export interface TransactionsPostRequest {
+export type TransactionsPostRequest = {
   sender: string;
   recipient: string;
   amount: number;
   fee: number;
-}
+};
 
-export interface TransactionsPatchRequest {
+export type TransactionsPatchRequest = {
   newTransaction: TransactionData;
-}
+};

@@ -46,7 +46,7 @@ export class Blockchain {
     return this.blocks[this.blocks.length - 1];
   }
 
-  createNextBlock(transactions: Transaction[] | TransactionData[]): Block | BlockData {
+  createNextBlock(transactions: (Transaction | TransactionData)[]): Block | BlockData {
     const previousHash = this.getPreviousBlock().hash;
     let block = new Block(this.blocks.length, 0, previousHash, transactions);
 
@@ -95,11 +95,21 @@ export class Blockchain {
     this.reward = blockReward;
   }
 
-  getPendingTransactions(): Transaction[] | TransactionData[] {
+  getPendingTransactions(): (Transaction | TransactionData)[] {
     return this.mempool.filter((transaction) => transaction.status === 'Pending');
   }
 
-  getNextBlockTransactionsByFee(minFee: number): Transaction[] | TransactionData[] {
+  getConfirmedTransactions(): (Transaction | TransactionData)[] {
+    const confirmedTransactions: (Transaction | TransactionData)[] = [];
+
+    for (let i = 1; i < this.blocks.length; i++) {
+      confirmedTransactions.push(...this.blocks[i].transactions);
+    }
+
+    return confirmedTransactions;
+  }
+
+  getNextBlockTransactionsByFee(minFee: number): (Transaction | TransactionData)[] {
     return this.mempool.filter((mempoolTransaction) => mempoolTransaction.fee >= minFee).slice(0, this.maxTransactionsPerBlock - 1);
   }
 }
