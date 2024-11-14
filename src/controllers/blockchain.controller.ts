@@ -3,7 +3,7 @@ import axios from 'axios';
 
 import '../global';
 
-import { Transaction } from '../models/Transaction';
+import { Transaction } from '../entities/transaction/Transaction';
 
 import { NextBlockPostRequest, BlockchainPatchRequest, NodesPostRequest, NodesPutRequest, TransactionsPostRequest, TransactionsPatchRequest } from '../types/request.types';
 
@@ -94,7 +94,6 @@ const sendNextBlock = async (req: Request<{}, {}, NextBlockPostRequest>, res: Re
 const addNextBlock = async (req: Request<{}, {}, BlockchainPatchRequest>, res: Response<CustomResponse<NextBlockDataPostResponse | ErrorDataResponse>>): Promise<void> => {
   try {
     const { nextBlock } = req.body;
-    console.log(nextBlock);
 
     blockchain.addBlock(nextBlock);
 

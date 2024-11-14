@@ -4,7 +4,7 @@ import { BlockchainData, BlockData, TransactionData } from '../types/data.types'
 import { CheckerFunction, CheckReturn } from '../types/check.types';
 
 import { checkAll } from './checkers.helpers';
-import { isValidTimestamp, isValidHex40String, isValidHex64String } from '../utils/validation.utils';
+import { isValidTimestamp, isValidHex40String, isValidHex64String } from '../utils/DateFomatValidation';
 
 export const checkBlockchainFormat = (blockchain: BlockchainData): CheckReturn => {
   if (!blockchain || typeof blockchain !== 'object' || Array.isArray(blockchain)) {
