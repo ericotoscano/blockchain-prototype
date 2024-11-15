@@ -1,4 +1,5 @@
-import { sha256 } from 'js-sha256';
+import { IBlockchain } from '../entities/blockchain/Blockchain';
+import { BlockForPatchRequest } from '../types/request.types';
 
 import { BlockchainData, BlockData, TransactionData } from '../types/data.types';
 import { CheckerFunction, CheckReturn } from '../types/check.types';
@@ -6,37 +7,73 @@ import { CheckerFunction, CheckReturn } from '../types/check.types';
 import { checkAll } from './checkers.helpers';
 import { isValidTimestamp, isValidHex40String, isValidHex64String } from '../utils/DateFomatValidation';
 
-export const checkBlockchainFormat = (blockchain: BlockchainData): CheckReturn => {
-  if (!blockchain || typeof blockchain !== 'object' || Array.isArray(blockchain)) {
-    return { result: false, message: 'The blockchain is not valid or was not provided.' };
+export type ValidationData = { title: string; result: boolean; type: string; code: number; message: string };
+
+export type ErrorData = { type: string; code: number; message: string };
+
+//class BlockchainValidation {class BlockchainFormatValidation {validateBlockchainFormat()}}
+//class BlockValidation {class BlockFormatValidation {validateBlockFormat(), validateHeightFormat(), validateNonceFormat()...}}
+export class FormatValidation {
+  static validateBlockchain(blockchain: IBlockchain): ValidationData {
+    if (!blockchain || typeof blockchain !== 'object' || Array.isArray(blockchain)) {
+      const failData = { title: 'Blockchain Format Validation', result: false, type: 'Format Fail', code: 11, message: 'The blockchain was not created or has an invalid format.' };
+
+      return failData;
+    }
+
+    const successData = { title: 'Blockchain Format Validation', result: true, type: 'Format Success', code: 10, message: 'The blockchain has a valid format.' };
+
+    return successData;
   }
 
-  return { result: true, message: 'The blockchain format is valid.' };
-};
+  static validateNextBlock(nextBlock: BlockForPatchRequest): ValidationData {
+    if (!nextBlock || typeof nextBlock !== 'object' || Array.isArray(nextBlock)) {
+      const failData = { title: 'Next Block Format Validation', result: false, type: 'Format Fail', code: 12, message: 'The next block was not provided or has an invalid format.' };
 
-export const checkNextBlockFormat = (nextBlock: BlockData): CheckReturn => {
-  if (!nextBlock || typeof nextBlock !== 'object' || Array.isArray(nextBlock)) {
-    return { result: false, message: 'The next block is not valid or was not provided.' };
+      return failData;
+    }
+
+    const successData = { title: 'Next Block Format Validation', result: true, type: 'Format Success', code: 10, message: 'The next block has a valid format.' };
+
+    return successData;
   }
 
-  return { result: true, message: 'The next block format is valid.' };
-};
+  static validateNextBlockHeight(height: number): ValidationData {
+    if (!height || height < 0 || !Number.isInteger(height) || typeof height !== 'number') {
+      const failData = {
+        title: 'Next Block Height Validation',
+        result: false,
+        type: 'Format Fail',
+        code: 13,
+        message: 'The next block height was not provided or has an invalid format (should be a positive integer number).',
+      };
 
-export const checkNextBlockHeigth = (height: number): CheckReturn => {
-  if (!height || height < 0 || !Number.isInteger(height) || typeof height !== 'number') {
-    return { result: false, message: 'The next block height is not a positive integer number or was not provided.' };
+      return failData;
+    }
+
+    const successData = { title: 'Next Block Height Validation', result: true, type: 'Format Success', code: 13, message: 'The next block height has a valid format.' };
+
+    return successData;
   }
 
-  return { result: true, message: 'The next block height is valid.' };
-};
+  static validateNextBlockNonce(nonce: number): ValidationData {
+    if (!nonce || nonce < 0 || !Number.isInteger(nonce) || typeof nonce !== 'number') {
+      const failData = {
+        title: 'Next Block Nonce Validation',
+        result: false,
+        type: 'Format Fail',
+        code: 13,
+        message: 'The next block nonce was not provided or has an invalid format (should be a positive integer number).',
+      };
 
-export const checkNextBlockNonce = (nonce: number): CheckReturn => {
-  if (!nonce || nonce < 0 || !Number.isInteger(nonce) || typeof nonce !== 'number') {
-    return { result: false, message: 'The next block nonce is not a positive integer number or was not provided.' };
+      return failData;
+    }
+
+    const successData = { title: 'Next Block Nonce Validation', result: true, type: 'Format Success', code: 13, message: 'The next block nonce has a valid format.' };
+
+    return successData;
   }
-
-  return { result: true, message: 'The next block nonce is valid.' };
-};
+}
 
 export const checkNextBlockHash = (height: number, nonce: number, hash: string, previousHash: string, transactions: TransactionData[]): CheckReturn => {
   if (!hash || !isValidHex64String(hash)) {

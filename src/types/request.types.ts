@@ -1,11 +1,9 @@
-import { PreTransactionData, BlockData, TransactionData } from './data.types';
-
 export type NextBlockPostRequest = {
   minFee: number;
 };
 
 export type BlockchainPatchRequest = {
-  nextBlock: BlockData;
+  nextBlock: BlockForPatchRequest;
 };
 
 export type NodesPostRequest = {
@@ -17,9 +15,35 @@ export type NodesPutRequest = {
 };
 
 export type TransactionsPostRequest = {
-  newPreTransaction: PreTransactionData;
+  newTransaction: TransactionForPostRequest;
 };
 
 export type TransactionsPatchRequest = {
-  newTransaction: TransactionData;
+  newTransaction: TransactionForPatchRequest;
+};
+
+export type BlockForPatchRequest = {
+  height: number;
+  nonce: number;
+  hash: string;
+  previousHash: string;
+  transactions: TransactionForPatchRequest[];
+  timestamp: number;
+};
+
+export type TransactionForPatchRequest = {
+  txId: string;
+  status: string;
+  sender: string;
+  recipient: string;
+  amount: number;
+  fee: number;
+  timestamp: Date;
+};
+
+export type TransactionForPostRequest = {
+  sender: string;
+  recipient: string;
+  amount: number;
+  fee: number;
 };

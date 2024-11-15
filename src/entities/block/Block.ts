@@ -1,9 +1,9 @@
-import { Transaction } from '../transaction/Transaction';
+import { ITransaction } from '../transaction/Transaction';
 
 interface IBlockProps {
   height: number;
   previousHash: string;
-  transactions: Transaction[];
+  transactions: ITransaction[];
 }
 
 export interface IBlock {
@@ -12,7 +12,7 @@ export interface IBlock {
   hash: string;
   readonly previousHash: string;
   readonly timestamp: number;
-  transactions: Transaction[];
+  transactions: ITransaction[];
   getData(): string;
 }
 
@@ -22,12 +22,12 @@ export class Block implements IBlock {
   hash: string;
   readonly previousHash: string;
   readonly timestamp: number;
-  transactions: Transaction[];
+  transactions: ITransaction[];
 
-  constructor(props: IBlockProps, timestamp?: number) {
+  constructor(props: IBlockProps, nonce?: number, hash?: string, timestamp?: number) {
     this.height = props.height;
-    this.nonce = 0;
-    this.hash = '';
+    this.nonce = 0 ?? nonce;
+    this.hash = '' ?? hash;
     this.previousHash = props.previousHash;
     this.transactions = props.transactions;
     this.timestamp = timestamp ?? Date.now();

@@ -5,11 +5,6 @@ export type CustomResponse<T> = {
   data: T;
 }
 
-export type ErrorDataResponse = {
-  code: number;
-  message: string;
-}
-
 export type BlockchainDataGetResponse = {
   blockchain: BlockchainData;
 }
