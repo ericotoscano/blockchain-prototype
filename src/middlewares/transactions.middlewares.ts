@@ -12,7 +12,7 @@ import {
   checkNewTransactionTimestamp,
   checkNewTransactionTxId,
 } from '../helpers/transactions.middlewares.helpers';
-import { checkAll } from '../helpers/checkers.helpers';
+import { checkAll } from '../helpers/validation.helpers';
 
 const checkSendNewTransactionData = async (req: Request<{}, {}, TransactionsPostRequest>, res: Response<CustomResponse<ErrorDataResponse>>, next: NextFunction): Promise<void> => {
   try {

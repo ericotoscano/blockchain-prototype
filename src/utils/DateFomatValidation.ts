@@ -3,7 +3,7 @@ export type DateFormatValidationType = {
 };
 
 export class TimestampFormatValidation {
-  static validate(data: Date): boolean {
+  static validate(data: number): boolean {
     const date = new Date(data);
 
     return !isNaN(date.getTime());
