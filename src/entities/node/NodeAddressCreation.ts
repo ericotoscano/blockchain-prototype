@@ -1,5 +1,5 @@
-import { HashCreationType } from '../block/HashCreation';
-import { IKeyCreation } from '../block/KeyCreation';
+import { HashCreationType } from '../../utils/HashCreation';
+import { IKeyCreation } from '../../utils/KeyCreation';
 
 export interface INodeAddressCreation {
   create(data: string): string;

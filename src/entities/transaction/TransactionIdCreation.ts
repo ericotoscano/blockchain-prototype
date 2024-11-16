@@ -1,4 +1,4 @@
-import { IHashCreation } from '../block/HashCreation';
+import { IHashCreation } from '../../utils/HashCreation';
 
 export interface ITransactionIdCreation {
   create(data: string): string;

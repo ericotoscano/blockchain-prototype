@@ -1,5 +1,5 @@
-import { ITransaction, Transaction } from '../transaction/Transaction';
-import { ITransactionIdCreation } from '../transaction/TransactionIdCreation';
+import { ITransaction, Transaction } from './Transaction';
+import { ITransactionIdCreation } from './TransactionIdCreation';
 import { FeeCalculationType } from './FeeCalculation';
 
 export interface IRewardTransactionCreation {

@@ -1,4 +1,4 @@
-import { HashCreationType } from './HashCreation';
+import { HashCreationType } from '../../utils/HashCreation';
 
 export interface IMineResults {
   hash: string;

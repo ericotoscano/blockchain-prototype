@@ -11,8 +11,8 @@ import { TargetManagement } from './entities/blockchain/TargetManagement';
 import { GenesisBlockCreation } from './entities/blockchain/GenesisBlockCreation';
 
 import { BlockMining } from './entities/block/BlockMining';
-import { Secp256k1KeyCreation } from './entities/block/KeyCreation';
-import { Sha256HashCreation, Ripemd160HashCreation } from './entities/block/HashCreation';
+import { Secp256k1KeyCreation } from './utils/KeyCreation';
+import { Sha256HashCreation, Ripemd160HashCreation } from './utils/HashCreation';
 
 declare global {
   var blockchain: Blockchain;
