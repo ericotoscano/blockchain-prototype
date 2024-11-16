@@ -1,4 +1,14 @@
-import { BlockData, BlockchainData, TransactionData } from './data.types';
+import { BlockData, BlockchainData, TransactionData } from "./data.types";
+
+export type ValidationData = {
+  title: string;
+  result: boolean;
+  type: string;
+  code: number;
+  message: string;
+};
+
+export type ErrorData = { type: string; code: number; message: string };
 
 export type CustomResponse<T> = {
   message: string;
@@ -30,7 +40,3 @@ export type NodesDataPutResponse = {
   nodeUrl: string;
   connectedNodes: string[];
 };
-
-export type ValidationData = { title: string; result: boolean; type: string; code: number; message: string };
-
-export type ErrorData = { type: string; code: number; message: string };
