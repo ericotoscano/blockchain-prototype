@@ -1,8 +1,9 @@
-import { IConnectedNodes, INode } from './Node';
+import { IConnectedNodes, INode } from '../../types/node.types';
 
 export interface INodeManagement {
   addToConnectedNodes(nodeUrl: string, nodeAddress: string): void;
   getConnectedNodesForBroadcast(nodeUrlTarget: string): IConnectedNodes[];
+  SortConnectedNodes(): void;
 }
 
 export class NodeManagement implements INodeManagement {
@@ -16,5 +17,9 @@ export class NodeManagement implements INodeManagement {
     const otherNodes = this.node.connectedNodes.filter((connectedNode) => connectedNode.nodeUrl !== nodeUrlTarget);
 
     return [...otherNodes, this.node];
+  }
+
+  SortConnectedNodes(): void {
+    this.node.connectedNodes.sort();
   }
 }

@@ -1,9 +1,5 @@
 import { ec as EC } from 'elliptic';
-
-export interface IKeyCreation {
-  createKeyPair(hashedData: string): EC.KeyPair;
-  createPublicKey(keyPair: EC.KeyPair): string;
-}
+import { IKeyCreation } from '../types/crypto.types';
 
 export class Secp256k1KeyCreation implements IKeyCreation {
   private curve: EC;

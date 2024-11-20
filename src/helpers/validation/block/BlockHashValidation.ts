@@ -1,82 +1,53 @@
-import { BlockForPatchRequest } from "../../../types/request.types";
-import { ValidationData } from "../../../types/response.types";
+import { BlockDataType } from '../../../types/block.types';
+import { ValidationResponseType } from '../../../types/response.types';
+import { HashCreationType } from '../../../types/crypto.types';
 
-import { HashCreationType } from "../../../utils/HashCreation";
-import { HexStringFormatValidation } from "../../../utils/HexStringFormatValidation";
+import { HexStringFormatValidation } from '../../../utils/HexStringFormatValidation';
 
 export class BlockHashValidation {
-  static validateFormat(hash: string): ValidationData {
-    if (!hash || !HexStringFormatValidation.validate(hash, 64)) {
-      const failData = {
-        title: "Block Hash Format Validation",
-        result: false,
-        type: "Format Fail",
-        code: 13,
-        message:
-          "The block hash was not provided or has an invalid format (it should be an hex 64 string).",
-      };
+  static validateFormat(hash: string): ValidationResponseType {
+    const TYPE: string = 'Block Hash Format Validation';
 
-      return failData;
-    }
+    const result: boolean = typeof hash === 'string' && HexStringFormatValidation.validate(hash, 64);
 
-    const successData = {
-      title: "Block Hash Format Validation",
-      result: true,
-      type: "Format Success",
+    return {
+      type: TYPE,
+      result,
       code: 13,
-      message: "The block hash has a valid format.",
+      message: result ? 'The block hash format is valid.' : 'The block hash is missing or has an invalid format.',
     };
-
-    return successData;
   }
 
-  static validateExpectedHash(
-    block: BlockForPatchRequest,
-    target: string,
-    hashCreation: HashCreationType
-  ) {
-    const { height, nonce, hash, previousHash, transactions, timestamp } =
-      block;
+  static validateDifficulty(hash: string, target: string) {
+    const TYPE: string = 'Block Hash Difficulty Validation';
 
-    const expectedHash = hashCreation.hash(
-      `${height}${nonce}${previousHash}${JSON.stringify(
-        transactions
-      )}${timestamp}`
-    );
+    const hashValue: bigint = BigInt('0x' + hash);
+    const targetValue: bigint = BigInt('0x' + target);
 
-    if (BigInt("0x" + expectedHash) >= BigInt("0x" + target)) {
-      const failData = {
-        title: "Block Expected Hash Validation",
-        result: false,
-        type: "Target Difficulty Matching Fail",
-        code: 13,
-        message:
-          "The block hash does not match with the required blockchain target difficulty.",
-      };
+    const result: boolean = hashValue < targetValue;
 
-      return failData;
-    }
-
-    if (expectedHash !== hash) {
-      const failData = {
-        title: "Block Expected Hash Validation",
-        result: false,
-        type: "Expected Hash Matching Fail",
-        code: 13,
-        message: "The block hash does not match with the expected hash.",
-      };
-
-      return failData;
-    }
-
-    const successData = {
-      title: "Block Expected Hash Validation",
-      result: true,
-      type: "Expected Hash Matching Success",
+    return {
+      type: TYPE,
+      result,
       code: 13,
-      message: "The block hash match with the expected hash.",
+      message: result ? 'The block hash matches with the required blockchain target difficulty.' : 'The block hash does not match with the required blockchain target difficulty.',
     };
+  }
 
-    return successData;
+  static validateExpectedHash(block: BlockDataType, hashCreation: HashCreationType) {
+    const TYPE: string = 'Block Expected Hash Validation';
+
+    const { height, nonce, hash, previousHash, transactions, timestamp } = block;
+
+    const expectedHash: string = hashCreation.hash(`${height}${nonce}${previousHash}${JSON.stringify(transactions)}${timestamp}`);
+
+    const result: boolean = expectedHash !== hash;
+
+    return {
+      type: TYPE,
+      result,
+      code: 13,
+      message: result ? 'The block hash matches with the expected hash.' : 'The block hash does not match with the expected hash.',
+    };
   }
 }

@@ -1,30 +1,18 @@
-import { ValidationData } from "../../../types/response.types";
+import { ValidationResponseType } from '../../../types/response.types';
 
-import { TimestampFormatValidation } from "../../../utils/DateFomatValidation";
+import { TimestampFormatValidation } from '../../../utils/DateFomatValidation';
 
 export class BlockTimestampValidation {
-  static validateFormat(timestamp: number): ValidationData {
-    if (!timestamp || TimestampFormatValidation.validate(timestamp)) {
-      const failData = {
-        title: "Block Timestamp Format Validation",
-        result: false,
-        type: "Format Fail",
-        code: 13,
-        message:
-          "The block timestamp was not provided or has an invalid format (it should be a number representing a timestamp).",
-      };
+  static validateFormat(timestamp: number): ValidationResponseType {
+    const TYPE: string = 'Block Timestamp Format Validation';
 
-      return failData;
-    }
+    const result: boolean = typeof timestamp === 'number' && TimestampFormatValidation.validate(timestamp);
 
-    const successData = {
-      title: "Block Timestamp Format Validation",
-      result: true,
-      type: "Format Success",
+    return {
+      type: TYPE,
+      result,
       code: 13,
-      message: "The block timestamp has a valid format.",
+      message: result ? 'The block timestamp format is valid.' : 'The block timestamp is missing or has an invalid format.',
     };
-
-    return successData;
   }
 }

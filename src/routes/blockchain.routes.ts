@@ -8,8 +8,8 @@ import transactionsMiddlewares from '../middlewares/transactions.middlewares';
 
 import blockchainController from '../controllers/blockchain.controller';
 
-const { validateBlockchainCreation } = blockchainMiddlewares;
-const { validateBlockFormat, validateBlockHeight, validateBlockNonce, validateBlockHash, validateBlockPreviousHash, validateBlockTransactions, validateBlockTimestamp } = blockMiddlewares;
+const { validateBlockchainStructure } = blockchainMiddlewares;
+const { validateBlockStructure, validateBlockHeight, validateBlockNonce, validateBlockHash, validateBlockPreviousHash, validateBlockTransactions, validateBlockTimestamp } = blockMiddlewares;
 const { checkNewNodeData, checkConnectedNodesData } = nodesMiddlewares;
 const { checkSendNextBlockData } = blocksMiddlewares;
 const { checkSendNewTransactionData, checkAddNewTransactionData } = transactionsMiddlewares;
@@ -20,10 +20,10 @@ const router: Router = Router();
 
 router
   .route('/')
-  .get(validateBlockchainCreation, getBlockchain)
+  .get(validateBlockchainStructure, getBlockchain)
   .patch(
-    validateBlockchainCreation,
-    validateBlockFormat,
+    validateBlockchainStructure,
+    validateBlockStructure,
     validateBlockHeight,
     validateBlockNonce,
     validateBlockHash,
@@ -31,16 +31,16 @@ router
     validateBlockTransactions,
     validateBlockTimestamp,
     addNextBlock
-  );
+  );//ate aqui ok
 
 router
   .route('/nodes')
-  .post(validateBlockchainCreation, checkNewNodeData, sendNewNode)
-  .patch(validateBlockchainCreation, checkNewNodeData, addNewNode)
-  .put(validateBlockchainCreation, checkConnectedNodesData, updateConnectedNodes);
+  .post(validateBlockchainStructure, checkNewNodeData, sendNewNode)
+  .patch(validateBlockchainStructure, checkNewNodeData, addNewNode)
+  .put(validateBlockchainStructure, checkConnectedNodesData, updateConnectedNodes);
 
-router.route('/next-block').post(validateBlockchainCreation, checkSendNextBlockData, sendNextBlock);
+router.route('/next-block').post(validateBlockchainStructure, checkSendNextBlockData, sendNextBlock);
 
-router.route('/transactions').post(validateBlockchainCreation, checkSendNewTransactionData, sendNewTransaction).patch(validateBlockchainCreation, checkAddNewTransactionData, addNewTransaction);
+router.route('/transactions').post(validateBlockchainStructure, checkSendNewTransactionData, sendNewTransaction).patch(validateBlockchainStructure, checkAddNewTransactionData, addNewTransaction);
 
 export default router;

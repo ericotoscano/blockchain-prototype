@@ -1,12 +1,7 @@
-import { ITransaction } from '../transaction/Transaction';
+import { ITransaction } from '../../types/transaction.types';
+import { IBlockTransactionsManagement } from '../../types/block.types';
 
-export interface IBlockTransactionManagement {
-  addTransaction(transaction: ITransaction): void;
-  addRewardTransaction(rewardTransaction: ITransaction): void;
-  getTransactions(): ITransaction[];
-}
-
-export class BlockTransactionManagement implements IBlockTransactionManagement {
+export class BlockTransactionsManagement implements IBlockTransactionsManagement {
   constructor(private readonly blockTransactions: ITransaction[]) {}
 
   addTransaction(transaction: ITransaction): void {

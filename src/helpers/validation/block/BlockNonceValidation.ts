@@ -1,33 +1,16 @@
-import { ValidationData } from "../../../types/response.types";
+import { ValidationResponseType } from '../../../types/response.types';
 
 export class BlockNonceValidation {
-  static validateFormat(nonce: number): ValidationData {
-    if (
-      !nonce ||
-      nonce < 0 ||
-      !Number.isInteger(nonce) ||
-      typeof nonce !== "number"
-    ) {
-      const failData = {
-        title: "Block Nonce Format Validation",
-        result: false,
-        type: "Format Fail",
-        code: 13,
-        message:
-          "The block nonce was not provided or has an invalid format (it should be a positive integer number).",
-      };
+  static validateFormat(nonce: number): ValidationResponseType {
+    const TYPE: string = 'Block Nonce Format Validation';
 
-      return failData;
-    }
+    const result: boolean = typeof nonce === 'number' && Number.isInteger(nonce) && nonce >= 0;
 
-    const successData = {
-      title: "Block Nonce Format Validation",
-      result: true,
-      type: "Format Success",
+    return {
+      type: TYPE,
+      result,
       code: 13,
-      message: "The block nonce has a valid format.",
+      message: result ? 'The block nonce format is valid.' : 'The block nonce is missing or has an invalid format.',
     };
-
-    return successData;
   }
 }

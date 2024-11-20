@@ -1,12 +1,13 @@
-import { IBlock } from '../block/Block';
-
-export interface IBlocks {
-  addBlock(block: IBlock): void;
-  getPreviousBlock(): IBlock;
-}
+import { IBlock } from '../../types/block.types';
+import { IBlocks } from '../../types/blockchain.types';
+import { ITransaction } from '../../types/transaction.types';
 
 export class Blocks implements IBlocks {
-  constructor(private readonly blocks: IBlock[]) {}
+  private readonly blocks: IBlock[];
+
+  constructor(blocks: IBlock[]) {
+    this.blocks = blocks;
+  }
 
   addBlock(block: IBlock): void {
     this.blocks.push(block);
@@ -14,5 +15,15 @@ export class Blocks implements IBlocks {
 
   getPreviousBlock(): IBlock {
     return this.blocks[this.blocks.length - 1];
+  }
+
+  getAllBlocksTransactions(): ITransaction[] {
+    const allBlocksTransactions: ITransaction[] = [];
+
+    for (let i = 0; i < this.blocks.length; i++) {
+      allBlocksTransactions.push(...this.blocks[i].transactions);
+    }
+
+    return allBlocksTransactions;
   }
 }

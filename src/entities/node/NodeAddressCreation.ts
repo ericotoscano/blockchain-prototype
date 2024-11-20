@@ -1,9 +1,5 @@
-import { HashCreationType } from '../../utils/HashCreation';
-import { IKeyCreation } from '../../utils/KeyCreation';
-
-export interface INodeAddressCreation {
-  create(data: string): string;
-}
+import { INodeAddressCreation } from '../../types/node.types';
+import { HashCreationType, IKeyCreation } from '../../types/crypto.types';
 
 export class LocalHostNodeAddressCreation implements INodeAddressCreation {
   constructor(private readonly secp256k1KeyCreation: IKeyCreation, private readonly sha256HashCreation: HashCreationType, private readonly ripemd160HashCreation: HashCreationType) {}

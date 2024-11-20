@@ -1,11 +1,6 @@
-import { ITransaction } from '../transaction/Transaction';
-import { IBlock } from '../block/Block';
-
-export interface IMempool {
-  addTransaction(transaction: ITransaction): void;
-  removeConfirmedTransactions(nextBlock: IBlock): void;
-  getPendingTransactions(minFee: number): ITransaction[];
-}
+import { IMempool } from '../../types/blockchain.types';
+import { IBlock } from '../../types/block.types';
+import { ITransaction } from '../../types/transaction.types';
 
 export class Mempool implements IMempool {
   private mempoolTransactions: ITransaction[];

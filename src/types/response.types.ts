@@ -1,26 +1,22 @@
-import { BlockData, BlockchainData, TransactionData } from "./data.types";
+import { BlockDataType } from './block.types';
+import { IBlockchain } from './blockchain.types';
 
-export type ValidationData = {
-  title: string;
-  result: boolean;
+export type ResponseBaseType = {
   type: string;
   code: number;
   message: string;
 };
 
-export type ErrorData = { type: string; code: number; message: string };
-
-export type CustomResponse<T> = {
-  message: string;
-  data: T;
+export type ValidationResponseType = ResponseBaseType & {
+  result: boolean;
 };
 
-export type BlockchainDataGetResponse = {
-  blockchain: BlockchainData;
+export type BlockchainResponseType = ResponseBaseType & {
+  data: { blockchain: IBlockchain };
 };
 
-export type NextBlockDataPostResponse = {
-  nextBlock: BlockData;
+export type NextBlockResponseType = ResponseBaseType & {
+  data: { nextBlock: BlockDataType };
 };
 
 export type TransactionsPostResponseData = {

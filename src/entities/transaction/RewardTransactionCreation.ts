@@ -1,25 +1,22 @@
-import { ITransaction, Transaction } from './Transaction';
-import { ITransactionIdCreation } from './TransactionIdCreation';
-import { FeeCalculationType } from './FeeCalculation';
-
-export interface IRewardTransactionCreation {
-  create(): ITransaction;
-}
+import { Transaction } from './Transaction';
+import { TransactionCalculationType, TransactionIdCreationType, IRewardTransactionCreation, ITransaction } from '../../types/transaction.types';
+import { HashCreationType } from '../../types/crypto.types';
 
 export class RewardTransactionCreation implements IRewardTransactionCreation {
   constructor(
     private readonly blockTransactions: ITransaction[],
     private readonly nodeAddress: string,
     private readonly reward: number,
-    private readonly feeCalculation: FeeCalculationType,
-    private readonly transactionIdCreation: ITransactionIdCreation
+    private readonly feeCalculation: TransactionCalculationType,
+    private readonly transactionIdCreation: TransactionIdCreationType,
+    private readonly hashCreation: HashCreationType
   ) {}
 
   create(): ITransaction {
-    const totalFee = this.feeCalculation.getTotalFee(this.blockTransactions);
+    const totalFee: number = this.feeCalculation.getTotalFee(this.blockTransactions);
 
-    const props = { sender: '0'.repeat(40), recipient: this.nodeAddress, amount: this.reward + totalFee, fee: 0 };
+    const input = { sender: '0'.repeat(40), recipient: this.nodeAddress, amount: this.reward + totalFee, fee: 0 };
 
-    return new Transaction(props, this.transactionIdCreation);
+    return new Transaction(input, this.transactionIdCreation, this.hashCreation);
   }
 }

@@ -1,33 +1,16 @@
-import { ValidationData } from "../../../types/response.types";
+import { ValidationResponseType } from '../../../types/response.types';
 
 export class BlockHeightValidation {
-  static validateFormat(height: number): ValidationData {
-    if (
-      !height ||
-      height < 0 ||
-      !Number.isInteger(height) ||
-      typeof height !== "number"
-    ) {
-      const failData = {
-        title: "Block Height Format Validation",
-        result: false,
-        type: "Format Fail",
-        code: 13,
-        message:
-          "The block height was not provided or has an invalid format (it should be a positive integer number).",
-      };
+  static validateFormat(height: number): ValidationResponseType {
+    const TYPE: string = 'Block Height Format Validation';
 
-      return failData;
-    }
+    const result: boolean = typeof height === 'number' && Number.isInteger(height) && height >= 0;
 
-    const successData = {
-      title: "Block Height Format Validation",
-      result: true,
-      type: "Format Success",
+    return {
+      type: TYPE,
+      result,
       code: 13,
-      message: "The block height has a valid format.",
+      message: result ? 'The block height format is valid.' : 'The block height is missing or has an invalid format.',
     };
-
-    return successData;
   }
 }

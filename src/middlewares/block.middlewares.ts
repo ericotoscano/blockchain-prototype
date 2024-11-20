@@ -1,26 +1,22 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction } from 'express';
 
-import { BlockchainPatchRequest } from "../types/request.types";
-import { ValidationData, ErrorData } from "../types/response.types";
+import { BlockDataType } from '../types/block.types';
+import { ValidationResponseType, ResponseBaseType } from '../types/response.types';
 
-import { Sha256HashCreation } from "../utils/HashCreation";
+import { BlockStructureValidation } from '../helpers/validation/block/BlockStructureValidation';
+import { BlockHeightValidation } from '../helpers/validation/block/BlockHeightValidation';
+import { BlockHashValidation } from '../helpers/validation/block/BlockHashValidation';
+import { BlockPreviousHashValidation } from '../helpers/validation/block/BlockPreviousHash';
+import { BlockTransactionsValidation } from '../helpers/validation/block/BlockTransactionsValidation';
+import { BlockTimestampValidation } from '../helpers/validation/block/BlockTimestampValidation';
 
-import { BlockValidation } from "../helpers/validation/block/BlockValidation";
-import { BlockHeightValidation } from "../helpers/validation/block/BlockHeightValidation";
-import { BlockHashValidation } from "../helpers/validation/block/BlockHashValidation";
-import { BlockPreviousHashValidation } from "../helpers/validation/block/BlockPreviousHash";
-import { BlockTransactionsValidation } from "../helpers/validation/block/BlockTransactionsValidation";
-import { BlockTimestampValidation } from "../helpers/validation/block/BlockTimestampValidation";
+import { Sha256HashCreation } from '../utils/HashCreation';
 
-const validateBlockFormat = async (
-  req: Request<{}, {}, BlockchainPatchRequest>,
-  res: Response<ValidationData | ErrorData>,
-  next: NextFunction
-): Promise<void> => {
+const validateBlockStructure = async (req: Request<{}, {}, BlockDataType>, res: Response<ValidationResponseType | ResponseBaseType>, next: NextFunction): Promise<void> => {
   try {
-    const { nextBlock } = req.body;
+    const block = req.body;
 
-    const data = BlockValidation.validateFormat(nextBlock);
+    const data = BlockStructureValidation.validate(block);
 
     if (!data.result) {
       res.status(400).send(data);
@@ -29,23 +25,16 @@ const validateBlockFormat = async (
 
     next();
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Unexpected error.";
+    const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
 
-    res
-      .status(500)
-      .send({ type: "Server Error", code: 50, message: errorMessage });
+    res.status(500).send({ type: 'Server Error', code: 50, message: errorMessage });
     return;
   }
 };
 
-const validateBlockHeight = async (
-  req: Request<{}, {}, BlockchainPatchRequest>,
-  res: Response<ValidationData | ErrorData>,
-  next: NextFunction
-): Promise<void> => {
+const validateBlockHeight = async (req: Request<{}, {}, BlockDataType>, res: Response<ValidationResponseType | ResponseBaseType>, next: NextFunction): Promise<void> => {
   try {
-    const { nextBlock } = req.body;
+    const nextBlock = req.body;
 
     const { height } = nextBlock;
 
@@ -58,23 +47,16 @@ const validateBlockHeight = async (
 
     next();
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Unexpected error.";
+    const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
 
-    res
-      .status(500)
-      .send({ type: "Server Error", code: 50, message: errorMessage });
+    res.status(500).send({ type: 'Server Error', code: 50, message: errorMessage });
     return;
   }
 };
 
-const validateBlockNonce = async (
-  req: Request<{}, {}, BlockchainPatchRequest>,
-  res: Response<ValidationData | ErrorData>,
-  next: NextFunction
-): Promise<void> => {
+const validateBlockNonce = async (req: Request<{}, {}, BlockDataType>, res: Response<ValidationResponseType | ResponseBaseType>, next: NextFunction): Promise<void> => {
   try {
-    const { nextBlock } = req.body;
+    const nextBlock = req.body;
 
     const { height } = nextBlock;
 
@@ -87,33 +69,23 @@ const validateBlockNonce = async (
 
     next();
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Unexpected error.";
+    const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
 
-    res
-      .status(500)
-      .send({ type: "Server Error", code: 50, message: errorMessage });
+    res.status(500).send({ type: 'Server Error', code: 50, message: errorMessage });
     return;
   }
 };
 
-const validateBlockHash = async (
-  req: Request<{}, {}, BlockchainPatchRequest>,
-  res: Response<ValidationData | ErrorData>,
-  next: NextFunction
-): Promise<void> => {
+const validateBlockHash = async (req: Request<{}, {}, BlockDataType>, res: Response<ValidationResponseType | ResponseBaseType>, next: NextFunction): Promise<void> => {
   try {
-    const { nextBlock } = req.body;
+    const nextBlock = req.body;
 
     const { hash } = nextBlock;
 
-    const allValidationData: ValidationData[] = [
+    const allValidationData: ValidationResponseType[] = [
       BlockHashValidation.validateFormat(hash),
-      BlockHashValidation.validateExpectedHash(
-        nextBlock,
-        global.blockchain.target,
-        Sha256HashCreation
-      ),
+      BlockHashValidation.validateDifficulty(hash, global.blockchain.target),
+      BlockHashValidation.validateExpectedHash(nextBlock, Sha256HashCreation),
     ];
 
     for (const data of allValidationData) {
@@ -125,32 +97,22 @@ const validateBlockHash = async (
 
     next();
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Unexpected error.";
+    const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
 
-    res
-      .status(500)
-      .send({ type: "Server Error", code: 50, message: errorMessage });
+    res.status(500).send({ type: 'Server Error', code: 50, message: errorMessage });
     return;
   }
 };
 
-const validateBlockPreviousHash = async (
-  req: Request<{}, {}, BlockchainPatchRequest>,
-  res: Response<ValidationData | ErrorData>,
-  next: NextFunction
-): Promise<void> => {
+const validateBlockPreviousHash = async (req: Request<{}, {}, BlockDataType>, res: Response<ValidationResponseType | ResponseBaseType>, next: NextFunction): Promise<void> => {
   try {
-    const { nextBlock } = req.body;
+    const nextBlock = req.body;
 
     const { previousHash } = nextBlock;
 
-    const allValidationData: ValidationData[] = [
+    const allValidationData: ValidationResponseType[] = [
       BlockPreviousHashValidation.validateFormat(previousHash),
-      BlockPreviousHashValidation.validateExpectedPreviousHash(
-        previousHash,
-        global.blockchain.blocks.getPreviousBlock().hash
-      ),
+      BlockPreviousHashValidation.validateExpectedPreviousHash(previousHash, global.blockchain.blocks.getPreviousBlock().hash),
     ];
 
     for (const data of allValidationData) {
@@ -162,52 +124,45 @@ const validateBlockPreviousHash = async (
 
     next();
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Unexpected error.";
+    const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
 
-    res
-      .status(500)
-      .send({ type: "Server Error", code: 50, message: errorMessage });
+    res.status(500).send({ type: 'Server Error', code: 50, message: errorMessage });
     return;
   }
 };
 
-const validateBlockTransactions = async (
-  req: Request<{}, {}, BlockchainPatchRequest>,
-  res: Response<ValidationData | ErrorData>,
-  next: NextFunction
-): Promise<void> => {
+const validateBlockTransactions = async (req: Request<{}, {}, BlockDataType>, res: Response<ValidationResponseType | ResponseBaseType>, next: NextFunction): Promise<void> => {
   try {
-    const { nextBlock } = req.body;
+    const nextBlock = req.body;
 
     const { transactions } = nextBlock;
 
-    const data = BlockTransactionsValidation.validateFormat(transactions);
+    const allValidationData: ValidationResponseType[] = [
+      BlockTransactionsValidation.validateStructure(transactions),
+      BlockTransactionsValidation.validateLength(transactions, global.blockchain.maxTransactionsPerBlock),
+      BlockTransactionsValidation.validateRewardTransactionFormat(transactions, global.blockchain.reward),
+      BlockTransactionsValidation.validateAllTransactions(transactions),
+    ];
 
-    if (!data.result) {
-      res.status(400).send(data);
-      return;
+    for (const data of allValidationData) {
+      if (!data.result) {
+        res.status(400).send(data);
+        return;
+      }
     }
 
     next();
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Unexpected error.";
+    const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
 
-    res
-      .status(500)
-      .send({ type: "Server Error", code: 50, message: errorMessage });
+    res.status(500).send({ type: 'Server Error', code: 50, message: errorMessage });
     return;
   }
 };
 
-const validateBlockTimestamp = async (
-  req: Request<{}, {}, BlockchainPatchRequest>,
-  res: Response<ValidationData | ErrorData>,
-  next: NextFunction
-): Promise<void> => {
+const validateBlockTimestamp = async (req: Request<{}, {}, BlockDataType>, res: Response<ValidationResponseType | ResponseBaseType>, next: NextFunction): Promise<void> => {
   try {
-    const { nextBlock } = req.body;
+    const nextBlock = req.body;
 
     const { timestamp } = nextBlock;
 
@@ -220,18 +175,15 @@ const validateBlockTimestamp = async (
 
     next();
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Unexpected error.";
+    const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
 
-    res
-      .status(500)
-      .send({ type: "Server Error", code: 50, message: errorMessage });
+    res.status(500).send({ type: 'Server Error', code: 50, message: errorMessage });
     return;
   }
 };
 
 export default {
-  validateBlockFormat,
+  validateBlockStructure,
   validateBlockHeight,
   validateBlockNonce,
   validateBlockHash,

@@ -1,12 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
 
-import { ValidationData, ErrorData } from '../types/response.types';
+import { ValidationResponseType, ResponseBaseType } from '../types/response.types';
 
-import { BlockchainValidation } from '../helpers/blockchain.middlewares.helpers';
+import { BlockchainStructureValidation } from '../helpers/validation/blockchain/BlockchainStructureValidation';
 
-const validateBlockchainCreation = async (req: Request, res: Response<ValidationData | ErrorData>, next: NextFunction): Promise<void> => {
+const validateBlockchainStructure = async (req: Request, res: Response<ValidationResponseType | ResponseBaseType>, next: NextFunction): Promise<void> => {
   try {
-    const data = BlockchainValidation.validateBlockchainCreation();
+    const data = BlockchainStructureValidation.validate();
 
     if (!data.result) {
       res.status(404).send(data);
@@ -23,5 +23,5 @@ const validateBlockchainCreation = async (req: Request, res: Response<Validation
 };
 
 export default {
-  validateBlockchainCreation,
+  validateBlockchainStructure,
 };

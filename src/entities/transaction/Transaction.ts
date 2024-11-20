@@ -1,24 +1,5 @@
-import { ITransactionIdCreation } from './TransactionIdCreation';
-import { TransactionStatusType } from './TransactionStatusManagement';
-
-interface TransactionProps {
-  sender: string;
-  recipient: string;
-  amount: number;
-  fee: number;
-}
-
-export interface ITransaction {
-  readonly txId: string;
-  status: TransactionStatusType;
-  readonly sender: string;
-  readonly recipient: string;
-  readonly amount: number;
-  readonly fee: number;
-  readonly timestamp: number;
-  readonly transactionIdCreation: ITransactionIdCreation;
-  getData(): string;
-}
+import { HashCreationType } from '../../types/crypto.types';
+import { TransactionStatusType, NewTransactionInputType, TransactionIdCreationType, ITransaction } from '../../types/transaction.types';
 
 export class Transaction implements ITransaction {
   readonly txId: string;
@@ -29,14 +10,21 @@ export class Transaction implements ITransaction {
   readonly fee: number;
   readonly timestamp: number;
 
-  constructor(props: TransactionProps, readonly transactionIdCreation: ITransactionIdCreation, txId?: string, status?: TransactionStatusType, timestamp?: number) {
-    this.sender = props.sender;
-    this.recipient = props.recipient;
-    this.amount = props.amount;
-    this.fee = props.fee;
+  constructor(
+    input: NewTransactionInputType,
+    readonly transactionIdCreation: TransactionIdCreationType,
+    readonly hashCreation: HashCreationType,
+    txId?: string,
+    status?: TransactionStatusType,
+    timestamp?: number
+  ) {
+    this.sender = input.sender;
+    this.recipient = input.recipient;
+    this.amount = input.amount;
+    this.fee = input.fee;
     this.status = status ?? 'Pending';
     this.timestamp = timestamp ?? Date.now();
-    this.txId = txId ?? this.transactionIdCreation.create(this.getData());
+    this.txId = txId ?? this.transactionIdCreation.create(this.getData(), hashCreation);
   }
 
   getData(): string {

@@ -1,20 +1,12 @@
-import { HashCreationType } from '../../utils/HashCreation';
+import { IBlockMining, MineBlockResultsType } from '../../types/block.types';
+import { HashCreationType } from '../../types/crypto.types';
 
-export interface IMineResults {
-  hash: string;
-  nonce: number;
-}
-
-export interface IBlockMining {
-  mine(data: string, target: string): IMineResults;
-}
-
-export class BlockMining {
+export class BlockMining implements IBlockMining {
   constructor(private readonly hashCreation: HashCreationType) {}
 
-  mine(data: string, target: string): IMineResults {
-    let hash = this.hashCreation.hash(data);
-    let nonce = 0;
+  mine(data: string, target: string): MineBlockResultsType {
+    let hash: string = this.hashCreation.hash(data);
+    let nonce: number = 0;
 
     while (BigInt('0x' + hash) >= BigInt('0x' + target)) {
       nonce += 1;

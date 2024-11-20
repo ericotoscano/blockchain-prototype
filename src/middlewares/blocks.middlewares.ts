@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 
-import { NextBlockPostRequest } from '../types/request.types';
+import { NextBlockPostRequest } from '../types/node.types';
 import { CustomResponse, ErrorDataResponse } from '../types/response.types';
 import { CheckerFunction } from '../types/check.types';
 

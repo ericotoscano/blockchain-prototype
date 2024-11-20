@@ -1,29 +1,6 @@
-import { INode } from '../node/Node';
-import { IMempool } from './Mempool';
-import { IGenesisBlockCreation } from './GenesisBlockCreation';
-
-import { TargetManagementType } from './TargetManagement';
-import { IBlocks } from './Blocks';
-
-interface IBlockchainProps {
-  targetZeros: number;
-  reward: number;
-  maxTransactionsPerBlock: number;
-}
-
-export interface IBlockchain {
-  target: string;
-  reward: number;
-  maxTransactionsPerBlock: number;
-  readonly node: INode;
-  mempool: IMempool;
-  blocks: IBlocks;
-  readonly targetManagement: TargetManagementType;
-  readonly genesisBlockCreation: IGenesisBlockCreation;
-  setTarget(targetZeros: number): void;
-  setReward(blockReward: number): void;
-  setMaxTransactionsPerBlock(maxNumber: number): void;
-}
+import { INode } from '../../types/node.types';
+import { BlockchainInputType, IBlockchain, IBlocks, IGenesisBlockCreation, IMempool, TargetManagementType } from '../../types/blockchain.types';
+import { NodeManagement } from '../node/NodeManagement';
 
 export class Blockchain implements IBlockchain {
   target: string;
@@ -33,11 +10,12 @@ export class Blockchain implements IBlockchain {
   blocks: IBlocks;
 
   constructor(
-    props: IBlockchainProps,
+    props: BlockchainInputType,
     readonly node: INode,
     mempool: IMempool,
     blocks: IBlocks,
     readonly targetManagement: TargetManagementType,
+    readonly nodeManagement: NodeManagement,
     readonly genesisBlockCreation: IGenesisBlockCreation
   ) {
     this.target = targetManagement.calculate(props.targetZeros);

@@ -8,6 +8,7 @@ import { Blockchain } from './entities/blockchain/Blockchain';
 import { Mempool } from './entities/blockchain/Mempool';
 import { Blocks } from './entities/blockchain/Blocks';
 import { TargetManagement } from './entities/blockchain/TargetManagement';
+import { NodeManagement } from './entities/node/NodeManagement';
 import { GenesisBlockCreation } from './entities/blockchain/GenesisBlockCreation';
 
 import { BlockMining } from './entities/block/BlockMining';
@@ -27,9 +28,10 @@ global.blockchainNode = new Node(LocalHostNodeUrlCreation, localHostNodeAddressC
 
 const mempool = new Mempool([]);
 const blocks = new Blocks([]);
+const nodeManagement = new NodeManagement(blockchainNode);
 const blockMining = new BlockMining(Sha256HashCreation);
 const genesisBlockCreation = new GenesisBlockCreation(blockMining);
 
-global.blockchain = new Blockchain({ targetZeros: 3, reward: 3.125, maxTransactionsPerBlock: 10 }, blockchainNode, mempool, blocks, TargetManagement, genesisBlockCreation);
+global.blockchain = new Blockchain({ targetZeros: 3, reward: 3.125, maxTransactionsPerBlock: 10 }, blockchainNode, mempool, blocks, TargetManagement, nodeManagement, genesisBlockCreation);
 
 export {};

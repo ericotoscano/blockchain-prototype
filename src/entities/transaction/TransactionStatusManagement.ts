@@ -1,10 +1,4 @@
-import { ITransaction } from './Transaction';
-
-export type TransactionStatusType = 'Pending' | 'Sent' | 'Confirmed';
-
-export interface ITransactionStatusManagement {
-  changeStatus(targetStatus: TransactionStatusType): void;
-}
+import { TransactionStatusType, ITransaction, ITransactionStatusManagement } from '../../types/transaction.types';
 
 export class TransactionStatusManagement implements ITransactionStatusManagement {
   constructor(private readonly transaction: ITransaction) {}

@@ -1,61 +1,31 @@
-import { ValidationData } from "../../../types/response.types";
+import { ValidationResponseType } from '../../../types/response.types';
 
-import { HexStringFormatValidation } from "../../../utils/HexStringFormatValidation";
+import { HexStringFormatValidation } from '../../../utils/HexStringFormatValidation';
 
 export class BlockPreviousHashValidation {
-  static validateFormat(previousHash: string): ValidationData {
-    if (
-      !previousHash ||
-      !HexStringFormatValidation.validate(previousHash, 64)
-    ) {
-      const failData = {
-        title: "Block Previous Hash Format Validation",
-        result: false,
-        type: "Format Fail",
-        code: 13,
-        message:
-          "The block previous hash was not provided or has an invalid format (it should be an hex 64 string).",
-      };
+  static validateFormat(previousHash: string): ValidationResponseType {
+    const TYPE: string = 'Block Previous Hash Format Validation';
 
-      return failData;
-    }
+    const result: boolean = typeof previousHash === 'string' && HexStringFormatValidation.validate(previousHash, 64);
 
-    const successData = {
-      title: "Block Previous Hash Format Validation",
-      result: true,
-      type: "Format Success",
+    return {
+      type: TYPE,
+      result,
       code: 13,
-      message: "The block previous hash has a valid format.",
+      message: result ? 'The block previous hash format is valid.' : 'The block previous hash is missing or has an invalid format.',
     };
-
-    return successData;
   }
 
-  static validateExpectedPreviousHash(
-    previousHash: string,
-    expectedPreviousHash: string
-  ): ValidationData {
-    if (previousHash !== expectedPreviousHash) {
-      const failData = {
-        title: "Block Expected Previous Hash Validation",
-        result: false,
-        type: "Expected Previous Hash Matching Fail",
-        code: 13,
-        message:
-          "The block previous hash does not match with the last valid block hash in blockchain.",
-      };
+  static validateExpectedPreviousHash(previousHash: string, expectedPreviousHash: string): ValidationResponseType {
+    const TYPE: string = 'Block Expected Previous Hash Validation';
 
-      return failData;
-    }
+    const result: boolean = previousHash !== expectedPreviousHash;
 
-    const successData = {
-      title: "Block Expected Previous Hash Validation",
-      result: true,
-      type: "EExpected Previous Hash Matching Success",
+    return {
+      type: TYPE,
+      result,
       code: 13,
-      message: "The block previous hash match with the expected previous hash.",
+      message: result ? 'The block previous hash matches with last valid block hash in blockchain.' : 'The block previous hash does not match with the last valid block hash in blockchain.',
     };
-
-    return successData;
   }
 }

@@ -1,21 +1,18 @@
-import { IBlock, Block } from '../block/Block';
-import { IBlockMining } from '../block/BlockMining';
-
-export interface IGenesisBlockCreation {
-  create(target: string): IBlock;
-}
+import { Block } from '../block/Block';
+import { IBlock, IBlockMining, MineBlockResultsType } from '../../types/block.types';
+import { IGenesisBlockCreation } from '../../types/blockchain.types';
 
 export class GenesisBlockCreation implements IGenesisBlockCreation {
   constructor(private readonly blockMining: IBlockMining) {}
 
   create(target: string): IBlock {
-    const props = { height: 0, previousHash: '0'.repeat(64), transactions: [] };
+    const input = { height: 0, previousHash: '0'.repeat(64), transactions: [] };
 
-    const genesisBlock = new Block(props);
+    const genesisBlock: IBlock = new Block(input);
 
-    const data = genesisBlock.getData();
+    const data: string = genesisBlock.getData();
 
-    const { hash, nonce } = this.blockMining.mine(data, target);
+    const { hash, nonce } : MineBlockResultsType = this.blockMining.mine(data, target);
 
     genesisBlock.hash = hash;
     genesisBlock.nonce = nonce;
