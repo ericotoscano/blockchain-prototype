@@ -11,9 +11,9 @@ export class Transaction implements ITransaction {
   readonly timestamp: number;
 
   constructor(
-    input: NewTransactionInputType,
-    readonly transactionIdCreation: TransactionIdCreationType,
+    readonly input: NewTransactionInputType,
     readonly hashCreation: HashCreationType,
+    readonly transactionIdCreation: TransactionIdCreationType,
     txId?: string,
     status?: TransactionStatusType,
     timestamp?: number

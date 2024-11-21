@@ -1,15 +1,24 @@
 import { Router } from 'express';
 
-import blockchainMiddlewares from '../middlewares/blockchain.middlewares';
-import blockMiddlewares from '../middlewares/block.middlewares';
-import nodesMiddlewares from '../middlewares/nodes.middlewares';
+import blockchainMiddlewares from '../middlewares/blockchain/blockchain.middlewares';
+import blockMiddlewares from '../middlewares/block/block.middlewares';
+import nodesMiddlewares from '../middlewares/nodes/nodes.middlewares';
 import blocksMiddlewares from '../middlewares/blocks.middlewares';
-import transactionsMiddlewares from '../middlewares/transactions.middlewares';
+import transactionsMiddlewares from '../middlewares/transactions/transactions.middlewares';
 
 import blockchainController from '../controllers/blockchain.controller';
 
-const { validateBlockchainStructure } = blockchainMiddlewares;
-const { validateBlockStructure, validateBlockHeight, validateBlockNonce, validateBlockHash, validateBlockPreviousHash, validateBlockTransactions, validateBlockTimestamp } = blockMiddlewares;
+const { validateBlockchainStructure, validateMempoolTransactionsByMinFee } = blockchainMiddlewares;
+const {
+  validateBlockStructure,
+  validateBlockHeight,
+  validateBlockNonce,
+  validateBlockHash,
+  validateBlockPreviousHash,
+  validateBlockTransactions,
+  validateNextBlockTransactionsMinFee,
+  validateBlockTimestamp,
+} = blockMiddlewares;
 const { checkNewNodeData, checkConnectedNodesData } = nodesMiddlewares;
 const { checkSendNextBlockData } = blocksMiddlewares;
 const { checkSendNewTransactionData, checkAddNewTransactionData } = transactionsMiddlewares;
@@ -31,15 +40,18 @@ router
     validateBlockTransactions,
     validateBlockTimestamp,
     addNextBlock
-  );//ate aqui ok
+  );
+
+router
+  .route('/next-block')
+  .get(validateBlockchainStructure, validateNextBlockTransactionsMinFee, validateMempoolTransactionsByMinFee)
+  .post(validateBlockchainStructure, checkSendNextBlockData, sendNextBlock);
 
 router
   .route('/nodes')
   .post(validateBlockchainStructure, checkNewNodeData, sendNewNode)
   .patch(validateBlockchainStructure, checkNewNodeData, addNewNode)
   .put(validateBlockchainStructure, checkConnectedNodesData, updateConnectedNodes);
-
-router.route('/next-block').post(validateBlockchainStructure, checkSendNextBlockData, sendNextBlock);
 
 router.route('/transactions').post(validateBlockchainStructure, checkSendNewTransactionData, sendNewTransaction).patch(validateBlockchainStructure, checkAddNewTransactionData, addNewTransaction);
 

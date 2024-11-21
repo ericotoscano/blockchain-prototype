@@ -30,6 +30,10 @@ export interface IBlockTransactionsManagement {
   getTransactions(): ITransaction[];
 }
 
+export interface IBlockCreation {
+  create(input: NewBlockInputType, target: string): IBlock;
+}
+
 export interface IBlock {
   readonly height: number;
   nonce: number;

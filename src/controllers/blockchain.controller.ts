@@ -7,8 +7,9 @@ import { Transaction } from '../entities/transaction/Transaction';
 
 import { ResponseBaseType, BlockchainResponseType, NextBlockResponseType } from '../types/response.types';
 import { BlockDataType } from '../types/block.types';
-import { TransactionIdCreation } from '../entities/transaction/TransactionIdCreation';
-import { BlockDataConversion, TransactionDataConversion } from '../helpers/conversion/block/BlockDataConversion';
+import { TransactionIdCreation } from '../helpers/creation/transactions/TransactionIdCreation';
+import { BlockDataConversion, TransactionDataConversion } from '../helpers/conversion/blocks/BlockDataConversion';
+import { ITransaction } from '../types/transaction.types';
 
 const getBlockchain = async (req: Request, res: Response<BlockchainResponseType | ResponseBaseType>): Promise<void> => {
   try {
@@ -62,8 +63,40 @@ const addNextBlock = async (req: Request<{}, {}, BlockDataType>, res: Response<N
   }
 };
 
-//DAR UMA GERAL NOS ARQUIVOS POIS HOUVE MUDANCA DE TYPES ETC
-//CONTINUAR NAS ROTAS
+const mineNextBlock = async (req: Request<{}, {}, { minFee: number }>, res: Response<NextBlockResponseType | ResponseBaseType>): Promise<void> => {
+  try {
+    const { minFee } = req.body;
+
+    const transactions: ITransaction[] = global.blockchain.mempool.getTransactionsByFee(minFee);
+    //CRIAR UMA CLASSE Block Creation (Block é so pra instanciar)
+    //filtrar quantidade por maxTransactionsPerBlock (middleware) e mandar para ca
+
+    //recebe as transacoes, cria o objeto para cada
+
+    //criar bloco (seguir create do genesis block)
+
+    const nextBlock = blockchain.createNextBlock(nextBlockTransactions);
+
+    blockchain.addBlock(nextBlock);
+
+    res.status(201).send({
+      message: 'The next block was mined by the node and sent to his connected nodes.',
+      data: {
+        nextBlock,
+      },
+    });
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
+
+    res.status(500).send({
+      message: 'Server Error',
+      data: {
+        code: 50,
+        message: errorMessage,
+      },
+    });
+  }
+};
 
 const sendNextBlock = async (req: Request<{}, {}, NextBlockPostRequest>, res: Response<ResponseDataType<NextBlockDataPostResponse | ErrorDataType>>): Promise<void> => {
   try {

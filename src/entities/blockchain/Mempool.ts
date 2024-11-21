@@ -21,7 +21,7 @@ export class Mempool implements IMempool {
     this.mempoolTransactions = filteredMempool;
   }
 
-  getPendingTransactions(minFee: number): ITransaction[] {
-    return this.mempoolTransactions.filter((mempoolTransaction) => mempoolTransaction.status === 'Pending' && mempoolTransaction.fee > minFee);
+  getTransactionsByFee(minFee: number): ITransaction[] {
+    return this.mempoolTransactions.filter((mempoolTransaction) => mempoolTransaction.fee >= minFee);
   }
 }

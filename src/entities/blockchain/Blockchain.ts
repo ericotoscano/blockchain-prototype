@@ -1,6 +1,6 @@
 import { INode } from '../../types/node.types';
 import { BlockchainInputType, IBlockchain, IBlocks, IGenesisBlockCreation, IMempool, TargetManagementType } from '../../types/blockchain.types';
-import { NodeManagement } from '../node/NodeManagement';
+import { NodeManagement } from '../../helpers/management/nodes/NodeManagement';
 
 export class Blockchain implements IBlockchain {
   target: string;

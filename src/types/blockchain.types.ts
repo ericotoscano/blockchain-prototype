@@ -19,7 +19,7 @@ export interface IGenesisBlockCreation {
 export interface IMempool {
   addTransaction(transaction: ITransaction): void;
   removeConfirmedTransactions(nextBlock: IBlock): void;
-  getPendingTransactions(minFee: number): ITransaction[];
+  getTransactionsByFee(minFee: number): ITransaction[];
 }
 
 export interface IBlocks {
