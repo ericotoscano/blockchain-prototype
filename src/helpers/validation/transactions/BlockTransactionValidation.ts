@@ -1,7 +1,9 @@
-import { TransactionStatusType, TransactionDataType } from '../../../types/transaction.types';
-import { ValidationResponseType } from '../../../types/response.types';
 import { TimestampFormatValidation } from '../../../utils/validation/DateFomatValidation';
 import { HexStringFormatValidation } from '../../../utils/validation/HexStringFormatValidation';
+
+import { TransactionStatusType } from '../../../types/transactions/TransactionStatusType';
+import { ValidationResponseType } from '../../../types/response/ValidationResponseType';
+import { TransactionDataType } from '../../../types/transactions/TransactionDataType';
 
 export class BlockTransactionValidation {
   static validateStructure(transaction: TransactionDataType, transactionIndex: number): ValidationResponseType {
@@ -126,7 +128,7 @@ export class BlockTransactionValidation {
   static validateTransactionUniqueness(transaction: TransactionDataType, txId: string): ValidationResponseType {
     const TYPE: string = 'Block Transaction Uniqueness Validation';
 
-    const allConfirmedTransactions = global.blockchain.blocks.getAllBlocksTransactions();
+    const allConfirmedTransactions = global.blockchain.blocksManagement.getAllBlocksTransactions();
 
     const isDuplicate = allConfirmedTransactions.some((confirmedTransaction) => confirmedTransaction.txId === transaction.txId);
 

@@ -1,30 +1,42 @@
-import { INode } from '../../types/node.types';
-import { BlockchainInputType, IBlockchain, IBlocks, IGenesisBlockCreation, IMempool, TargetManagementType } from '../../types/blockchain.types';
-import { NodeManagement } from '../../helpers/management/nodes/NodeManagement';
+import { IBlockchain } from '../../interfaces/blockchain/IBlockchain';
+import { IBlock } from '../../interfaces/block/IBlock';
+import { INode } from '../../interfaces/nodes/INode';
+import { ITransaction } from '../../interfaces/transactions/ITransaction';
+import { INodeManagement } from '../../interfaces/management/INodeManagement';
+import { IMempoolManagement } from '../../interfaces/management/IMempoolManagement';
+import { IBlocksManagement } from '../../interfaces/management/IBlocksManagement';
+
+import { BlockchainInputType } from '../../types/blockchain/BlockchainInputType';
+import { TargetManagementType } from '../../types/management/TargetManagementType';
+import { BlockMiningType } from '../../types/mining/BlockMiningType';
+import { BlockCreationType } from '../../types/creation/BlockCreationType';
 
 export class Blockchain implements IBlockchain {
   target: string;
   reward: number;
   maxTransactionsPerBlock: number;
-  mempool: IMempool;
-  blocks: IBlocks;
+  mempool: ITransaction[];
+  blocks: IBlock[];
 
   constructor(
-    props: BlockchainInputType,
+    input: BlockchainInputType,
     readonly node: INode,
-    mempool: IMempool,
-    blocks: IBlocks,
+    mempool: ITransaction[],
+    blocks: IBlock[],
+    readonly blockMining: BlockMiningType,
+    readonly blockCreation: BlockCreationType,
     readonly targetManagement: TargetManagementType,
-    readonly nodeManagement: NodeManagement,
-    readonly genesisBlockCreation: IGenesisBlockCreation
+    readonly nodeManagement: INodeManagement,
+    readonly mempoolManagement: IMempoolManagement,
+    readonly blocksManagement: IBlocksManagement
   ) {
-    this.target = targetManagement.calculate(props.targetZeros);
-    this.reward = props.reward;
-    this.maxTransactionsPerBlock = props.maxTransactionsPerBlock;
+    this.target = targetManagement.calculate(input.targetZeros);
+    this.reward = input.reward;
+    this.maxTransactionsPerBlock = input.maxTransactionsPerBlock;
     this.mempool = mempool;
     this.blocks = blocks;
 
-    this.blocks.addBlock(this.genesisBlockCreation.create(this.target));
+    this.blocksManagement.addBlock(this.blockCreation.create({ height: 0, previousHash: '0'.repeat(64), transactions: [] }, this.target, this.blockMining));
   }
 
   setTarget(targetZeros: number): void {

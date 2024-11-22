@@ -5,11 +5,21 @@ import '../global';
 
 import { Transaction } from '../entities/transaction/Transaction';
 
-import { ResponseBaseType, BlockchainResponseType, NextBlockResponseType } from '../types/response.types';
-import { BlockDataType } from '../types/block.types';
+import { IBlock } from '../interfaces/block/IBlock';
+
 import { TransactionIdCreation } from '../helpers/creation/transactions/TransactionIdCreation';
-import { BlockDataConversion, TransactionDataConversion } from '../helpers/conversion/blocks/BlockDataConversion';
-import { ITransaction } from '../types/transaction.types';
+import { BlockDataConversion } from '../helpers/conversion/block/BlockDataConversion';
+import { TransactionDataConversion } from '../helpers/conversion/transactions/TransactionDataConversion';
+import { BlockCreation } from '../helpers/creation/blocks/BlockCreation';
+import { BlockMining } from '../helpers/mining/block/BlockMining';
+
+import { Sha256HashCreation } from '../utils/creation/Sha256HashCreation';
+
+import { ResponseBaseType } from '../types/response/ResponseBaseType';
+import { BlockchainResponseType } from '../types/response/BlockchainResponseType';
+import { NextBlockResponseType } from '../types/response/NextBlockResponseType';
+import { BlockDataType } from '../types/block/BlockDataType';
+import { TransactionDataType } from '../types/transactions/TransactionDataType';
 
 const getBlockchain = async (req: Request, res: Response<BlockchainResponseType | ResponseBaseType>): Promise<void> => {
   try {
@@ -37,11 +47,13 @@ const getBlockchain = async (req: Request, res: Response<BlockchainResponseType 
 
 const addNextBlock = async (req: Request<{}, {}, BlockDataType>, res: Response<NextBlockResponseType | ResponseBaseType>): Promise<void> => {
   try {
-    const nextBlock = req.body;
+    const nextBlock: BlockDataType = req.body;
 
-    const block = BlockDataConversion.convert(nextBlock, TransactionDataConversion, TransactionIdCreation);
+    const transactionDataConversion = new TransactionDataConversion(Sha256HashCreation, TransactionIdCreation);
 
-    global.blockchain.blocks.addBlock(block);
+    const block: IBlock = BlockDataConversion.convert(nextBlock, transactionDataConversion);
+
+    global.blockchain.blocksManagement.addBlock(block);
 
     res.status(200).send({
       type: 'Blockchain Patch Response',
@@ -63,24 +75,24 @@ const addNextBlock = async (req: Request<{}, {}, BlockDataType>, res: Response<N
   }
 };
 
-const mineNextBlock = async (req: Request<{}, {}, { minFee: number }>, res: Response<NextBlockResponseType | ResponseBaseType>): Promise<void> => {
+const mineNextBlock = async (req: Request<{}, {}, { minFee: number; data: TransactionDataType[] }>, res: Response<NextBlockResponseType | ResponseBaseType>): Promise<void> => {
   try {
-    const { minFee } = req.body;
+    const { data }: { data: TransactionDataType[] } = req.body;
 
-    const transactions: ITransaction[] = global.blockchain.mempool.getTransactionsByFee(minFee);
-    //CRIAR UMA CLASSE Block Creation (Block é so pra instanciar)
-    //filtrar quantidade por maxTransactionsPerBlock (middleware) e mandar para ca
+    const transactionDataConversion = new TransactionDataConversion(Sha256HashCreation, TransactionIdCreation);
 
-    //recebe as transacoes, cria o objeto para cada
+    const transactions = transactionDataConversion.convertAll(data);
 
-    //criar bloco (seguir create do genesis block)
+    const input = { height: global.blockchain.blocks.length, previousHash: global.blockchain.blocksManagement.getPreviousBlock().hash, transactions };
 
-    const nextBlock = blockchain.createNextBlock(nextBlockTransactions);
+    const nextBlock = BlockCreation.create(input, global.blockchain.target, BlockMining);
 
-    blockchain.addBlock(nextBlock);
+    global.blockchain.blocksManagement.addBlock(nextBlock);
 
     res.status(201).send({
-      message: 'The next block was mined by the node and sent to his connected nodes.',
+      type: 'Next Block Post Response',
+      code: 10,
+      message: 'The next block has been mined and is ready to be sent for validation by other nodes.',
       data: {
         nextBlock,
       },
@@ -89,36 +101,15 @@ const mineNextBlock = async (req: Request<{}, {}, { minFee: number }>, res: Resp
     const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
 
     res.status(500).send({
-      message: 'Server Error',
-      data: {
-        code: 50,
-        message: errorMessage,
-      },
+      type: 'Server Error',
+      code: 50,
+      message: errorMessage,
     });
   }
 };
 
 const sendNextBlock = async (req: Request<{}, {}, NextBlockPostRequest>, res: Response<ResponseDataType<NextBlockDataPostResponse | ErrorDataType>>): Promise<void> => {
   try {
-    const { minFee } = req.body;
-
-    const nextBlockTransactions = blockchain.getNextBlockTransactionsByFee(minFee);
-
-    if (nextBlockTransactions.length === 0) {
-      res.status(400).send({
-        message: 'Next Block Error',
-        data: {
-          code: 101,
-          message: 'There are no pending transactions in the mempool with a fee greater than or equal to the minimum fee.',
-        },
-      });
-      return;
-    }
-
-    const nextBlock = blockchain.createNextBlock(nextBlockTransactions);
-
-    blockchain.addBlock(nextBlock);
-
     const updateBlockchainPromises: Promise<ResponseDataType<NextBlockDataPostResponse | ErrorDataType>>[] = [];
 
     for (const connectedNode of blockchain.connectedNodes) {
@@ -323,8 +314,9 @@ const addNewTransaction = async (req: Request<{}, {}, TransactionsPatchRequest>,
 
 export default {
   getBlockchain,
-  sendNextBlock,
   addNextBlock,
+  mineNextBlock,
+  sendNextBlock,
   sendNewNode,
   addNewNode,
   updateConnectedNodes,

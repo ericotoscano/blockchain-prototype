@@ -1,9 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
 
-import { ValidationResponseType, ResponseBaseType } from '../../types/response.types';
-
 import { BlockchainStructureValidation } from '../../helpers/validation/blockchain/BlockchainStructureValidation';
 import { MempoolTransactionsValidation } from '../../helpers/validation/blockchain/MempoolTransactionsValidation';
+import { MempoolTransactionsSelection } from '../../helpers/selection/blockchain/MempoolTransactionsSelection';
+
+import { ResponseBaseType } from '../../types/response/ResponseBaseType';
+import { ValidationResponseType } from '../../types/response/ValidationResponseType';
+import { TransactionDataType } from '../../types/transactions/TransactionDataType';
 
 const validateBlockchainStructure = async (req: Request, res: Response<ValidationResponseType | ResponseBaseType>, next: NextFunction): Promise<void> => {
   try {
@@ -43,9 +46,25 @@ const validateMempoolTransactionsByMinFee = async (req: Request<{}, {}, { minFee
   }
 };
 
-//const validateMaxBlockTransactions => recebera as transacoes para o bloco, respeitando o limite maximo e passara por req.
+const selectMempoolTransactionsByMinFee = async (req: Request<{}, {}, { minFee: number; data: TransactionDataType[] }>, res: Response<ResponseBaseType>, next: NextFunction): Promise<void> => {
+  try {
+    const { minFee } = req.body;
+
+    const { data } = MempoolTransactionsSelection.selectMempoolTransactionsByFee(minFee);
+
+    req.body.data = data;
+
+    next();
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
+
+    res.status(500).send({ type: 'Server Error', code: 50, message: errorMessage });
+    return;
+  }
+};
 
 export default {
   validateBlockchainStructure,
   validateMempoolTransactionsByMinFee,
+  selectMempoolTransactionsByMinFee,
 };

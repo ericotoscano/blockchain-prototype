@@ -1,5 +1,6 @@
 import { Blockchain } from '../../../entities/blockchain/Blockchain';
-import { ValidationResponseType } from '../../../types/response.types';
+
+import { ValidationResponseType } from '../../../types/response/ValidationResponseType';
 
 export class BlockchainStructureValidation {
   static validate(): ValidationResponseType {

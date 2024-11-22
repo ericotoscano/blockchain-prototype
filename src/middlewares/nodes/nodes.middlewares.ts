@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 
-import { NodesPostRequest, NodesPutRequest } from '../../types/node.types';
-import { CustomResponse, ErrorDataResponse } from '../../types/response.types';
+import { NodesPostRequest, NodesPutRequest } from '../../types/creation/NodeUrlCreationType';
+import { CustomResponse, ErrorDataResponse } from '../../types/response/ValidationResponseType';
 import { CheckerFunction } from '../types/check.types';
 
 import { checkNewNodeFormat, checkNewNodeUrlOption, checkNewNodeConnections, checkNewConnectedNodes, checkNewConnectedNodesFormat } from '../../helpers/nodes.middlewares.helpers';

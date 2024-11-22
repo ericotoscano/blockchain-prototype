@@ -1,17 +1,18 @@
 import { Request, Response, NextFunction } from 'express';
 
-import { BlockDataType } from '../../types/block.types';
-import { ValidationResponseType, ResponseBaseType } from '../../types/response.types';
+import { BlockStructureValidation } from '../../helpers/validation/block/BlockStructureValidation';
+import { BlockHeightValidation } from '../../helpers/validation/block/BlockHeightValidation';
+import { BlockHashValidation } from '../../helpers/validation/block/BlockHashValidation';
+import { BlockPreviousHashValidation } from '../../helpers/validation/block/BlockPreviousHash';
+import { BlockTransactionsValidation } from '../../helpers/validation/block/BlockTransactionsValidation';
+import { BlockTimestampValidation } from '../../helpers/validation/block/BlockTimestampValidation';
+import { BlockMiningValidation } from '../../helpers/validation/block/BlockMiningValidation';
 
-import { BlockStructureValidation } from '../../helpers/validation/blocks/BlockStructureValidation';
-import { BlockHeightValidation } from '../../helpers/validation/blocks/BlockHeightValidation';
-import { BlockHashValidation } from '../../helpers/validation/blocks/BlockHashValidation';
-import { BlockPreviousHashValidation } from '../../helpers/validation/blocks/BlockPreviousHash';
-import { BlockTransactionsValidation } from '../../helpers/validation/blocks/BlockTransactionsValidation';
-import { BlockTimestampValidation } from '../../helpers/validation/blocks/BlockTimestampValidation';
-import { BlockMiningValidation } from '../../helpers/validation/blocks/BlockMiningValidation';
+import { Sha256HashCreation } from '../../utils/creation/Sha256HashCreation';
 
-import { Sha256HashCreation } from '../../utils/creation/HashCreation';
+import { BlockDataType } from '../../types/block/BlockDataType';
+import { ResponseBaseType } from '../../types/response/ResponseBaseType';
+import { ValidationResponseType } from '../../types/response/ValidationResponseType';
 
 const validateBlockStructure = async (req: Request<{}, {}, BlockDataType>, res: Response<ValidationResponseType | ResponseBaseType>, next: NextFunction): Promise<void> => {
   try {
@@ -113,7 +114,7 @@ const validateBlockPreviousHash = async (req: Request<{}, {}, BlockDataType>, re
 
     const allValidationData: ValidationResponseType[] = [
       BlockPreviousHashValidation.validateFormat(previousHash),
-      BlockPreviousHashValidation.validateExpectedPreviousHash(previousHash, global.blockchain.blocks.getPreviousBlock().hash),
+      BlockPreviousHashValidation.validateExpectedPreviousHash(previousHash, global.blockchain.blocksManagement.getPreviousBlock().hash),
     ];
 
     for (const data of allValidationData) {

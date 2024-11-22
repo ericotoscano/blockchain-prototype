@@ -1,4 +1,8 @@
-import { NodeUrlCreationType, INodeAddressCreation, IConnectedNodes, INode } from '../../types/node.types';
+import { INode } from '../../interfaces/nodes/INode';
+import { IConnectedNodes } from '../../interfaces/nodes/IConnectedNodes';
+import { INodeAddressCreation } from '../../interfaces/creation/INodeAddressCreation';
+
+import { NodeUrlCreationType } from '../../types/creation/NodeUrlCreationType';
 
 export class Node implements INode {
   readonly nodeUrl: string;

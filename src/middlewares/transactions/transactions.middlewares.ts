@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 
-import { TransactionsPostRequest, TransactionsPatchRequest } from '../../types/node.types';
-import { CustomResponse, ErrorDataResponse } from '../../types/response.types';
+import { TransactionsPostRequest, TransactionsPatchRequest } from '../../types/creation/NodeUrlCreationType';
+import { CustomResponse, ErrorDataResponse } from '../../types/response/ValidationResponseType';
 import { CheckerFunction } from '../types/check.types';
 
 import {

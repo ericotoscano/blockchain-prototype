@@ -1,4 +1,7 @@
-import { TransactionStatusType, ITransaction, ITransactionStatusManagement } from '../../../types/transaction.types';
+import { ITransactionStatusManagement } from '../../../interfaces/management/ITransactonStatusManagement';
+import { ITransaction } from '../../../interfaces/transactions/ITransaction';
+
+import { TransactionStatusType } from '../../../types/transactions/TransactionStatusType';
 
 export class TransactionStatusManagement implements ITransactionStatusManagement {
   constructor(private readonly transaction: ITransaction) {}

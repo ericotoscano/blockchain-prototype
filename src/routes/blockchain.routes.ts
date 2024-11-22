@@ -3,12 +3,12 @@ import { Router } from 'express';
 import blockchainMiddlewares from '../middlewares/blockchain/blockchain.middlewares';
 import blockMiddlewares from '../middlewares/block/block.middlewares';
 import nodesMiddlewares from '../middlewares/nodes/nodes.middlewares';
-import blocksMiddlewares from '../middlewares/blocks.middlewares';
 import transactionsMiddlewares from '../middlewares/transactions/transactions.middlewares';
 
 import blockchainController from '../controllers/blockchain.controller';
 
-const { validateBlockchainStructure, validateMempoolTransactionsByMinFee } = blockchainMiddlewares;
+const { validateBlockchainStructure, validateMempoolTransactionsByMinFee, selectMempoolTransactionsByMinFee } = blockchainMiddlewares;
+
 const {
   validateBlockStructure,
   validateBlockHeight,
@@ -19,11 +19,11 @@ const {
   validateNextBlockTransactionsMinFee,
   validateBlockTimestamp,
 } = blockMiddlewares;
+
 const { checkNewNodeData, checkConnectedNodesData } = nodesMiddlewares;
-const { checkSendNextBlockData } = blocksMiddlewares;
 const { checkSendNewTransactionData, checkAddNewTransactionData } = transactionsMiddlewares;
 
-const { getBlockchain, sendNextBlock, addNextBlock, sendNewNode, addNewNode, updateConnectedNodes, sendNewTransaction, addNewTransaction } = blockchainController;
+const { getBlockchain, addNextBlock, mineNextBlock, sendNewNode, addNewNode, updateConnectedNodes, sendNewTransaction, addNewTransaction } = blockchainController;
 
 const router: Router = Router();
 
@@ -42,10 +42,8 @@ router
     addNextBlock
   );
 
-router
-  .route('/next-block')
-  .get(validateBlockchainStructure, validateNextBlockTransactionsMinFee, validateMempoolTransactionsByMinFee)
-  .post(validateBlockchainStructure, checkSendNextBlockData, sendNextBlock);
+router.route('/next-block').post(validateBlockchainStructure, validateNextBlockTransactionsMinFee, validateMempoolTransactionsByMinFee, selectMempoolTransactionsByMinFee, mineNextBlock);
+//.post(validateBlockchainStructure, sendNextBlock);
 
 router
   .route('/nodes')

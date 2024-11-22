@@ -1,5 +1,5 @@
-import { ITransaction } from '../../../types/transaction.types';
-import { IBlockTransactionsManagement } from '../../../types/block.types';
+import { IBlockTransactionsManagement } from '../../../interfaces/management/IBlockTransactionsManagement';
+import { ITransaction } from '../../../interfaces/transactions/ITransaction';
 
 export class BlockTransactionsManagement implements IBlockTransactionsManagement {
   constructor(private readonly blockTransactions: ITransaction[]) {}

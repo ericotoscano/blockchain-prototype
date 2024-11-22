@@ -1,5 +1,9 @@
-import { HashCreationType } from '../../types/crypto.types';
-import { TransactionStatusType, NewTransactionInputType, TransactionIdCreationType, ITransaction } from '../../types/transaction.types';
+import { ITransaction } from '../../interfaces/transactions/ITransaction';
+
+import { HashCreationType } from '../../types/creation/HashCreationType';
+import { TransactionIdCreationType } from '../../types/creation/TransactionIdCreationType';
+import { TransactionInputType } from '../../types/transactions/TransactionInputType';
+import { TransactionStatusType } from '../../types/transactions/TransactionStatusType';
 
 export class Transaction implements ITransaction {
   readonly txId: string;
@@ -11,7 +15,7 @@ export class Transaction implements ITransaction {
   readonly timestamp: number;
 
   constructor(
-    readonly input: NewTransactionInputType,
+    readonly input: TransactionInputType,
     readonly hashCreation: HashCreationType,
     readonly transactionIdCreation: TransactionIdCreationType,
     txId?: string,

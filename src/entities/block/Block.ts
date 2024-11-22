@@ -1,5 +1,7 @@
-import { NewBlockInputType, IBlock } from '../../types/block.types';
-import { ITransaction } from '../../types/transaction.types';
+import { IBlock } from '../../interfaces/block/IBlock';
+import { ITransaction } from '../../interfaces/transactions/ITransaction';
+
+import { BlockInputType } from '../../types/block/BlockInputType';
 
 export class Block implements IBlock {
   readonly height: number;
@@ -9,7 +11,7 @@ export class Block implements IBlock {
   readonly timestamp: number;
   transactions: ITransaction[];
 
-  constructor(input: NewBlockInputType, nonce?: number, hash?: string, timestamp?: number) {
+  constructor(input: BlockInputType, nonce?: number, hash?: string, timestamp?: number) {
     this.height = input.height;
     this.nonce = 0 ?? nonce;
     this.hash = '' ?? hash;

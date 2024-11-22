@@ -1,11 +1,12 @@
-import { ValidationResponseType } from '../../../types/response.types';
-import { ITransaction } from '../../../types/transaction.types';
+import { ITransaction } from '../../../interfaces/transactions/ITransaction';
+
+import { ValidationResponseType } from '../../../types/response/ValidationResponseType';
 
 export class MempoolTransactionsValidation {
   static validateByFee(minFee: number): ValidationResponseType {
     const TYPE: string = 'Mempool Transactions Validation By Minimum Fee';
 
-    const transactions: ITransaction[] = global.blockchain.mempool.getTransactionsByFee(minFee);
+    const transactions: ITransaction[] = global.blockchain.mempoolManagement.getTransactionsByFee(minFee);
 
     const result: boolean = transactions.length > 0;
 
