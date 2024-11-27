@@ -1,12 +1,24 @@
-import { IBlockchain } from './blockchain.types';
 import { TransactionStatusType } from './transaction.types';
 
-export type BlockchainDTO = {
-  blockchain: IBlockchain;
+export type CreateBlockchainRequestDTO = {
+  targetZeros: number;
+  reward: number;
+  maxTransactionsPerBlock: number;
 };
 
-export type NodeDTO = {
+export type CreateBlockchainResponseDTO = {
+  target: string;
+  reward: number;
+  maxTransactionsPerBlock: number;
+  node: GetNodeDTO;
+  mempool: TransactionDTO[];
+  blocks: BlockDTO[];
+};
+
+export type GetNodeDTO = {
   nodeUrl: string;
+  nodeAddress: string;
+  connectedNodes: ConnectedNodesDTO;
 };
 
 export type ConnectedNodesDTO = {
@@ -22,9 +34,8 @@ export type BlockDTO = {
   timestamp: number;
 };
 
-export type MineBlockDTO = {
+export type GetTransactionsToMineBlockDTO = {
   minFee: number;
-  selectedTransactions: TransactionDTO[];
 };
 
 export type TransactionDTO = {

@@ -2,35 +2,43 @@ import { Blockchain } from '../../models/Blockchain';
 import { MempoolManagement } from '../management/MempoolManagement';
 import { BlocksManagement } from '../management/BlocksManagement';
 import { NodeManagement } from '../management/NodeManagement';
-import { BlockchainInputType, IBlockchain } from '../../types/blockchain.types';
+import { IBlockchain } from '../../types/blockchain.types';
 import { BlockMiningType, IBlock } from '../../types/block.types';
-import { INode } from '../../types/node.types';
 import { ITransaction } from '../../types/transaction.types';
-import { BlockCreationType, HashCreationType } from '../../types/creation.types';
+import { BlockCreationType, HashCreationType, KeyCreationType, NodeAddressCreationType, NodeUrlCreationType } from '../../types/creation.types';
 import { TargetManagementType } from '../../types/management.types';
+import { NodeCreation } from './NodeCreation';
 
 export class BlockchainCreation {
   static create(
-    input: BlockchainInputType,
-    node: INode,
+    targetZeros: number,
     targetManagement: TargetManagementType,
-    hashCreation: HashCreationType,
+    reward: number,
+    maxTransactionsPerBlock: number,
     blockMining: BlockMiningType,
-    blockCreation: BlockCreationType
+    blockCreation: BlockCreationType,
+    nodeUrlCreation: NodeUrlCreationType,
+    nodeAddressCreation: NodeAddressCreationType,
+    keyCurveOption: string,
+    keyCreation: KeyCreationType,
+    mainHashCreation: HashCreationType,
+    addressHashCreation: HashCreationType
   ): IBlockchain {
     const mempool: ITransaction[] = [];
     const blocks: IBlock[] = [];
+
+    const node = NodeCreation.create(nodeUrlCreation, nodeAddressCreation, keyCurveOption, keyCreation, mainHashCreation, addressHashCreation);
 
     const nodeManagement = new NodeManagement(node);
     const mempoolManagement = new MempoolManagement(mempool);
     const blocksManagement = new BlocksManagement(blocks);
 
-    const target = targetManagement.calculate(input.targetZeros);
+    const target = targetManagement.calculate(targetZeros);
 
-    const genesisBlock = blockCreation.create({ height: 0, previousHash: '0'.repeat(64), transactions: [] }, target, blockMining, hashCreation);
+    const genesisBlock = blockCreation.create({ height: 0, previousHash: '0'.repeat(64), transactions: [] }, target, blockMining, mainHashCreation);
 
     blocksManagement.addBlock(genesisBlock);
 
-    return new Blockchain(input, node, mempool, blocks, target, nodeManagement, mempoolManagement, blocksManagement);
+    return new Blockchain(target, reward, maxTransactionsPerBlock, node, mempool, blocks, nodeManagement, mempoolManagement, blocksManagement);
   }
 }

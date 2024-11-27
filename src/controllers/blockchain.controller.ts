@@ -3,25 +3,56 @@ import axios from 'axios';
 
 import '../global';
 
+import { IBlock } from '../types/block.types';
 import { TransactionIdCreation } from '../services/creation/TransactionIdCreation';
 import { BlockDataConversion } from '../services/conversion/BlockDataConversion';
 import { TransactionDataConversion } from '../services/conversion/TransactionDataConversion';
 import { BlockCreation } from '../services/creation/BlockCreation';
 import { BlockMining } from '../services/mining/BlockMining';
-
 import { Sha256HashCreation } from '../utils/creation/Sha256HashCreation';
-import { BlockchainDTO, BlockDTO, TransactionDTO, ResponseDTO, ErrorDTO, MineBlockDTO } from '../types/dto.types';
-import { IBlock } from '../types/block.types';
+import { BlockDTO, ResponseDTO, ErrorDTO, CreateBlockchainResponseDTO, CreateBlockchainRequestDTO } from '../types/dto.types';
+import { BlockchainConversion } from '../services/conversion/BlockchainConversion';
+
+const createBlockchain = async (req: Request<{}, {}, CreateBlockchainRequestDTO>, res: Response<ResponseDTO<CreateBlockchainResponseDTO> | ErrorDTO>): Promise<void> => {
+  try {
+    const blockchain = BlockchainConversion.convertToClass(req.body);
+
+    //levar isso para GlobalService.setBlockchain(blockchain) guardando no global
+
+    global.blockchain = blockchain;
+
+    //fazer as conversoes internas do DTO (node, mempool, blocks)
+    const blockchainDTO = BlockchainConversion.convertToDTO(blockchain);
+
+    //nao esquecer dos middlewares de validacao do CreateBlockDTO
+
+    res.status(201).send({
+      type: 'Create Blockchain',
+      code: 10,
+      message: 'The blockchain has been created.',
+      data: blockchainDTO,
+    });
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
+
+    res.status(500).send({
+      type: 'Server Error',
+      code: 50,
+      message: errorMessage,
+    });
+    return;
+  }
+};
 
 const getBlockchain = async (req: Request, res: Response<ResponseDTO<BlockchainDTO> | ErrorDTO>): Promise<void> => {
   try {
     global.blockchain.nodeManagement.SortConnectedNodes();
 
     res.status(200).send({
-      type: 'Get Blockchain Response',
-      code: 10,
+      type: 'Get Blockchain',
+      code: 11,
       message: 'The blockchain has been found.',
-      data: global.blockchain,
+      data: { blockchain: global.blockchain },
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
@@ -300,6 +331,7 @@ const addNewTransaction = async (req: Request<{}, {}, TransactionsPatchRequest>,
 }; */
 
 export default {
+  createBlockchain,
   getBlockchain,
   addNextBlock,
   mineNextBlock,

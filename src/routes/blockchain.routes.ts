@@ -23,11 +23,12 @@ const {
 const { checkNewNodeData, checkConnectedNodesData } = nodesMiddlewares;
 const { checkSendNewTransactionData, checkAddNewTransactionData } = transactionsMiddlewares;
 
-const { getBlockchain, mineNextBlock, addNextBlock, sendNextBlock /* sendNewNode, addNewNode, updateConnectedNodes, sendNewTransaction, addNewTransaction */ } = blockchainController;
+const { getBlockchain, createBlockchain, mineNextBlock, addNextBlock, sendNextBlock /* sendNewNode, addNewNode, updateConnectedNodes, sendNewTransaction, addNewTransaction */ } = blockchainController;
 
 const router: Router = Router();
 
-router.route('/').get(validateBlockchainStructure, getBlockchain);
+//escrever middlewares para CreateBlockchainDTO
+router.route('/').post(createBlockchain).get(validateBlockchainStructure, getBlockchain);
 
 router.route('/blocks/mining').post(validateBlockchainStructure, validateNextBlockTransactionsMinFee, validateMempoolTransactionsByMinFee, selectMempoolTransactionsByMinFee, mineNextBlock);
 
@@ -53,6 +54,7 @@ router.route('/blocks/transmission').post(sendNextBlock);
   .patch(validateBlockchainStructure, checkNewNodeData, addNewNode)
   .put(validateBlockchainStructure, checkConnectedNodesData, updateConnectedNodes);
 
+  GET para pegar as transacoes a serem minadas
 router.route('/transactions').post(validateBlockchainStructure, checkSendNewTransactionData, sendNewTransaction).patch(validateBlockchainStructure, checkAddNewTransactionData, addNewTransaction); */
 
 export default router;

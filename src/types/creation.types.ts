@@ -1,18 +1,42 @@
 import { ec as EC } from 'elliptic';
 
 import { BlockchainInputType, IBlockchain } from './blockchain.types';
-import { INode } from './node.types';
 import { BlockInputType, BlockMiningType, IBlock } from './block.types';
 import { ITransaction } from './transaction.types';
 import { TargetManagementType } from './management.types';
+import { INode } from './node.types';
 
 export type BlockchainCreationType = {
-  create(input: BlockchainInputType, node: INode, targetManagement: TargetManagementType, hashCreation: HashCreationType, blockMining: BlockMiningType, blockCreation: BlockCreationType): IBlockchain;
+  create(
+    targetZeros: number,
+    targetManagement: TargetManagementType,
+    reward: number,
+    maxTransactionsPerBlock: number,
+    blockMining: BlockMiningType,
+    blockCreation: BlockCreationType,
+    nodeUrlCreation: NodeUrlCreationType,
+    nodeAddressCreation: NodeAddressCreationType,
+    keyCurveOption: string,
+    keyCreation: KeyCreationType,
+    mainHashCreation: HashCreationType,
+    addressHashCreation: HashCreationType
+  ): IBlockchain;
 };
 
-export interface INodeAddressCreation {
-  create(data: string): string;
-}
+export type NodeCreationType = {
+  create(
+    nodeUrlCreation: NodeUrlCreationType,
+    nodeAddressCreation: NodeAddressCreationType,
+    keyCurveOption: string,
+    keyCreation: KeyCreationType,
+    mainHashCreation: HashCreationType,
+    addressHashCreation: HashCreationType
+  ): INode;
+};
+
+export type NodeAddressCreationType = {
+  create(data: string, keyCurveOption: string, keyCreation: KeyCreationType, mainHashCreation: HashCreationType, finalHashCreation: HashCreationType): string;
+};
 
 export type NodeUrlCreationType = {
   create(): string;
@@ -34,7 +58,7 @@ export type HashCreationType = {
   hash(data: string): string;
 };
 
-export interface IKeyCreation {
-  createKeyPair(hashedData: string): EC.KeyPair;
+export type KeyCreationType = {
+  createKeyPair(hashedData: string, curve: EC): EC.KeyPair;
   createPublicKey(keyPair: EC.KeyPair): string;
-}
+};

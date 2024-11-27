@@ -1,12 +1,8 @@
+import { IBlock } from '../types/block.types';
 import { IBlockchain } from '../types/blockchain.types';
-import { IBlock } from '../interfaces/block/IBlock';
-import { INode } from '../interfaces/nodes/INode';
-import { ITransaction } from '../types/ITransaction';
-import { INodeManagement } from '../interfaces/management/INodeManagement';
-import { IMempoolManagement } from '../interfaces/management/IMempoolManagement';
-import { IBlocksManagement } from '../interfaces/management/IBlocksManagement';
-
-import { BlockchainInputType } from '../types/input.types';
+import { INode } from '../types/node.types';
+import { ITransaction } from '../types/transaction.types';
+import { IBlocksManagement, IMempoolManagement, INodeManagement } from '../types/management.types';
 
 export class Blockchain implements IBlockchain {
   target: string;
@@ -16,18 +12,19 @@ export class Blockchain implements IBlockchain {
   blocks: IBlock[];
 
   constructor(
-    input: BlockchainInputType,
+    target: string,
+    reward: number,
+    maxTransactionsPerBlock: number,
     readonly node: INode,
     mempool: ITransaction[],
     blocks: IBlock[],
-    target: string,
     readonly nodeManagement: INodeManagement,
     readonly mempoolManagement: IMempoolManagement,
     readonly blocksManagement: IBlocksManagement
   ) {
     this.target = target;
-    this.reward = input.reward;
-    this.maxTransactionsPerBlock = input.maxTransactionsPerBlock;
+    this.reward = reward;
+    this.maxTransactionsPerBlock = maxTransactionsPerBlock;
     this.mempool = mempool;
     this.blocks = blocks;
   }

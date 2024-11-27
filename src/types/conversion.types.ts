@@ -1,10 +1,15 @@
 import { IBlock } from './block.types';
 import { ITransaction } from './transaction.types';
-import { BlockDTO, TransactionDTO } from './dto.types';
+import { BlockDTO, NodeDTO, TransactionDTO } from './dto.types';
 import { HashCreationType, TransactionIdCreationType } from './creation.types';
+import { INode } from './node.types';
 
 export type BlockDataConversionType = {
   convert(data: BlockDTO, hashCreation: HashCreationType, transactionIdCreation: TransactionIdCreationType, transactionDataConversion: ITransactionDataConversion): IBlock;
+};
+
+export type NodeDataConversionType = {
+  convert(data: NodeDTO): INode;
 };
 
 export interface ITransactionDataConversion {

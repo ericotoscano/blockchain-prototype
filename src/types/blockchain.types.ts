@@ -17,9 +17,3 @@ export interface IBlockchain {
   setReward(blockReward: number): void;
   setMaxTransactionsPerBlock(maxNumber: number): void;
 }
-
-export type BlockchainInputType = {
-  targetZeros: number;
-  reward: number;
-  maxTransactionsPerBlock: number;
-};

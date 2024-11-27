@@ -11,7 +11,7 @@ export class BlockchainStructureValidation {
       type: TYPE,
       result,
       code: result ? 10 : 11,
-      message: result ? 'The blockchain stucture is valid' : 'The blockchain structure is missing or is invalid.',
+      message: result ? 'The blockchain stucture is valid.' : 'The blockchain structure is missing or is invalid.',
     };
   }
 }

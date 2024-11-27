@@ -1,14 +1,10 @@
 import { ec as EC } from 'elliptic';
-import { IKeyCreation } from '../../types/creation.types';
-
-export class KeyCreation implements IKeyCreation {
-  constructor(private readonly curve: EC) {}
-
-  createKeyPair(hashedData: string): EC.KeyPair {
-    return this.curve.keyFromPrivate(hashedData);
+export class KeyCreation {
+  static createKeyPair(hashedData: string, curve: EC): EC.KeyPair {
+    return curve.keyFromPrivate(hashedData);
   }
 
-  createPublicKey(keyPair: EC.KeyPair): string {
+  static createPublicKey(keyPair: EC.KeyPair): string {
     return keyPair.getPublic('hex');
   }
 }

@@ -1,17 +1,18 @@
-import { HashCreationType, IKeyCreation, INodeAddressCreation } from '../../types/creation.types';
+import { ec as EC } from 'elliptic';
+import { HashCreationType, KeyCreationType } from '../../types/creation.types';
 
-export class LocalHostNodeAddressCreation implements INodeAddressCreation {
-  constructor(private readonly secp256k1KeyCreation: IKeyCreation, private readonly sha256HashCreation: HashCreationType, private readonly ripemd160HashCreation: HashCreationType) {}
+export class LocalHostNodeAddressCreation {
+  static create(data: string, keyCurveOption: string, keyCreation: KeyCreationType, mainHashCreation: HashCreationType, finalHashCreation: HashCreationType): string {
+    const hashedData = mainHashCreation.hash(data);
 
-  create(data: string): string {
-    const hashedData = this.sha256HashCreation.hash(data);
+    const curve = new EC(keyCurveOption);
 
-    const keyPair = this.secp256k1KeyCreation.createKeyPair(hashedData);
+    const keyPair = keyCreation.createKeyPair(hashedData, curve);
 
-    const publicKey = this.secp256k1KeyCreation.createPublicKey(keyPair);
+    const publicKey = keyCreation.createPublicKey(keyPair);
 
-    const publicKeyFirstHash = this.sha256HashCreation.hash(publicKey);
+    const publicKeyFirstHash = mainHashCreation.hash(publicKey);
 
-    return this.ripemd160HashCreation.hash(publicKeyFirstHash);
+    return finalHashCreation.hash(publicKeyFirstHash);
   }
 }
