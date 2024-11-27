@@ -1,5 +1,5 @@
 import { ec as EC } from 'elliptic';
-import { IKeyCreation } from '../../interfaces/creation/IKeyCreation';
+import { IKeyCreation } from '../../types/creation.types';
 
 export class KeyCreation implements IKeyCreation {
   constructor(private readonly curve: EC) {}

@@ -1,9 +1,9 @@
 import { Router } from 'express';
 
-import blockchainMiddlewares from '../middlewares/blockchain/blockchain.middlewares';
-import blockMiddlewares from '../middlewares/block/block.middlewares';
-import nodesMiddlewares from '../middlewares/nodes/nodes.middlewares';
-import transactionsMiddlewares from '../middlewares/transactions/transactions.middlewares';
+import blockchainMiddlewares from '../middlewares/blockchain.middlewares';
+import blockMiddlewares from '../middlewares/block.middlewares';
+import nodesMiddlewares from '../middlewares/nodes.middlewares';
+import transactionsMiddlewares from '../middlewares/transactions.middlewares';
 
 import blockchainController from '../controllers/blockchain.controller';
 
@@ -23,14 +23,17 @@ const {
 const { checkNewNodeData, checkConnectedNodesData } = nodesMiddlewares;
 const { checkSendNewTransactionData, checkAddNewTransactionData } = transactionsMiddlewares;
 
-const { getBlockchain, addNextBlock, mineNextBlock, sendNewNode, addNewNode, updateConnectedNodes, sendNewTransaction, addNewTransaction } = blockchainController;
+const { getBlockchain, mineNextBlock, addNextBlock, sendNextBlock /* sendNewNode, addNewNode, updateConnectedNodes, sendNewTransaction, addNewTransaction */ } = blockchainController;
 
 const router: Router = Router();
 
+router.route('/').get(validateBlockchainStructure, getBlockchain);
+
+router.route('/blocks/mining').post(validateBlockchainStructure, validateNextBlockTransactionsMinFee, validateMempoolTransactionsByMinFee, selectMempoolTransactionsByMinFee, mineNextBlock);
+
 router
-  .route('/')
-  .get(validateBlockchainStructure, getBlockchain)
-  .patch(
+  .route('/blocks')
+  .post(
     validateBlockchainStructure,
     validateBlockStructure,
     validateBlockHeight,
@@ -42,15 +45,14 @@ router
     addNextBlock
   );
 
-router.route('/next-block').post(validateBlockchainStructure, validateNextBlockTransactionsMinFee, validateMempoolTransactionsByMinFee, selectMempoolTransactionsByMinFee, mineNextBlock);
-//.post(validateBlockchainStructure, sendNextBlock);
+router.route('/blocks/transmission').post(sendNextBlock);
 
-router
+/* router
   .route('/nodes')
   .post(validateBlockchainStructure, checkNewNodeData, sendNewNode)
   .patch(validateBlockchainStructure, checkNewNodeData, addNewNode)
   .put(validateBlockchainStructure, checkConnectedNodesData, updateConnectedNodes);
 
-router.route('/transactions').post(validateBlockchainStructure, checkSendNewTransactionData, sendNewTransaction).patch(validateBlockchainStructure, checkAddNewTransactionData, addNewTransaction);
+router.route('/transactions').post(validateBlockchainStructure, checkSendNewTransactionData, sendNewTransaction).patch(validateBlockchainStructure, checkAddNewTransactionData, addNewTransaction); */
 
 export default router;

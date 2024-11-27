@@ -3,35 +3,25 @@ import axios from 'axios';
 
 import '../global';
 
-import { Transaction } from '../entities/transaction/Transaction';
-
-import { IBlock } from '../interfaces/block/IBlock';
-
-import { TransactionIdCreation } from '../helpers/creation/transactions/TransactionIdCreation';
-import { BlockDataConversion } from '../helpers/conversion/block/BlockDataConversion';
-import { TransactionDataConversion } from '../helpers/conversion/transactions/TransactionDataConversion';
-import { BlockCreation } from '../helpers/creation/blocks/BlockCreation';
-import { BlockMining } from '../helpers/mining/block/BlockMining';
+import { TransactionIdCreation } from '../services/creation/TransactionIdCreation';
+import { BlockDataConversion } from '../services/conversion/BlockDataConversion';
+import { TransactionDataConversion } from '../services/conversion/TransactionDataConversion';
+import { BlockCreation } from '../services/creation/BlockCreation';
+import { BlockMining } from '../services/mining/BlockMining';
 
 import { Sha256HashCreation } from '../utils/creation/Sha256HashCreation';
+import { BlockchainDTO, BlockDTO, TransactionDTO, ResponseDTO, ErrorDTO, MineBlockDTO } from '../types/dto.types';
+import { IBlock } from '../types/block.types';
 
-import { ResponseBaseType } from '../types/response/ResponseBaseType';
-import { BlockchainResponseType } from '../types/response/BlockchainResponseType';
-import { NextBlockResponseType } from '../types/response/NextBlockResponseType';
-import { BlockDataType } from '../types/block/BlockDataType';
-import { TransactionDataType } from '../types/transactions/TransactionDataType';
-
-const getBlockchain = async (req: Request, res: Response<BlockchainResponseType | ResponseBaseType>): Promise<void> => {
+const getBlockchain = async (req: Request, res: Response<ResponseDTO<BlockchainDTO> | ErrorDTO>): Promise<void> => {
   try {
     global.blockchain.nodeManagement.SortConnectedNodes();
 
     res.status(200).send({
-      type: 'Blockchain Get Response',
+      type: 'Get Blockchain Response',
       code: 10,
       message: 'The blockchain has been found.',
-      data: {
-        blockchain: global.blockchain,
-      },
+      data: global.blockchain,
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
@@ -45,9 +35,9 @@ const getBlockchain = async (req: Request, res: Response<BlockchainResponseType 
   }
 };
 
-const addNextBlock = async (req: Request<{}, {}, BlockDataType>, res: Response<NextBlockResponseType | ResponseBaseType>): Promise<void> => {
+const addNextBlock = async (req: Request<{}, {}, BlockDTO>, res: Response<ResponseDTO<BlockDTO> | ErrorDTO>): Promise<void> => {
   try {
-    const nextBlock: BlockDataType = req.body;
+    const nextBlock: BlockDTO = req.body;
 
     const transactionDataConversion = new TransactionDataConversion(Sha256HashCreation, TransactionIdCreation);
 
@@ -56,12 +46,10 @@ const addNextBlock = async (req: Request<{}, {}, BlockDataType>, res: Response<N
     global.blockchain.blocksManagement.addBlock(block);
 
     res.status(200).send({
-      type: 'Blockchain Patch Response',
+      type: 'Add Next Block Response',
       code: 10,
       message: 'The next block has been added.',
-      data: {
-        nextBlock,
-      },
+      data: nextBlock,
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
@@ -75,27 +63,25 @@ const addNextBlock = async (req: Request<{}, {}, BlockDataType>, res: Response<N
   }
 };
 
-const mineNextBlock = async (req: Request<{}, {}, { minFee: number; data: TransactionDataType[] }>, res: Response<NextBlockResponseType | ResponseBaseType>): Promise<void> => {
+const mineNextBlock = async (req: Request<{}, {}, MineBlockDTO>, res: Response<ResponseDTO<BlockDTO> | ErrorDTO>): Promise<void> => {
   try {
-    const { data }: { data: TransactionDataType[] } = req.body;
+    const { selectedTransactions }: MineBlockDTO = req.body;
 
     const transactionDataConversion = new TransactionDataConversion(Sha256HashCreation, TransactionIdCreation);
 
-    const transactions = transactionDataConversion.convertAll(data);
+    const transactions = transactionDataConversion.convertAll(selectedTransactions);
 
     const input = { height: global.blockchain.blocks.length, previousHash: global.blockchain.blocksManagement.getPreviousBlock().hash, transactions };
 
-    const nextBlock = BlockCreation.create(input, global.blockchain.target, BlockMining);
+    const nextBlock = BlockCreation.create(input, global.blockchain.target, BlockMining, Sha256HashCreation);
 
     global.blockchain.blocksManagement.addBlock(nextBlock);
 
     res.status(201).send({
-      type: 'Next Block Post Response',
+      type: 'Mine Next Block Response',
       code: 10,
-      message: 'The next block has been mined and is ready to be sent for validation by other nodes.',
-      data: {
-        nextBlock,
-      },
+      message: 'The next block has been created and is ready to be sent for validation by other nodes.',
+      data: nextBlock,
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
@@ -108,12 +94,14 @@ const mineNextBlock = async (req: Request<{}, {}, { minFee: number; data: Transa
   }
 };
 
-const sendNextBlock = async (req: Request<{}, {}, NextBlockPostRequest>, res: Response<ResponseDataType<NextBlockDataPostResponse | ErrorDataType>>): Promise<void> => {
+const sendNextBlock = async (req: Request<{}, {}, BlockDTO>, res: Response<ResponseDTO<BlockDTO> | ErrorDTO>): Promise<void> => {
   try {
-    const updateBlockchainPromises: Promise<ResponseDataType<NextBlockDataPostResponse | ErrorDataType>>[] = [];
+    const nextBlock: BlockDTO = req.body;
 
-    for (const connectedNode of blockchain.connectedNodes) {
-      const updateBlockchainPromise = axios.patch<ResponseDataType<NextBlockDataPostResponse | ErrorDataType>>(`${connectedNode}/blockchain`, { nextBlock }).then((response) => response.data);
+    const updateBlockchainPromises: Promise<Response<ResponseDTO<BlockDTO> | ErrorDTO>>[] = [];
+
+    for (const connectedNode of blockchain.node.connectedNodes) {
+      const updateBlockchainPromise = axios.post<Response<ResponseDTO<BlockDTO> | ErrorDTO>>(`${connectedNode}/blockchain/blocks`, { nextBlock }).then((response) => response.data);
 
       updateBlockchainPromises.push(updateBlockchainPromise);
     }
@@ -121,25 +109,24 @@ const sendNextBlock = async (req: Request<{}, {}, NextBlockPostRequest>, res: Re
     await Promise.all(updateBlockchainPromises);
 
     res.status(201).send({
-      message: 'The next block was mined by the node and sent to his connected nodes.',
-      data: {
-        nextBlock,
-      },
+      type: 'Send Next Block Response',
+      code: 10,
+      message: 'The next block has been added.',
+      data: nextBlock,
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
 
     res.status(500).send({
-      message: 'Server Error',
-      data: {
-        code: 50,
-        message: errorMessage,
-      },
+      type: 'Server Error',
+      code: 50,
+      message: errorMessage,
     });
+    return;
   }
 };
 
-const sendNewNode = async (req: Request<{}, {}, NodesPostRequest>, res: Response<ResponseDataType<NodesDataPostResponse | ErrorDataType>>): Promise<void> => {
+/* const sendNewNode = async (req: Request<{}, {}, NodesPostRequest>, res: Response<ResponseDataType<NodesDataPostResponse | ErrorDataType>>): Promise<void> => {
   try {
     const { nodeUrl } = req.body;
 
@@ -310,16 +297,16 @@ const addNewTransaction = async (req: Request<{}, {}, TransactionsPatchRequest>,
       },
     });
   }
-};
+}; */
 
 export default {
   getBlockchain,
   addNextBlock,
   mineNextBlock,
   sendNextBlock,
-  sendNewNode,
+  /*   sendNewNode,
   addNewNode,
   updateConnectedNodes,
   sendNewTransaction,
-  addNewTransaction,
+  addNewTransaction,*/
 };
