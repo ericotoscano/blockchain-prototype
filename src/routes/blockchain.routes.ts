@@ -7,7 +7,7 @@ import transactionsMiddlewares from '../middlewares/transactions.middlewares';
 
 import blockchainController from '../controllers/blockchain.controller';
 
-const { validateBlockchainStructure /* validateMempoolTransactionsByMinFee, selectMempoolTransactionsByMinFee */ } = blockchainMiddlewares;
+const { validateBlockchainDTO, validateTargetZeros, validateReward, validateMaxTransactionsPerBlock, validateBlockchain } = blockchainMiddlewares;
 
 const {
   validateBlockStructure,
@@ -27,22 +27,7 @@ const { getBlockchain, createBlockchain /* mineNextBlock, addNextBlock, sendNext
 
 const router: Router = Router();
 
-//COMECAR DAQUI!!!!! Escrever middlewares: validateTargetZeros, validateReward, validateMaxTransactionsPerBlock
-
-/* function validateCreateBlockchainRequest(data: any): boolean {
-  const requiredKeys = ["targetZeros", "reward", "maxTransactionsPerBlock"];
-  
-  // Verifica se todas as propriedades esperadas estão presentes
-  const hasAllRequiredKeys = requiredKeys.every((key) => key in data);
-
-  // Verifica se existem propriedades extras
-  const hasNoExtraKeys = Object.keys(data).every((key) => requiredKeys.includes(key));
-
-  return hasAllRequiredKeys && hasNoExtraKeys && isValidTypes;
-}
- */
-
-router.route('/').post(createBlockchain).get(validateCreateBlockchainRequestDTOStructure, validateTargetZeros, validateReward, validateMaxTransactionsPerBlock, validateBlockchainStructure, getBlockchain);
+router.route('/').post(validateBlockchainDTO, validateTargetZeros, validateReward, validateMaxTransactionsPerBlock, createBlockchain).get(validateBlockchain, getBlockchain);
 
 /*router.route('/blocks/mining').post(validateBlockchainStructure, validateNextBlockTransactionsMinFee, validateMempoolTransactionsByMinFee, selectMempoolTransactionsByMinFee, mineNextBlock);
 

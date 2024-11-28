@@ -1,12 +1,12 @@
 import { ITransaction } from './transaction.types';
 
-export type CreateBlockchainRequestDTO = {
+export type CreateBlockchainDTO = {
   targetZeros: number;
   reward: number;
   maxTransactionsPerBlock: number;
 };
 
-export type CreateBlockchainResponseDTO = {
+export type BlockchainDTO = {
   target: string;
   reward: number;
   maxTransactionsPerBlock: number;

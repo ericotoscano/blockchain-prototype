@@ -14,7 +14,7 @@ export class RewardTransactionCreation implements IRewardTransactionCreation {
 
   create(): ITransaction {
     const totalFee: number = this.feeCalculation.getTotalFee(this.blockTransactions);
-    //usar TrasnactionCreation
+    //usar TrasnactionCreation COMECAR DAQUI
     return new Transaction('0'.repeat(40), this.nodeAddress, this.reward + totalFee, 0, this.hashCreation, this.transactionIdCreation);
   }
 }

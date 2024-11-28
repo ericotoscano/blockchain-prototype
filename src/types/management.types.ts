@@ -1,11 +1,10 @@
 import { IBlock } from './block.types';
-import { IConnectedNodes } from './node.types';
+import { IConnectedNode } from './node.types';
 import { ITransaction, TransactionStatusType } from './transaction.types';
 
 export interface INodeManagement {
   addToConnectedNodes(nodeUrl: string, nodeAddress: string): void;
-  getConnectedNodesForBroadcast(nodeUrlTarget: string): IConnectedNodes[];
-  SortConnectedNodes(): void;
+  getConnectedNodesForBroadcast(nodeUrlTarget: string): IConnectedNode[];
 }
 
 export interface IBlocksManagement {
