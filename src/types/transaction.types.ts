@@ -1,15 +1,12 @@
-import { TransactionIdCreationType } from './creation.types';
-
 export interface ITransaction {
-  readonly txId: string;
-  status: TransactionStatusType;
   readonly sender: string;
   readonly recipient: string;
   readonly amount: number;
   readonly fee: number;
+  readonly txId: string;
+  status: TransactionStatusType;
   readonly timestamp: number;
-  readonly transactionIdCreation: TransactionIdCreationType;
-  getData(): string;
+  setStatus(targetStatus: TransactionStatusType): void;
 }
 
 export type TransactionInputType = {

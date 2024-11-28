@@ -29,6 +29,10 @@ export class Blockchain implements IBlockchain {
     this.blocks = blocks;
   }
 
+  getTarget(): string {
+    return this.target;
+  }
+
   setTarget(target: string): void {
     this.target = target;
   }

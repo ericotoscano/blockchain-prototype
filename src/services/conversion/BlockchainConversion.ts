@@ -1,45 +1,56 @@
-import { Block } from '../../models/Block';
-import { BlockInputType } from '../../types/block.types';
+import { BlockMiningType } from '../../types/block.types';
 import { IBlockchain } from '../../types/blockchain.types';
-import { CreateBlockchainDTO, GetBlockchainDTO } from '../../types/dto.types';
-import { ITransaction } from '../../types/transaction.types';
-import { KeyCreation } from '../../utils/creation/KeyCreation';
-import { Ripemd160HashCreation } from '../../utils/creation/Ripmed160HashCreation';
-import { Sha256HashCreation } from '../../utils/creation/Sha256HashCreation';
-import { BlockCreation } from '../creation/BlockCreation';
+import { BlockConversionType, NodeConversionType, TransactionConversionType } from '../../types/conversion.types';
+import { BlockCreationType, HashCreationType, KeyCreationType, NodeAddressCreationType, NodeUrlCreationType } from '../../types/creation.types';
+import { BlockDTO, CreateBlockchainRequestDTO, CreateBlockchainResponseDTO, NodeDTO, TransactionDTO } from '../../types/dto.types';
+import { TargetManagementType } from '../../types/management.types';
 import { BlockchainCreation } from '../creation/BlockchainCreation';
-import { LocalHostNodeAddressCreation } from '../creation/NodeAddressCreation';
-import { LocalHostNodeUrlCreation } from '../creation/NodeUrlCreation';
-import { TargetManagement } from '../management/TargetManagement';
-import { BlockMining } from '../mining/BlockMining';
 
 export class BlockchainConversion {
-  static convertToClass(blockchainDTO: CreateBlockchainDTO): IBlockchain {
-    const { targetZeros, reward, maxTransactionsPerBlock }: CreateBlockchainDTO = blockchainDTO;
+  static convertToClass(
+    blockchainDTO: CreateBlockchainRequestDTO,
+    targetManagement: TargetManagementType,
+    blockMining: BlockMiningType,
+    blockCreation: BlockCreationType,
+    nodeUrlCreation: NodeUrlCreationType,
+    nodeAddressCreation: NodeAddressCreationType,
+    keyCurveOption: string,
+    keyCreation: KeyCreationType,
+    mainHashCreation: HashCreationType,
+    secondHashCreation: HashCreationType
+  ): IBlockchain {
+    const { targetZeros, reward, maxTransactionsPerBlock }: CreateBlockchainRequestDTO = blockchainDTO;
 
     return BlockchainCreation.create(
       targetZeros,
-      TargetManagement,
+      targetManagement,
       reward,
       maxTransactionsPerBlock,
-      BlockMining,
-      BlockCreation,
-      LocalHostNodeUrlCreation,
-      LocalHostNodeAddressCreation,
-      'secp256k1',
-      KeyCreation,
-      Sha256HashCreation,
-      Ripemd160HashCreation
+      blockMining,
+      blockCreation,
+      nodeUrlCreation,
+      nodeAddressCreation,
+      keyCurveOption,
+      keyCreation,
+      mainHashCreation,
+      secondHashCreation
     );
   }
-  
-  static convertToDTO(blockchain: IBlockchain): GetBlockchainDTO {
+
+  static convertToDTO(
+    blockchain: IBlockchain,
+    blockConversion: BlockConversionType,
+    transactionConversion: TransactionConversionType,
+    nodeConversion: NodeConversionType
+  ): CreateBlockchainResponseDTO {
     const { target, reward, maxTransactionsPerBlock, node, mempool, blocks } = blockchain;
 
-    const convertedTransactions: ITransaction[] = transactionDataConversion.convertAll(transactions);
+    const nodeDTO: NodeDTO = nodeConversion.convertToDTO(node);
 
-    const input: BlockInputType = { height, previousHash, transactions: convertedTransactions };
+    const mempoolTransactionsDTO: TransactionDTO[] = transactionConversion.convertAllToDTO(mempool);
 
-    return new Block(input, nonce, hash, timestamp);
+    const blocksDTO: BlockDTO[] = blockConversion.convertAllToDTO(blocks, transactionConversion);
+
+    return { target, reward, maxTransactionsPerBlock, node: nodeDTO, mempool: mempoolTransactionsDTO, blocks: blocksDTO };
   }
 }

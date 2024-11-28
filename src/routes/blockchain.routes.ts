@@ -7,7 +7,7 @@ import transactionsMiddlewares from '../middlewares/transactions.middlewares';
 
 import blockchainController from '../controllers/blockchain.controller';
 
-const { validateBlockchainStructure, validateMempoolTransactionsByMinFee, selectMempoolTransactionsByMinFee } = blockchainMiddlewares;
+const { validateBlockchainStructure /* validateMempoolTransactionsByMinFee, selectMempoolTransactionsByMinFee */ } = blockchainMiddlewares;
 
 const {
   validateBlockStructure,
@@ -23,14 +23,28 @@ const {
 const { checkNewNodeData, checkConnectedNodesData } = nodesMiddlewares;
 const { checkSendNewTransactionData, checkAddNewTransactionData } = transactionsMiddlewares;
 
-const { getBlockchain, createBlockchain, mineNextBlock, addNextBlock, sendNextBlock /* sendNewNode, addNewNode, updateConnectedNodes, sendNewTransaction, addNewTransaction */ } = blockchainController;
+const { getBlockchain, createBlockchain /* mineNextBlock, addNextBlock, sendNextBlock  sendNewNode, addNewNode, updateConnectedNodes, sendNewTransaction, addNewTransaction */ } = blockchainController;
 
 const router: Router = Router();
 
-//escrever middlewares para CreateBlockchainDTO
-router.route('/').post(createBlockchain).get(validateBlockchainStructure, getBlockchain);
+//COMECAR DAQUI!!!!! Escrever middlewares: validateTargetZeros, validateReward, validateMaxTransactionsPerBlock
 
-router.route('/blocks/mining').post(validateBlockchainStructure, validateNextBlockTransactionsMinFee, validateMempoolTransactionsByMinFee, selectMempoolTransactionsByMinFee, mineNextBlock);
+/* function validateCreateBlockchainRequest(data: any): boolean {
+  const requiredKeys = ["targetZeros", "reward", "maxTransactionsPerBlock"];
+  
+  // Verifica se todas as propriedades esperadas estão presentes
+  const hasAllRequiredKeys = requiredKeys.every((key) => key in data);
+
+  // Verifica se existem propriedades extras
+  const hasNoExtraKeys = Object.keys(data).every((key) => requiredKeys.includes(key));
+
+  return hasAllRequiredKeys && hasNoExtraKeys && isValidTypes;
+}
+ */
+
+router.route('/').post(createBlockchain).get(validateCreateBlockchainRequestDTOStructure, validateTargetZeros, validateReward, validateMaxTransactionsPerBlock, validateBlockchainStructure, getBlockchain);
+
+/*router.route('/blocks/mining').post(validateBlockchainStructure, validateNextBlockTransactionsMinFee, validateMempoolTransactionsByMinFee, selectMempoolTransactionsByMinFee, mineNextBlock);
 
 router
   .route('/blocks')
@@ -48,7 +62,7 @@ router
 
 router.route('/blocks/transmission').post(sendNextBlock);
 
-/* router
+ router
   .route('/nodes')
   .post(validateBlockchainStructure, checkNewNodeData, sendNewNode)
   .patch(validateBlockchainStructure, checkNewNodeData, addNewNode)

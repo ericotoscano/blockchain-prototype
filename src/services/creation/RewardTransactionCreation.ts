@@ -14,9 +14,7 @@ export class RewardTransactionCreation implements IRewardTransactionCreation {
 
   create(): ITransaction {
     const totalFee: number = this.feeCalculation.getTotalFee(this.blockTransactions);
-
-    const input = { sender: '0'.repeat(40), recipient: this.nodeAddress, amount: this.reward + totalFee, fee: 0 };
-
-    return new Transaction(input, this.hashCreation, this.transactionIdCreation);
+    //usar TrasnactionCreation
+    return new Transaction('0'.repeat(40), this.nodeAddress, this.reward + totalFee, 0, this.hashCreation, this.transactionIdCreation);
   }
 }

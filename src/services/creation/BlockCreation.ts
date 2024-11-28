@@ -1,17 +1,34 @@
 import { Block } from '../../models/Block';
-import { BlockInputType, BlockMiningType, IBlock, MineBlockResultsType } from '../../types/block.types';
+import { BlockMiningType, IBlock, MineBlockResultsType } from '../../types/block.types';
 import { HashCreationType } from '../../types/creation.types';
+import { ITransaction } from '../../types/transaction.types';
 
 export class BlockCreation {
-  static create(input: BlockInputType, target: string, blockMining: BlockMiningType, hashCreation: HashCreationType): IBlock {
-    const block: IBlock = new Block(input);
+  static create(
+    height: number,
+    previousHash: string,
+    transactions: ITransaction[],
+    target: string,
+    blockMining: BlockMiningType,
+    hashCreation: HashCreationType,
+    nonce?: number,
+    hash?: string,
+    timestamp?: number
+  ): IBlock {
+    const blockNonce: number = nonce ?? 0;
 
-    const data: string = block.getData();
+    const blockHash: string = hash ?? '';
 
-    const { hash, nonce }: MineBlockResultsType = blockMining.mine(data, target, hashCreation);
+    const blockTimestamp: number = timestamp ?? Date.now();
 
-    block.hash = hash;
-    block.nonce = nonce;
+    const block: IBlock = new Block(height, previousHash, blockNonce, blockHash, blockTimestamp, transactions);
+
+    const blockData: string = block.getData();
+
+    const { calculatedHash, foundNonce }: MineBlockResultsType = blockMining.mine(blockData, target, hashCreation);
+
+    block.setHash(calculatedHash);
+    block.setNonce(foundNonce);
 
     return block;
   }

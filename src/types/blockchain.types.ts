@@ -13,6 +13,7 @@ export interface IBlockchain {
   nodeManagement: INodeManagement;
   mempoolManagement: IMempoolManagement;
   blocksManagement: IBlocksManagement;
+  getTarget(): string
   setTarget(target: string): void;
   setReward(blockReward: number): void;
   setMaxTransactionsPerBlock(maxNumber: number): void;

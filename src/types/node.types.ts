@@ -1,11 +1,11 @@
 export interface INode {
   readonly nodeUrl: string;
   readonly nodeAddress: string;
-  connectedNodes: IConnectedNodes[];
-  setConnectedNodes(connectedNodes: IConnectedNodes[]): void;
+  connectedNodes: IConnectedNode[];
+  setConnectedNodes(connectedNodes: IConnectedNode[]): void;
 }
 
-export interface IConnectedNodes {
-  nodeUrl: string;
-  nodeAddress: string;
+export interface IConnectedNode {
+  readonly nodeUrl: string;
+  readonly nodeAddress: string;
 }

@@ -3,14 +3,14 @@ import { HashCreationType } from '../../types/creation.types';
 
 export class BlockMining {
   static mine(data: string, target: string, hashCreation: HashCreationType): MineBlockResultsType {
-    let hash: string = hashCreation.hash(data);
-    let nonce: number = 0;
+    let calculatedHash: string = hashCreation.hash(data);
+    let foundNonce: number = 0;
 
-    while (BigInt('0x' + hash) >= BigInt('0x' + target)) {
-      nonce += 1;
-      hash = hashCreation.hash(`${data}${nonce.toString()}`);
+    while (BigInt('0x' + calculatedHash) >= BigInt('0x' + target)) {
+      foundNonce += 1;
+      calculatedHash = hashCreation.hash(`${data}${foundNonce.toString()}`);
     }
 
-    return { hash, nonce };
+    return { calculatedHash, foundNonce };
   }
 }

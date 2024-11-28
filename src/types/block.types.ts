@@ -9,19 +9,15 @@ export interface IBlock {
   readonly timestamp: number;
   transactions: ITransaction[];
   getData(): string;
+  setNonce(blockNonce: number): void;
+  setHash(blockHash: string): void;
 }
-
-export type BlockInputType = {
-  height: number;
-  previousHash: string;
-  transactions: ITransaction[];
-};
 
 export type BlockMiningType = {
   mine(data: string, target: string, hashCreation: HashCreationType): MineBlockResultsType;
 };
 
 export type MineBlockResultsType = {
-  hash: string;
-  nonce: number;
+  calculatedHash: string;
+  foundNonce: number;
 };

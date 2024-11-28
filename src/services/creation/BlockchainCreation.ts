@@ -35,7 +35,7 @@ export class BlockchainCreation {
 
     const target = targetManagement.calculate(targetZeros);
 
-    const genesisBlock = blockCreation.create({ height: 0, previousHash: '0'.repeat(64), transactions: [] }, target, blockMining, mainHashCreation);
+    const genesisBlock = blockCreation.create(0, '0'.repeat(64), [], target, blockMining, mainHashCreation);
 
     blocksManagement.addBlock(genesisBlock);
 

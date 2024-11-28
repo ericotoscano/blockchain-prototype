@@ -1,7 +1,7 @@
 import { ec as EC } from 'elliptic';
 
-import { BlockchainInputType, IBlockchain } from './blockchain.types';
-import { BlockInputType, BlockMiningType, IBlock } from './block.types';
+import { IBlockchain } from './blockchain.types';
+import { BlockMiningType, IBlock } from './block.types';
 import { ITransaction } from './transaction.types';
 import { TargetManagementType } from './management.types';
 import { INode } from './node.types';
@@ -43,7 +43,7 @@ export type NodeUrlCreationType = {
 };
 
 export type BlockCreationType = {
-  create(input: BlockInputType, target: string, blockMining: BlockMiningType, hashCreation: HashCreationType): IBlock;
+  create(height: number, previousHash: string, transactions: ITransaction[], target: string, blockMining: BlockMiningType, hashCreation: HashCreationType): IBlock;
 };
 
 export type TransactionIdCreationType = {

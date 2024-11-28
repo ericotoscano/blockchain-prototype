@@ -26,10 +26,6 @@ export interface IBlockTransactionsManagement {
   getTransactions(): ITransaction[];
 }
 
-export interface ITransactionStatusManagement {
-  changeStatus(targetStatus: TransactionStatusType): void;
-}
-
 export type TargetManagementType = {
   calculate(targetZeros: number): string;
 };
