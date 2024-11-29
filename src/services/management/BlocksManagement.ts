@@ -3,27 +3,25 @@ import { IBlocksManagement } from '../../types/management.types';
 import { ITransaction } from '../../types/transaction.types';
 
 export class BlocksManagement implements IBlocksManagement {
-  private readonly blocks: IBlock[];
+  private _blocks: IBlock[];
 
-  constructor(blocks: IBlock[]) {
-    this.blocks = blocks;
+  constructor(private readonly blockchainBlocks: IBlock[]) {
+    this._blocks = blockchainBlocks;
   }
 
-  addBlock(block: IBlock): void {
-    this.blocks.push(block);
+  get blocks(): IBlock[] {
+    return [...this._blocks];
   }
 
   getPreviousBlock(): IBlock {
-    return this.blocks[this.blocks.length - 1];
+    return this._blocks[this.blocks.length - 1];
   }
 
   getAllBlocksTransactions(): ITransaction[] {
-    const allBlocksTransactions: ITransaction[] = [];
+    return this._blocks.flatMap((block) => block.transactions);
+  }
 
-    for (let i = 0; i < this.blocks.length; i++) {
-      allBlocksTransactions.push(...this.blocks[i].transactions);
-    }
-
-    return allBlocksTransactions;
+  addBlock(block: IBlock): void {
+    this._blocks.push(block);
   }
 }

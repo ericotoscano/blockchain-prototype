@@ -8,13 +8,9 @@ export interface IBlockchain {
   reward: number;
   maxTransactionsPerBlock: number;
   readonly node: INode;
-  mempool: ITransaction[];
-  blocks: IBlock[];
-  nodeManagement: INodeManagement;
-  mempoolManagement: IMempoolManagement;
-  blocksManagement: IBlocksManagement;
-  getTarget(): string
-  setTarget(target: string): void;
-  setReward(blockReward: number): void;
-  setMaxTransactionsPerBlock(maxNumber: number): void;
+  readonly mempool: ITransaction[];
+  readonly blocks: IBlock[];
+  readonly nodeManagement: INodeManagement;
+  readonly mempoolManagement: IMempoolManagement;
+  readonly blocksManagement: IBlocksManagement;
 }

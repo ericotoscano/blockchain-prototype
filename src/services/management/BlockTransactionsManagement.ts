@@ -2,17 +2,21 @@ import { IBlockTransactionsManagement } from '../../types/management.types';
 import { ITransaction } from '../../types/transaction.types';
 
 export class BlockTransactionsManagement implements IBlockTransactionsManagement {
-  constructor(private readonly blockTransactions: ITransaction[]) {}
+  private _blockTransactions: ITransaction[];
+
+  constructor(blockTransactions: ITransaction[]) {
+    this._blockTransactions = blockTransactions;
+  }
 
   addTransaction(transaction: ITransaction): void {
-    this.blockTransactions.push(transaction);
+    this._blockTransactions.push(transaction);
   }
 
   addRewardTransaction(rewardTransaction: ITransaction): void {
-    this.blockTransactions.unshift(rewardTransaction);
+    this._blockTransactions.unshift(rewardTransaction);
   }
 
-  getTransactions(): ITransaction[] {
-    return [...this.blockTransactions];
+  get transactions(): ITransaction[] {
+    return [...this._blockTransactions];
   }
 }

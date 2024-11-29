@@ -1,6 +1,6 @@
 import { HashCreationType } from '../../../types/creation.types';
 import { BlockDTO, ValidationDTO } from '../../../types/dto.types';
-import { HexStringFormatValidation } from '../../../utils/validation/HexStringFormatValidation';
+import { HexStringFormatValidation } from '../../../utils/validation/HexStringValidation';
 
 export class BlockHashValidation {
   static validateFormat(hash: string): ValidationDTO {

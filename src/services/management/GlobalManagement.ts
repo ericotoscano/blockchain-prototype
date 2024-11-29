@@ -8,6 +8,6 @@ export class GlobalManagement {
   }
 
   static getBlockchain(): IBlockchain {
-    return global.blockchain;
+    return { ...global.blockchain };
   }
 }

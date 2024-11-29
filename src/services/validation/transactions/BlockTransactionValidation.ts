@@ -1,5 +1,5 @@
-import { TimestampFormatValidation } from '../../../utils/validation/DateFomatValidation';
-import { HexStringFormatValidation } from '../../../utils/validation/HexStringFormatValidation';
+import { TimestampFormatValidation } from '../../../utils/validation/DateValidation';
+import { HexStringFormatValidation } from '../../../utils/validation/HexStringValidation';
 import { TransactionStatusType } from '../../../types/transaction.types';
 import { TransactionDTO, ValidationDTO } from '../../../types/dto.types';
 

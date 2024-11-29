@@ -3,25 +3,29 @@ import { IMempoolManagement } from '../../types/management.types';
 import { ITransaction } from '../../types/transaction.types';
 
 export class MempoolManagement implements IMempoolManagement {
-  private mempoolTransactions: ITransaction[];
+  private _mempoolTransactions: ITransaction[];
 
-  constructor(mempoolTransacions: ITransaction[]) {
-    this.mempoolTransactions = mempoolTransacions;
+  constructor(private readonly mempoolTransacions: ITransaction[]) {
+    this._mempoolTransactions = mempoolTransacions;
+  }
+
+  get mempool(): ITransaction[] {
+    return [...this._mempoolTransactions];
   }
 
   addTransaction(transaction: ITransaction): void {
-    this.mempoolTransactions.push(transaction);
+    this._mempoolTransactions.push(transaction);
   }
 
   removeConfirmedTransactions(nextBlock: IBlock): void {
     const transactionsIdsToRemove = new Set(nextBlock.transactions.map((transaction) => transaction.txId));
 
-    const filteredMempool = this.mempoolTransactions.filter((mempoolTransaction) => !transactionsIdsToRemove.has(mempoolTransaction.txId));
+    const filteredMempool = this._mempoolTransactions.filter((mempoolTransaction) => !transactionsIdsToRemove.has(mempoolTransaction.txId));
 
-    this.mempoolTransactions = filteredMempool;
+    this._mempoolTransactions = filteredMempool;
   }
 
   getTransactionsByFee(minFee: number): ITransaction[] {
-    return this.mempoolTransactions.filter((mempoolTransaction) => mempoolTransaction.fee >= minFee);
+    return this._mempoolTransactions.filter((mempoolTransaction) => mempoolTransaction.fee >= minFee);
   }
 }

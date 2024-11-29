@@ -1,21 +1,22 @@
 import { IBlock } from '../types/block.types';
+import { IBlockTransactionsManagement } from '../types/management.types';
 import { ITransaction } from '../types/transaction.types';
 
 export class Block implements IBlock {
   nonce: number;
   hash: string;
 
-  constructor(readonly height: number, readonly previousHash: string, nonce: number, hash: string, readonly timestamp: number, readonly transactions: ITransaction[]) {
+  constructor(
+    readonly height: number,
+    readonly previousHash: string,
+    nonce: number,
+    hash: string,
+    readonly timestamp: number,
+    readonly transactions: ITransaction[],
+    readonly blockTransactionsManagement: IBlockTransactionsManagement
+  ) {
     this.nonce = nonce;
     this.hash = hash;
-  }
-
-  setNonce(blockNonce: number): void {
-    this.nonce = blockNonce;
-  }
-
-  setHash(blockHash: string): void {
-    this.hash = blockHash;
   }
 
   getData(): string {

@@ -1,24 +1,15 @@
 import { Request, Response, NextFunction } from 'express';
 
-import { BlockStructureValidation } from '../../helpers/validation/block/BlockStructureValidation';
-import { BlockHeightValidation } from '../../helpers/validation/block/BlockHeightValidation';
-import { BlockHashValidation } from '../../helpers/validation/block/BlockHashValidation';
-import { BlockPreviousHashValidation } from '../../helpers/validation/block/BlockPreviousHash';
-import { BlockTransactionsValidation } from '../../helpers/validation/block/BlockTransactionsValidation';
-import { BlockTimestampValidation } from '../../helpers/validation/block/BlockTimestampValidation';
-import { BlockMiningValidation } from '../../helpers/validation/block/BlockMiningValidation';
-
 import { Sha256HashCreation } from '../utils/creation/Sha256HashCreation';
 
-import { BlockDataType } from '../types/dto.types';
-import { ResponseBaseType } from '../../types/response/response.types';
-import { ValidationResponseType } from '../../types/response/ValidationResponseType';
+import { BlockDTO, ErrorDTO, ValidationDTO } from '../types/dto.types';
+import { BlockDTOValidation } from '../services/validation/block/BlockDTOValidation';
 
-const validateBlockStructure = async (req: Request<{}, {}, BlockDataType>, res: Response<ValidationResponseType | ResponseBaseType>, next: NextFunction): Promise<void> => {
+const validateBlockDTO = async (req: Request<{}, {}, BlockDTO>, res: Response<ValidationDTO | ErrorDTO>, next: NextFunction): Promise<void> => {
   try {
-    const block = req.body;
+    const block: BlockDTO = req.body;
 
-    const data = BlockStructureValidation.validate(block);
+    const data = BlockDTOValidation.validateFormat(block);
 
     if (!data.result) {
       res.status(400).send(data);
@@ -27,7 +18,7 @@ const validateBlockStructure = async (req: Request<{}, {}, BlockDataType>, res: 
 
     next();
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
+    const errorMessage: string = error instanceof Error ? error.message : 'Unexpected error.';
 
     res.status(500).send({ type: 'Server Error', code: 50, message: errorMessage });
     return;
@@ -205,7 +196,7 @@ const validateBlockTimestamp = async (req: Request<{}, {}, BlockDataType>, res: 
 };
 
 export default {
-  validateBlockStructure,
+  validateBlockDTO,
   validateBlockHeight,
   validateBlockNonce,
   validateBlockHash,

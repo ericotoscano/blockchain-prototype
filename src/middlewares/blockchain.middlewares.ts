@@ -10,7 +10,7 @@ import { BlockchainMaxTransactionsPerBlockValidation } from '../services/validat
 
 const validateBlockchainDTO = async (req: Request<{}, {}, CreateBlockchainDTO>, res: Response<ValidationDTO | ErrorDTO>, next: NextFunction): Promise<void> => {
   try {
-    const data = BlockchainDTOValidation.validateFormat(req.body);
+    const data = BlockchainDTOValidation.validateKeys(req.body);
 
     if (!data.result) {
       res.status(404).send(data);
@@ -88,7 +88,7 @@ const validateMaxTransactionsPerBlock = async (req: Request<{}, {}, CreateBlockc
 
 const validateBlockchain = async (req: Request, res: Response<ValidationDTO | ErrorDTO>, next: NextFunction): Promise<void> => {
   try {
-    const data = BlockchainValidation.validateFormat();
+    const data: ValidationDTO = BlockchainValidation.validateFormat();
 
     if (!data.result) {
       res.status(404).send(data);
@@ -97,7 +97,7 @@ const validateBlockchain = async (req: Request, res: Response<ValidationDTO | Er
 
     next();
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
+    const errorMessage: string = error instanceof Error ? error.message : 'Unexpected error.';
 
     res.status(500).send({ type: 'Server Error', code: 50, message: errorMessage });
     return;

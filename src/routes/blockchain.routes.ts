@@ -6,11 +6,12 @@ import nodesMiddlewares from '../middlewares/nodes.middlewares';
 import transactionsMiddlewares from '../middlewares/transactions.middlewares';
 
 import blockchainController from '../controllers/blockchain.controller';
+import blockController from '../controllers/block.controller';
 
 const { validateBlockchainDTO, validateTargetZeros, validateReward, validateMaxTransactionsPerBlock, validateBlockchain } = blockchainMiddlewares;
 
 const {
-  validateBlockStructure,
+  validateBlockDTO,
   validateBlockHeight,
   validateBlockNonce,
   validateBlockHash,
@@ -23,27 +24,24 @@ const {
 const { checkNewNodeData, checkConnectedNodesData } = nodesMiddlewares;
 const { checkSendNewTransactionData, checkAddNewTransactionData } = transactionsMiddlewares;
 
-const { getBlockchain, createBlockchain /* mineNextBlock, addNextBlock, sendNextBlock  sendNewNode, addNewNode, updateConnectedNodes, sendNewTransaction, addNewTransaction */ } = blockchainController;
+const { getBlockchain, createBlockchain } = blockchainController;
+const { addNextBlock } = blockController;
 
 const router: Router = Router();
 
 router.route('/').post(validateBlockchainDTO, validateTargetZeros, validateReward, validateMaxTransactionsPerBlock, createBlockchain).get(validateBlockchain, getBlockchain);
 
-/*router.route('/blocks/mining').post(validateBlockchainStructure, validateNextBlockTransactionsMinFee, validateMempoolTransactionsByMinFee, selectMempoolTransactionsByMinFee, mineNextBlock);
-
 router
   .route('/blocks')
   .post(
-    validateBlockchainStructure,
-    validateBlockStructure,
-    validateBlockHeight,
-    validateBlockNonce,
-    validateBlockHash,
-    validateBlockPreviousHash,
-    validateBlockTransactions,
-    validateBlockTimestamp,
-    addNextBlock
+    validateBlockchain,
+    validateBlockDTO,
+    /* validateBlockHeight, validateBlockNonce, validateBlockHash, validateBlockPreviousHash, validateBlockTransactions, validateBlockTimestamp, */ addNextBlock
   );
+
+/*router.route('/blocks/mining').post(validateBlockchainStructure, validateNextBlockTransactionsMinFee, validateMempoolTransactionsByMinFee, selectMempoolTransactionsByMinFee, mineNextBlock);
+
+
 
 router.route('/blocks/transmission').post(sendNextBlock);
 

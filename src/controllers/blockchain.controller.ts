@@ -18,10 +18,11 @@ import { LocalHostNodeAddressCreation } from '../services/creation/NodeAddressCr
 import { KeyCreation } from '../utils/creation/KeyCreation';
 import { Ripemd160HashCreation } from '../utils/creation/Ripmed160HashCreation';
 import { Sha256HashCreation } from '../utils/creation/Sha256HashCreation';
+import { IBlockchain } from '../types/blockchain.types';
 
 const createBlockchain = async (req: Request<{}, {}, CreateBlockchainDTO>, res: Response<ResponseDTO<BlockchainDTO> | ErrorDTO>): Promise<void> => {
   try {
-    const blockchain = BlockchainConversion.convertToClass(
+    const blockchain: IBlockchain = BlockchainConversion.convertToClass(
       req.body,
       TargetManagement,
       BlockMining,
@@ -36,7 +37,7 @@ const createBlockchain = async (req: Request<{}, {}, CreateBlockchainDTO>, res: 
 
     GlobalManagement.setBlockchain(blockchain);
 
-    const blockchainDTO = BlockchainConversion.convertToDTO(blockchain, BlockConversion, TransactionConversion, NodeConversion);
+    const blockchainDTO: BlockchainDTO = BlockchainConversion.convertToDTO(blockchain, BlockConversion, TransactionConversion, NodeConversion);
 
     res.status(201).send({
       type: 'Create Blockchain',
@@ -58,9 +59,9 @@ const createBlockchain = async (req: Request<{}, {}, CreateBlockchainDTO>, res: 
 
 const getBlockchain = async (req: Request, res: Response<ResponseDTO<BlockchainDTO> | ErrorDTO>): Promise<void> => {
   try {
-    const blockchain = GlobalManagement.getBlockchain();
+    const blockchain: IBlockchain = GlobalManagement.getBlockchain();
 
-    const blockchainDTO = BlockchainConversion.convertToDTO(blockchain, BlockConversion, TransactionConversion, NodeConversion);
+    const blockchainDTO: BlockchainDTO = BlockchainConversion.convertToDTO(blockchain, BlockConversion, TransactionConversion, NodeConversion);
 
     res.status(200).send({
       type: 'Get Blockchain',

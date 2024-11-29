@@ -1,7 +1,7 @@
 import { PreTransactionData } from '../types/data.types';
 import { CheckReturn } from '../types/check.types';
 
-import { isValidTimestamp, isValidHex40String, isValidHex64String } from '../utils/validation/DateFomatValidation';
+import { isValidTimestamp, isValidHex40String, isValidHex64String } from '../utils/validation/DateValidation';
 
 export const checkNewPreTransactionFormat = (newPreTransaction: PreTransactionData): CheckReturn => {
   if (!newPreTransaction || typeof newPreTransaction !== 'object' || Array.isArray(newPreTransaction)) {

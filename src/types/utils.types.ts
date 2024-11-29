@@ -9,3 +9,7 @@ export type HexStringFormatValidationType = {
 export type AddressVerificationType = {
   verify(publicKey: string, expectedAddress: string): boolean;
 };
+
+export type DTOValidationType = {
+  validateKeys(dto: Record<string, any>, requiredKeys: string[]): boolean;
+};

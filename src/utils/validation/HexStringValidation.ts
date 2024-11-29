@@ -1,5 +1,5 @@
 export class HexStringFormatValidation {
-  static validate(data: string, numberOfChar: number): boolean {
+  static validateFormat(data: string, numberOfChar: number): boolean {
     const dataRegex = new RegExp(`^[0-9a-f]{${numberOfChar}}$`);
 
     return typeof data === 'string' && dataRegex.test(data);

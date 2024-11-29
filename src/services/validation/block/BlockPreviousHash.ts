@@ -1,5 +1,5 @@
 import { ValidationDTO } from '../../../types/dto.types';
-import { HexStringFormatValidation } from '../../../utils/validation/HexStringFormatValidation';
+import { HexStringFormatValidation } from '../../../utils/validation/HexStringValidation';
 
 export class BlockPreviousHashValidation {
   static validateFormat(previousHash: string): ValidationDTO {

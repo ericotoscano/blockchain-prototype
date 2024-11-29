@@ -1,4 +1,5 @@
 import { HashCreationType } from './creation.types';
+import { IBlockTransactionsManagement } from './management.types';
 import { ITransaction } from './transaction.types';
 
 export interface IBlock {
@@ -7,14 +8,13 @@ export interface IBlock {
   hash: string;
   readonly previousHash: string;
   readonly timestamp: number;
-  transactions: ITransaction[];
+  readonly transactions: ITransaction[];
+  readonly blockTransactionsManagement: IBlockTransactionsManagement;
   getData(): string;
-  setNonce(blockNonce: number): void;
-  setHash(blockHash: string): void;
 }
 
 export type BlockMiningType = {
-  mine(data: string, target: string, hashCreation: HashCreationType): MineBlockResultsType;
+  mine(blockData: string, target: string, hashCreation: HashCreationType): MineBlockResultsType;
 };
 
 export type MineBlockResultsType = {
