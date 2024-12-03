@@ -17,7 +17,7 @@ const {
   validateBlockHash,
   validateBlockPreviousHash,
   validateBlockTransactions,
-  validateNextBlockTransactionsMinFee,
+  validateBlockTransactionsMinFee,
   validateBlockTimestamp,
 } = blockMiddlewares;
 
@@ -33,11 +33,7 @@ router.route('/').post(validateBlockchainDTO, validateTargetZeros, validateRewar
 
 router
   .route('/blocks')
-  .post(
-    validateBlockchain,
-    validateBlockDTO,
-    /* validateBlockHeight, validateBlockNonce, validateBlockHash, validateBlockPreviousHash, validateBlockTransactions, validateBlockTimestamp, */ addNextBlock
-  );
+  .post(validateBlockchain, validateBlockDTO, validateBlockHeight, validateBlockNonce, validateBlockHash, validateBlockPreviousHash, validateBlockTransactions, validateBlockTimestamp, addNextBlock);
 
 /*router.route('/blocks/mining').post(validateBlockchainStructure, validateNextBlockTransactionsMinFee, validateMempoolTransactionsByMinFee, selectMempoolTransactionsByMinFee, mineNextBlock);
 

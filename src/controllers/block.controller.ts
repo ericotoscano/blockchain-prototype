@@ -9,7 +9,7 @@ import { BlockMining } from '../services/mining/BlockMining';
 import { TransactionIdCreation } from '../services/creation/TransactionIdCreation';
 import { BlockCreation } from '../services/creation/BlockCreation';
 import { Sha256HashCreation } from '../utils/creation/Sha256HashCreation';
-
+//COMEÇAR DAQUI!!!! VALIDAR essa funcao para liberar a rota /blocks post (seguir padrao do createBlockchain)
 const addNextBlock = async (req: Request<{}, {}, BlockDTO>, res: Response<ResponseDTO<BlockDTO> | ErrorDTO>): Promise<void> => {
   try {
     const nextBlock: BlockDTO = req.body;

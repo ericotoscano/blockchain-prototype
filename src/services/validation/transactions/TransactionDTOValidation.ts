@@ -15,7 +15,7 @@ export class TransactionDTOValidation {
       type: TYPE,
       result,
       code: 12,
-      message: result ? `The transaction DTO keys are valid.` : `In transaction ${txId}, one or more transaction DTO keys are invalid.`,
+      message: result ? `The transaction DTO keys are valid.` : `In transaction ${txId}, the transaction DTO keys are invalid.`,
     };
   }
 }

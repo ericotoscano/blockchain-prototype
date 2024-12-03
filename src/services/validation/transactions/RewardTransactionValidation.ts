@@ -27,9 +27,9 @@ export class RewardTransactionValidation {
       message: 'The reward transaction is valid.',
     };
   }
-  //começar daqui, reorganizar textos etc
+
   static validateSender(rewardTransaction: TransactionDTO): ValidationDTO {
-    const TYPE: string = 'Block Reward Transaction Sender Validation';
+    const TYPE: string = 'Reward Transaction Sender Validation';
 
     const { sender }: TransactionDTO = rewardTransaction;
 
@@ -39,12 +39,12 @@ export class RewardTransactionValidation {
       type: TYPE,
       result,
       code: 13,
-      message: result ? 'The block reward transaction sender is valid.' : `The block reward transaction sender is invalid.`,
+      message: result ? 'The reward transaction sender is valid.' : `The reward transaction sender is invalid.`,
     };
   }
 
   static validateAmount(rewardTransaction: TransactionDTO): ValidationDTO {
-    const TYPE: string = 'Block Reward Transaction Amount Validation';
+    const TYPE: string = 'Reward Transaction Amount Validation';
 
     const { amount }: TransactionDTO = rewardTransaction;
 
@@ -56,12 +56,12 @@ export class RewardTransactionValidation {
       type: TYPE,
       result,
       code: 13,
-      message: result ? 'The block reward transaction amount is valid.' : `The block reward transaction amount is invalid.`,
+      message: result ? 'The reward transaction amount is valid.' : `The reward transaction amount is invalid.`,
     };
   }
 
   static validateFee(rewardTransaction: TransactionDTO): ValidationDTO {
-    const TYPE: string = 'Block Reward Transaction Fee Validation';
+    const TYPE: string = 'Reward Transaction Fee Validation';
 
     const { fee }: TransactionDTO = rewardTransaction;
 
@@ -71,7 +71,7 @@ export class RewardTransactionValidation {
       type: TYPE,
       result,
       code: 13,
-      message: result ? 'The block reward transaction fee is valid.' : `The block reward transaction fee is invalid.`,
+      message: result ? 'The reward transaction fee is valid.' : `The reward transaction fee is invalid.`,
     };
   }
 }

@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 
 import { Sha256HashCreation } from '../utils/creation/Sha256HashCreation';
 
-import { BlockDTO, ErrorDTO, ValidationDTO } from '../types/dto.types';
+import { BlockDTO, ErrorDTO, GetTransactionsToMineBlockDTO, ValidationDTO } from '../types/dto.types';
 import { BlockDTOValidation } from '../services/validation/block/BlockDTOValidation';
 import { BlockHeightValidation } from '../services/validation/block/BlockHeightValidation';
 import { BlockHashValidation } from '../services/validation/block/BlockHashValidation';
@@ -153,9 +153,9 @@ const validateBlockTransactions = async (req: Request<{}, {}, BlockDTO>, res: Re
   }
 };
 
-const validateBlockTransactionsMinFee = async (req: Request<{}, {}, { minFee: number }>, res: Response<ValidationDTO | ErrorDTO>, next: NextFunction): Promise<void> => {
+const validateBlockTransactionsMinFee = async (req: Request<{}, {}, GetTransactionsToMineBlockDTO>, res: Response<ValidationDTO | ErrorDTO>, next: NextFunction): Promise<void> => {
   try {
-    const { minFee } = req.body;
+    const { minFee }: GetTransactionsToMineBlockDTO = req.body;
 
     const data = BlockMiningValidation.validateMinFeeFormat(minFee);
 
@@ -166,7 +166,7 @@ const validateBlockTransactionsMinFee = async (req: Request<{}, {}, { minFee: nu
 
     next();
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
+    const errorMessage: string = error instanceof Error ? error.message : 'Unexpected error.';
 
     res.status(500).send({ type: 'Server Error', code: 50, message: errorMessage });
     return;

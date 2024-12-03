@@ -1,25 +1,28 @@
-import { TimestampFormatValidation } from '../../../utils/validation/TimestampValidation';
-import { HexStringFormatValidation } from '../../../utils/validation/HexStringValidation';
 import { TransactionStatusType } from '../../../types/transaction.types';
 import { TransactionDTO, ValidationDTO } from '../../../types/dto.types';
+import { TransactionDTOValidation } from './TransactionDTOValidation';
+import { HexStringValidation } from '../../../utils/validation/HexStringValidation';
+import { TimestampValidation } from '../../../utils/validation/TimestampValidation';
+import { IBlockchain } from '../../../types/blockchain.types';
+import { GlobalManagement } from '../../management/GlobalManagement';
 
 export class TransactionValidation {
   static validateAll(transactions: TransactionDTO[]): ValidationDTO {
-    const TYPE: string = 'Block All Transactions Validation';
+    const TYPE: string = 'All Transactions Validation';
 
-    for (let i = 0; i < transactions.length - 1; i++) {
+    for (let i = 1; i < transactions.length; i++) {
       const { sender, recipient, amount, fee, status, timestamp, txId } = transactions[i];
 
       const allValidationData: ValidationDTO[] = [
-        TransactionValidation.validateStructure(transactions[i], i),
+        TransactionDTOValidation.validateKeys(transactions[i]),
         TransactionValidation.validateSenderFormat(sender, txId),
         TransactionValidation.validateRecipientFormat(recipient, txId),
         TransactionValidation.validateAddressMismatch(sender, recipient, txId),
         TransactionValidation.validateAmountFormat(amount, txId),
         TransactionValidation.validateFeeFormat(fee, txId),
         TransactionValidation.validateStatusFormat(status, txId),
-        TransactionValidation.validateTxIdFormat(txId, i),
-        TransactionValidation.validateTransactionUniqueness(transactions[i], txId),
+        TransactionValidation.validateTxIdFormat(txId),
+        TransactionValidation.validateTransactionUniqueness(txId),
         TransactionValidation.validateTimestampFormat(timestamp, txId),
       ];
 
@@ -34,48 +37,33 @@ export class TransactionValidation {
       type: TYPE,
       result: true,
       code: 13,
-      message: 'All block transactions are valid.',
-    };
-  }
-
-  static validateStructure(transaction: TransactionDTO, transactionIndex: number): ValidationDTO {
-    const TYPE: string = 'Block Individual Transaction Structure Format Validation';
-
-    const result: boolean = transaction && typeof transaction === 'object' && !Array.isArray(transaction);
-
-    return {
-      type: TYPE,
-      result,
-      code: 13,
-      message: result
-        ? 'All block transactions have a valid structure format.'
-        : `At index ${transactionIndex} in the block's transactions, the transaction structure is missing or has an invalid format.`,
+      message: 'All transactions are valid.',
     };
   }
 
   static validateSenderFormat(sender: string, txId: string): ValidationDTO {
     const TYPE: string = 'Block Transaction Sender Format Validation';
 
-    const result: boolean = typeof sender == 'string' && HexStringFormatValidation.validate(sender, 40);
+    const result: boolean = typeof sender == 'string' && HexStringValidation.validateFormat(sender, 40);
 
     return {
       type: TYPE,
       result,
       code: 13,
-      message: result ? 'All block transactions have a valid sender address format.' : `In transaction ${txId}, the sender address is missing or has an invalid format.`,
+      message: result ? 'All block transactions sender address format are valid.' : `In transaction ${txId}, the sender address format is invalid.`,
     };
   }
 
   static validateRecipientFormat(recipient: string, txId: string): ValidationDTO {
     const TYPE: string = 'Block Transaction Recipient Format Validation';
 
-    const result: boolean = typeof recipient == 'string' && HexStringFormatValidation.validate(recipient, 40);
+    const result: boolean = typeof recipient == 'string' && HexStringValidation.validateFormat(recipient, 40);
 
     return {
       type: TYPE,
       result,
       code: 13,
-      message: result ? 'All block transactions have a valid recipient address format.' : `In transaction ${txId}, the recipient address is missing or has an invalid format.`,
+      message: result ? 'All block transactions recipient address format are valid.' : `In transaction ${txId}, the recipient address format is invalid.`,
     };
   }
 
@@ -101,20 +89,20 @@ export class TransactionValidation {
       type: TYPE,
       result,
       code: 13,
-      message: result ? 'All block transactions have a valid amount format.' : `In transaction ${txId}, the amount is missing or has an invalid format.`,
+      message: result ? 'All block transactions amount format are valid.' : `In transaction ${txId}, the amount format is invalid.`,
     };
   }
 
   static validateFeeFormat(fee: number, txId: string): ValidationDTO {
     const TYPE: string = 'Block Transaction Fee Format Validation';
 
-    const result: boolean = typeof fee === 'number' && fee >= 0;
+    const result: boolean = typeof fee === 'number' && fee > 0;
 
     return {
       type: TYPE,
       result,
       code: 13,
-      message: result ? 'All block transactions have a valid fee format.' : `In transaction ${txId}, the fee is missing or has an invalid format.`,
+      message: result ? 'All block transactions fee format are valid.' : `In transaction ${txId}, the fee format is invalid.`,
     };
   }
 
@@ -127,42 +115,44 @@ export class TransactionValidation {
       type: TYPE,
       result,
       code: 13,
-      message: result ? 'All next block transactions have a valid status format.' : `In transaction ${txId}, the status is missing or has an invalid format.`,
+      message: result ? 'All next block transactions status format are valid.' : `In transaction ${txId}, the status format is invalid.`,
     };
   }
 
-  static validateTxIdFormat(txId: string, transactionIndex: number): ValidationDTO {
+  static validateTxIdFormat(txId: string): ValidationDTO {
     const TYPE: string = 'Block Transaction TxId Format Validation';
 
-    const result: boolean = typeof txId == 'string' && HexStringFormatValidation.validate(txId, 64);
+    const result: boolean = typeof txId == 'string' && HexStringValidation.validateFormat(txId, 64);
 
     return {
       type: TYPE,
       result,
       code: 13,
-      message: result ? 'All block transactions have a valid txId format.' : `At index ${transactionIndex} in the block's transactions, the txId is missing or has an invalid format.`,
+      message: result ? 'All block transactions txId format are valid.' : `In transaction ${txId}, the txId format is invalid.`,
     };
   }
 
   static validateTimestampFormat(timestamp: number, txId: string): ValidationDTO {
     const TYPE: string = 'Block Transaction Timestamp Format Validation';
 
-    const result: boolean = typeof timestamp === 'number' && TimestampFormatValidation.validate(timestamp);
+    const result: boolean = typeof timestamp === 'number' && TimestampValidation.validateFormat(timestamp);
 
     return {
       type: TYPE,
       result,
       code: 13,
-      message: result ? 'All block transactions have a valid timestamp format.' : `In transaction ${txId}, the timestamp is missing or has an invalid format.`,
+      message: result ? 'All block transactions timestamp format are valid.' : `In transaction ${txId}, the timestamp format is invalid.`,
     };
   }
 
-  static validateTransactionUniqueness(transaction: TransactionDTO, txId: string): ValidationDTO {
+  static validateTransactionUniqueness(txId: string): ValidationDTO {
     const TYPE: string = 'Block Transaction Uniqueness Validation';
 
-    const allConfirmedTransactions = global.blockchain.blocksManagement.getAllBlocksTransactions();
+    const blockchain: IBlockchain = GlobalManagement.getBlockchain();
 
-    const isDuplicate = allConfirmedTransactions.some((confirmedTransaction) => confirmedTransaction.txId === transaction.txId);
+    const allConfirmedTransactions = blockchain.blocksManagement.getAllBlocksTransactions();
+
+    const isDuplicate = allConfirmedTransactions.some((confirmedTransaction) => confirmedTransaction.txId === txId);
 
     const result: boolean = !isDuplicate;
 
@@ -170,7 +160,7 @@ export class TransactionValidation {
       type: TYPE,
       result,
       code: 13,
-      message: result ? 'All block transactions have a unique txId.' : `Transaction ${txId} has the same txId as another transaction in the blockchain.`,
+      message: result ? 'All block transactions have a unique txId.' : `Transaction ${txId} has the same txId as one confirmed transaction in the blockchain.`,
     };
   }
 }

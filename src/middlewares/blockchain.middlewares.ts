@@ -28,7 +28,7 @@ const validateBlockchainDTO = async (req: Request<{}, {}, CreateBlockchainDTO>, 
 
 const validateTargetZeros = async (req: Request<{}, {}, CreateBlockchainDTO>, res: Response<ValidationDTO | ErrorDTO>, next: NextFunction): Promise<void> => {
   try {
-    const { targetZeros } = req.body;
+    const { targetZeros }: CreateBlockchainDTO = req.body;
 
     const data: ValidationDTO = BlockchainTargetZerosValidation.validateFormat(targetZeros);
 
@@ -48,7 +48,7 @@ const validateTargetZeros = async (req: Request<{}, {}, CreateBlockchainDTO>, re
 
 const validateReward = async (req: Request<{}, {}, CreateBlockchainDTO>, res: Response<ValidationDTO | ErrorDTO>, next: NextFunction): Promise<void> => {
   try {
-    const { reward } = req.body;
+    const { reward }: CreateBlockchainDTO = req.body;
 
     const data: ValidationDTO = BlockchainRewardValidation.validateFormat(reward);
 
@@ -68,7 +68,7 @@ const validateReward = async (req: Request<{}, {}, CreateBlockchainDTO>, res: Re
 
 const validateMaxTransactionsPerBlock = async (req: Request<{}, {}, CreateBlockchainDTO>, res: Response<ValidationDTO | ErrorDTO>, next: NextFunction): Promise<void> => {
   try {
-    const { maxTransactionsPerBlock } = req.body;
+    const { maxTransactionsPerBlock }: CreateBlockchainDTO = req.body;
 
     const data: ValidationDTO = BlockchainMaxTransactionsPerBlockValidation.validateFormat(maxTransactionsPerBlock);
 
