@@ -3,7 +3,7 @@ import { DTOKeysValidation } from '../../../utils/validation/DTOKeysValidation';
 
 export class BlockDTOValidation {
   static validateKeys(blockDTO: BlockDTO): ValidationDTO {
-    const TYPE: string = 'Block DTO Format Validation';
+    const TYPE: string = 'Block DTO Keys Validation';
 
     const requiredKeys: string[] = ['height', 'nonce', 'hash', 'previousHash', 'transactions', 'timestamp'];
 
@@ -18,4 +18,4 @@ export class BlockDTOValidation {
   }
 }
 
-//seguir em validateBlockHeight middleware etc
+

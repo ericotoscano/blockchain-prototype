@@ -10,7 +10,7 @@ export class BlockMiningValidation {
       type: TYPE,
       result,
       code: 13,
-      message: result ? 'The minimum fee for block transactions has a valid format.' : 'The minimum fee for block transactions has an invalid format.',
+      message: result ? 'The block transactions min fee format is valid.' : 'The block transactions min fee format is invalid.',
     };
   }
 }

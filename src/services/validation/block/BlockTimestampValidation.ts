@@ -1,17 +1,17 @@
-import { TimestampFormatValidation } from '../../../utils/validation/DateValidation';
 import { ValidationDTO } from '../../../types/dto.types';
+import { TimestampValidation } from '../../../utils/validation/TimestampValidation';
 
 export class BlockTimestampValidation {
   static validateFormat(timestamp: number): ValidationDTO {
     const TYPE: string = 'Block Timestamp Format Validation';
 
-    const result: boolean = typeof timestamp === 'number' && TimestampFormatValidation.validate(timestamp);
+    const result: boolean = typeof timestamp === 'number' && TimestampValidation.validateFormat(timestamp);
 
     return {
       type: TYPE,
       result,
       code: 13,
-      message: result ? 'The block timestamp format is valid.' : 'The block timestamp is missing or has an invalid format.',
+      message: result ? 'The block timestamp format is valid.' : 'The block timestamp format is invalid.',
     };
   }
 }

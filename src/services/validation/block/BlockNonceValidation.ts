@@ -10,7 +10,7 @@ export class BlockNonceValidation {
       type: TYPE,
       result,
       code: 13,
-      message: result ? 'The block nonce format is valid.' : 'The block nonce is missing or has an invalid format.',
+      message: result ? 'The block nonce format is valid.' : 'The block nonce format is invalid.',
     };
   }
 }

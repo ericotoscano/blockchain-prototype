@@ -4,12 +4,18 @@ import { Sha256HashCreation } from '../utils/creation/Sha256HashCreation';
 
 import { BlockDTO, ErrorDTO, ValidationDTO } from '../types/dto.types';
 import { BlockDTOValidation } from '../services/validation/block/BlockDTOValidation';
+import { BlockHeightValidation } from '../services/validation/block/BlockHeightValidation';
+import { BlockHashValidation } from '../services/validation/block/BlockHashValidation';
+import { BlockPreviousHashValidation } from '../services/validation/block/BlockPreviousHashValidation';
+import { BlockTransactionsValidation } from '../services/validation/block/BlockTransactionsValidation';
+import { BlockTimestampValidation } from '../services/validation/block/BlockTimestampValidation';
+import { BlockMiningValidation } from '../services/validation/block/BlockMiningValidation';
 
 const validateBlockDTO = async (req: Request<{}, {}, BlockDTO>, res: Response<ValidationDTO | ErrorDTO>, next: NextFunction): Promise<void> => {
   try {
     const block: BlockDTO = req.body;
 
-    const data = BlockDTOValidation.validateFormat(block);
+    const data: ValidationDTO = BlockDTOValidation.validateKeys(block);
 
     if (!data.result) {
       res.status(400).send(data);
@@ -25,13 +31,11 @@ const validateBlockDTO = async (req: Request<{}, {}, BlockDTO>, res: Response<Va
   }
 };
 
-const validateBlockHeight = async (req: Request<{}, {}, BlockDataType>, res: Response<ValidationResponseType | ResponseBaseType>, next: NextFunction): Promise<void> => {
+const validateBlockHeight = async (req: Request<{}, {}, BlockDTO>, res: Response<ValidationDTO | ErrorDTO>, next: NextFunction): Promise<void> => {
   try {
-    const nextBlock = req.body;
+    const { height }: BlockDTO = req.body;
 
-    const { height } = nextBlock;
-
-    const data = BlockHeightValidation.validateFormat(height);
+    const data: ValidationDTO = BlockHeightValidation.validateFormat(height);
 
     if (!data.result) {
       res.status(400).send(data);
@@ -40,20 +44,18 @@ const validateBlockHeight = async (req: Request<{}, {}, BlockDataType>, res: Res
 
     next();
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
+    const errorMessage: string = error instanceof Error ? error.message : 'Unexpected error.';
 
     res.status(500).send({ type: 'Server Error', code: 50, message: errorMessage });
     return;
   }
 };
 
-const validateBlockNonce = async (req: Request<{}, {}, BlockDataType>, res: Response<ValidationResponseType | ResponseBaseType>, next: NextFunction): Promise<void> => {
+const validateBlockNonce = async (req: Request<{}, {}, BlockDTO>, res: Response<ValidationDTO | ErrorDTO>, next: NextFunction): Promise<void> => {
   try {
-    const nextBlock = req.body;
+    const { nonce }: BlockDTO = req.body;
 
-    const { height } = nextBlock;
-
-    const data = BlockHeightValidation.validateFormat(height);
+    const data: ValidationDTO = BlockHeightValidation.validateFormat(nonce);
 
     if (!data.result) {
       res.status(400).send(data);
@@ -62,124 +64,100 @@ const validateBlockNonce = async (req: Request<{}, {}, BlockDataType>, res: Resp
 
     next();
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
+    const errorMessage: string = error instanceof Error ? error.message : 'Unexpected error.';
 
     res.status(500).send({ type: 'Server Error', code: 50, message: errorMessage });
     return;
   }
 };
 
-const validateBlockHash = async (req: Request<{}, {}, BlockDataType>, res: Response<ValidationResponseType | ResponseBaseType>, next: NextFunction): Promise<void> => {
+const validateBlockHash = async (req: Request<{}, {}, BlockDTO>, res: Response<ValidationDTO | ErrorDTO>, next: NextFunction): Promise<void> => {
   try {
-    const nextBlock = req.body;
+    const block: BlockDTO = req.body;
 
-    const { hash } = nextBlock;
+    const { hash }: BlockDTO = block;
 
-    const allValidationData: ValidationResponseType[] = [
-      BlockHashValidation.validateFormat(hash),
-      BlockHashValidation.validateDifficulty(hash, global.blockchain.target),
-      BlockHashValidation.validateExpectedHash(nextBlock, Sha256HashCreation),
-    ];
+    const data: ValidationDTO = BlockHashValidation.validateAll(block, hash, Sha256HashCreation);
 
-    for (const data of allValidationData) {
-      if (!data.result) {
-        res.status(400).send(data);
-        return;
-      }
+    if (!data.result) {
+      res.status(400).send(data);
+      return;
     }
 
     next();
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
+    const errorMessage: string = error instanceof Error ? error.message : 'Unexpected error.';
 
     res.status(500).send({ type: 'Server Error', code: 50, message: errorMessage });
     return;
   }
 };
 
-const validateBlockPreviousHash = async (req: Request<{}, {}, BlockDataType>, res: Response<ValidationResponseType | ResponseBaseType>, next: NextFunction): Promise<void> => {
+const validateBlockPreviousHash = async (req: Request<{}, {}, BlockDTO>, res: Response<ValidationDTO | ErrorDTO>, next: NextFunction): Promise<void> => {
   try {
-    const nextBlock = req.body;
+    const { previousHash }: BlockDTO = req.body;
 
-    const { previousHash } = nextBlock;
+    const data: ValidationDTO = BlockPreviousHashValidation.validateAll(previousHash);
 
-    const allValidationData: ValidationResponseType[] = [
-      BlockPreviousHashValidation.validateFormat(previousHash),
-      BlockPreviousHashValidation.validateExpectedPreviousHash(previousHash, global.blockchain.blocksManagement.getPreviousBlock().hash),
-    ];
-
-    for (const data of allValidationData) {
-      if (!data.result) {
-        res.status(400).send(data);
-        return;
-      }
+    if (!data.result) {
+      res.status(400).send(data);
+      return;
     }
 
     next();
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
+    const errorMessage: string = error instanceof Error ? error.message : 'Unexpected error.';
 
     res.status(500).send({ type: 'Server Error', code: 50, message: errorMessage });
     return;
   }
 };
 
-const validateBlockTransactions = async (req: Request<{}, {}, BlockDataType>, res: Response<ValidationResponseType | ResponseBaseType>, next: NextFunction): Promise<void> => {
+const validateBlockTimestamp = async (req: Request<{}, {}, BlockDTO>, res: Response<ValidationDTO | ErrorDTO>, next: NextFunction): Promise<void> => {
   try {
-    const nextBlock = req.body;
+    const { timestamp }: BlockDTO = req.body;
 
-    const { transactions } = nextBlock;
+    const data: ValidationDTO = BlockTimestampValidation.validateFormat(timestamp);
 
-    const allValidationData: ValidationResponseType[] = [
-      BlockTransactionsValidation.validateStructure(transactions),
-      BlockTransactionsValidation.validateLength(transactions, global.blockchain.maxTransactionsPerBlock),
-      BlockTransactionsValidation.validateRewardTransactionFormat(transactions, global.blockchain.reward),
-      BlockTransactionsValidation.validateAllTransactions(transactions),
-    ];
-
-    for (const data of allValidationData) {
-      if (!data.result) {
-        res.status(400).send(data);
-        return;
-      }
+    if (!data.result) {
+      res.status(400).send(data);
+      return;
     }
 
     next();
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
+    const errorMessage: string = error instanceof Error ? error.message : 'Unexpected error.';
 
     res.status(500).send({ type: 'Server Error', code: 50, message: errorMessage });
     return;
   }
 };
 
-const validateNextBlockTransactionsMinFee = async (req: Request<{}, {}, { minFee: number }>, res: Response<ValidationResponseType | ResponseBaseType>, next: NextFunction): Promise<void> => {
+const validateBlockTransactions = async (req: Request<{}, {}, BlockDTO>, res: Response<ValidationDTO | ErrorDTO>, next: NextFunction): Promise<void> => {
+  try {
+    const { transactions }: BlockDTO = req.body;
+
+    const data: ValidationDTO = BlockTransactionsValidation.validateAll(transactions);
+
+    if (!data.result) {
+      res.status(400).send(data);
+      return;
+    }
+
+    next();
+  } catch (error) {
+    const errorMessage: string = error instanceof Error ? error.message : 'Unexpected error.';
+
+    res.status(500).send({ type: 'Server Error', code: 50, message: errorMessage });
+    return;
+  }
+};
+
+const validateBlockTransactionsMinFee = async (req: Request<{}, {}, { minFee: number }>, res: Response<ValidationDTO | ErrorDTO>, next: NextFunction): Promise<void> => {
   try {
     const { minFee } = req.body;
 
     const data = BlockMiningValidation.validateMinFeeFormat(minFee);
-
-    if (!data.result) {
-      res.status(400).send(data);
-      return;
-    }
-
-    next();
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
-
-    res.status(500).send({ type: 'Server Error', code: 50, message: errorMessage });
-    return;
-  }
-};
-
-const validateBlockTimestamp = async (req: Request<{}, {}, BlockDataType>, res: Response<ValidationResponseType | ResponseBaseType>, next: NextFunction): Promise<void> => {
-  try {
-    const nextBlock = req.body;
-
-    const { timestamp } = nextBlock;
-
-    const data = BlockTimestampValidation.validateFormat(timestamp);
 
     if (!data.result) {
       res.status(400).send(data);
@@ -201,7 +179,7 @@ export default {
   validateBlockNonce,
   validateBlockHash,
   validateBlockPreviousHash,
-  validateBlockTransactions,
-  validateNextBlockTransactionsMinFee,
   validateBlockTimestamp,
+  validateBlockTransactions,
+  validateBlockTransactionsMinFee,
 };

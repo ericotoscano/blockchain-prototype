@@ -1,9 +1,43 @@
-import { TimestampFormatValidation } from '../../../utils/validation/DateValidation';
+import { TimestampFormatValidation } from '../../../utils/validation/TimestampValidation';
 import { HexStringFormatValidation } from '../../../utils/validation/HexStringValidation';
 import { TransactionStatusType } from '../../../types/transaction.types';
 import { TransactionDTO, ValidationDTO } from '../../../types/dto.types';
 
-export class BlockTransactionValidation {
+export class TransactionValidation {
+  static validateAll(transactions: TransactionDTO[]): ValidationDTO {
+    const TYPE: string = 'Block All Transactions Validation';
+
+    for (let i = 0; i < transactions.length - 1; i++) {
+      const { sender, recipient, amount, fee, status, timestamp, txId } = transactions[i];
+
+      const allValidationData: ValidationDTO[] = [
+        TransactionValidation.validateStructure(transactions[i], i),
+        TransactionValidation.validateSenderFormat(sender, txId),
+        TransactionValidation.validateRecipientFormat(recipient, txId),
+        TransactionValidation.validateAddressMismatch(sender, recipient, txId),
+        TransactionValidation.validateAmountFormat(amount, txId),
+        TransactionValidation.validateFeeFormat(fee, txId),
+        TransactionValidation.validateStatusFormat(status, txId),
+        TransactionValidation.validateTxIdFormat(txId, i),
+        TransactionValidation.validateTransactionUniqueness(transactions[i], txId),
+        TransactionValidation.validateTimestampFormat(timestamp, txId),
+      ];
+
+      for (const data of allValidationData) {
+        if (!data.result) {
+          return data;
+        }
+      }
+    }
+
+    return {
+      type: TYPE,
+      result: true,
+      code: 13,
+      message: 'All block transactions are valid.',
+    };
+  }
+
   static validateStructure(transaction: TransactionDTO, transactionIndex: number): ValidationDTO {
     const TYPE: string = 'Block Individual Transaction Structure Format Validation';
 

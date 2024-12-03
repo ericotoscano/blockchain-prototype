@@ -1,4 +1,4 @@
-export class TimestampFormatValidation {
+export class TimestampValidation {
   static validateFormat(data: number): boolean {
     const date = new Date(data);
 

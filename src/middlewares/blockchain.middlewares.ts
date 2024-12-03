@@ -10,7 +10,7 @@ import { BlockchainMaxTransactionsPerBlockValidation } from '../services/validat
 
 const validateBlockchainDTO = async (req: Request<{}, {}, CreateBlockchainDTO>, res: Response<ValidationDTO | ErrorDTO>, next: NextFunction): Promise<void> => {
   try {
-    const data = BlockchainDTOValidation.validateKeys(req.body);
+    const data: ValidationDTO = BlockchainDTOValidation.validateKeys(req.body);
 
     if (!data.result) {
       res.status(404).send(data);
@@ -19,7 +19,7 @@ const validateBlockchainDTO = async (req: Request<{}, {}, CreateBlockchainDTO>, 
 
     next();
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
+    const errorMessage: string = error instanceof Error ? error.message : 'Unexpected error.';
 
     res.status(500).send({ type: 'Server Error', code: 50, message: errorMessage });
     return;
@@ -30,7 +30,7 @@ const validateTargetZeros = async (req: Request<{}, {}, CreateBlockchainDTO>, re
   try {
     const { targetZeros } = req.body;
 
-    const data = BlockchainTargetZerosValidation.validateFormat(targetZeros);
+    const data: ValidationDTO = BlockchainTargetZerosValidation.validateFormat(targetZeros);
 
     if (!data.result) {
       res.status(404).send(data);
@@ -39,7 +39,7 @@ const validateTargetZeros = async (req: Request<{}, {}, CreateBlockchainDTO>, re
 
     next();
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
+    const errorMessage: string = error instanceof Error ? error.message : 'Unexpected error.';
 
     res.status(500).send({ type: 'Server Error', code: 50, message: errorMessage });
     return;
@@ -50,7 +50,7 @@ const validateReward = async (req: Request<{}, {}, CreateBlockchainDTO>, res: Re
   try {
     const { reward } = req.body;
 
-    const data = BlockchainRewardValidation.validateFormat(reward);
+    const data: ValidationDTO = BlockchainRewardValidation.validateFormat(reward);
 
     if (!data.result) {
       res.status(404).send(data);
@@ -59,7 +59,7 @@ const validateReward = async (req: Request<{}, {}, CreateBlockchainDTO>, res: Re
 
     next();
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
+    const errorMessage: string = error instanceof Error ? error.message : 'Unexpected error.';
 
     res.status(500).send({ type: 'Server Error', code: 50, message: errorMessage });
     return;
@@ -70,7 +70,7 @@ const validateMaxTransactionsPerBlock = async (req: Request<{}, {}, CreateBlockc
   try {
     const { maxTransactionsPerBlock } = req.body;
 
-    const data = BlockchainMaxTransactionsPerBlockValidation.validateFormat(maxTransactionsPerBlock);
+    const data: ValidationDTO = BlockchainMaxTransactionsPerBlockValidation.validateFormat(maxTransactionsPerBlock);
 
     if (!data.result) {
       res.status(404).send(data);
@@ -79,7 +79,7 @@ const validateMaxTransactionsPerBlock = async (req: Request<{}, {}, CreateBlockc
 
     next();
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
+    const errorMessage: string = error instanceof Error ? error.message : 'Unexpected error.';
 
     res.status(500).send({ type: 'Server Error', code: 50, message: errorMessage });
     return;

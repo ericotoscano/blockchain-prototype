@@ -3,7 +3,7 @@ import { DTOKeysValidation } from '../../../utils/validation/DTOKeysValidation';
 
 export class BlockchainDTOValidation {
   static validateKeys(blockchainDTO: CreateBlockchainDTO): ValidationDTO {
-    const TYPE: string = 'Blockchain DTO Format Validation';
+    const TYPE: string = 'Blockchain DTO Keys Validation';
 
     const requiredKeys: string[] = ['targetZeros', 'reward', 'maxTransactionsPerBlock'];
 

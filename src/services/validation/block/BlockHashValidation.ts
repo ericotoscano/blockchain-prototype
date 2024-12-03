@@ -1,25 +1,49 @@
+import { IBlockchain } from '../../../types/blockchain.types';
 import { HashCreationType } from '../../../types/creation.types';
 import { BlockDTO, ValidationDTO } from '../../../types/dto.types';
-import { HexStringFormatValidation } from '../../../utils/validation/HexStringValidation';
+import { HexStringValidation } from '../../../utils/validation/HexStringValidation';
+import { GlobalManagement } from '../../management/GlobalManagement';
 
 export class BlockHashValidation {
+  static validateAll(block: BlockDTO, hash: string, hashCreation: HashCreationType): ValidationDTO {
+    const TYPE: string = 'Block Hash All Validation';
+
+    const allValidationData: ValidationDTO[] = [BlockHashValidation.validateFormat(hash), BlockHashValidation.validateDifficulty(hash), BlockHashValidation.validateExpectedHash(block, hashCreation)];
+
+    for (const data of allValidationData) {
+      if (!data.result) {
+        return data;
+      }
+    }
+
+    return {
+      type: TYPE,
+      result: true,
+      code: 13,
+      message: 'The block hash is valid.',
+    };
+  }
+
   static validateFormat(hash: string): ValidationDTO {
     const TYPE: string = 'Block Hash Format Validation';
 
-    const result: boolean = typeof hash === 'string' && HexStringFormatValidation.validate(hash, 64);
+    const result: boolean = typeof hash === 'string' && HexStringValidation.validateFormat(hash, 64);
 
     return {
       type: TYPE,
       result,
       code: 13,
-      message: result ? 'The block hash format is valid.' : 'The block hash is missing or has an invalid format.',
+      message: result ? 'The block hash format is valid.' : 'The block hash format is invalid.',
     };
   }
 
-  static validateDifficulty(hash: string, target: string) {
+  static validateDifficulty(hash: string) {
     const TYPE: string = 'Block Hash Difficulty Validation';
 
     const hashValue: bigint = BigInt('0x' + hash);
+
+    const { target }: IBlockchain = GlobalManagement.getBlockchain();
+
     const targetValue: bigint = BigInt('0x' + target);
 
     const result: boolean = hashValue < targetValue;
