@@ -15,15 +15,8 @@ export type BlockchainDTO = {
   blocks: BlockDTO[];
 };
 
-export type NodeDTO = {
-  nodeUrl: string;
-  nodeAddress: string;
-  connectedNodes: ConnectedNodeDTO[];
-};
-
-export type ConnectedNodeDTO = {
-  nodeUrl: string;
-  nodeAddress: string;
+export type AddBlockDTO = {
+  chainLength: number;
 };
 
 export type BlockDTO = {
@@ -33,6 +26,17 @@ export type BlockDTO = {
   previousHash: string;
   transactions: TransactionDTO[];
   timestamp: number;
+};
+
+export type NodeDTO = {
+  nodeUrl: string;
+  nodeAddress: string;
+  connectedNodes: ConnectedNodeDTO[];
+};
+
+export type ConnectedNodeDTO = {
+  nodeUrl: string;
+  nodeAddress: string;
 };
 
 export type GetTransactionsToMineBlockDTO = {

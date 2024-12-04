@@ -1,4 +1,4 @@
-import { MineBlockDTO, TransactionDTO } from '../../types/dto.types';
+import { TransactionDTO } from '../../types/dto.types';
 import { ITransaction } from '../../types/transaction.types';
 
 export class MempoolTransactionsSelection {

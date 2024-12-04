@@ -12,7 +12,7 @@ export class TransactionConversion {
     return TransactionCreation.create(sender, recipient, amount, fee, hashCreation, transactionIdCreation, txId, status, timestamp);
   }
 
-  static convertAllToClasses(transactionsDTO: TransactionDTO[]): ITransaction[] {
+  static convertAllToClass(transactionsDTO: TransactionDTO[]): ITransaction[] {
     const transactions: ITransaction[] = [];
 
     for (const transaction of transactionsDTO) {

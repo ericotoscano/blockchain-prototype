@@ -8,15 +8,15 @@ export class BlockTransactionsManagement implements IBlockTransactionsManagement
     this._blockTransactions = blockTransactions;
   }
 
+  get transactions(): ITransaction[] {
+    return [...this._blockTransactions];
+  }
+
   addTransaction(transaction: ITransaction): void {
     this._blockTransactions.push(transaction);
   }
 
   addRewardTransaction(rewardTransaction: ITransaction): void {
     this._blockTransactions.unshift(rewardTransaction);
-  }
-
-  get transactions(): ITransaction[] {
-    return [...this._blockTransactions];
   }
 }

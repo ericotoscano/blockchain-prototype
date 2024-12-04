@@ -1,28 +1,57 @@
-import { IBlock } from '../../types/block.types';
+import { BlockMiningType, IBlock } from '../../types/block.types';
+import { IBlockchain } from '../../types/blockchain.types';
 import { TransactionConversionType } from '../../types/conversion.types';
+import { HashCreationType, RewardTransactionCreationType, TransactionIdCreationType } from '../../types/creation.types';
 import { BlockDTO, TransactionDTO } from '../../types/dto.types';
-import { ITransaction } from '../../types/transaction.types';
-import { Sha256HashCreation } from '../../utils/creation/Sha256HashCreation';
+import { ITransaction, TransactionCalculationType } from '../../types/transaction.types';
 import { BlockCreation } from '../creation/BlockCreation';
 import { GlobalManagement } from '../management/GlobalManagement';
-import { BlockMining } from '../mining/BlockMining';
 
 export class BlockConversion {
-  static convertToClass(blockDTO: BlockDTO, transactionConversion: TransactionConversionType): IBlock {
+  static convertToClass(
+    blockDTO: BlockDTO,
+    transactionConversion: TransactionConversionType,
+    transactionCalculation: TransactionCalculationType,
+    transactionIdCreation: TransactionIdCreationType,
+    rewardTransactionCreation: RewardTransactionCreationType,
+    blockMining: BlockMiningType,
+    hashCreation: HashCreationType
+  ): IBlock {
     const { height, nonce, hash, previousHash, timestamp, transactions } = blockDTO;
 
-    const convertedTransactions: ITransaction[] = transactionConversion.convertAllToClasses(transactions);
+    const convertedTransactions: ITransaction[] = transactionConversion.convertAllToClass(transactions);
 
-    const target: string = GlobalManagement.getBlockchain().getTarget();
+    const { target }: IBlockchain = GlobalManagement.getBlockchain();
 
-    return BlockCreation.create(height, previousHash, convertedTransactions, target, BlockMining, Sha256HashCreation, nonce, hash, timestamp);
+    return BlockCreation.create(
+      height,
+      previousHash,
+      convertedTransactions,
+      transactionCalculation,
+      transactionIdCreation,
+      rewardTransactionCreation,
+      target,
+      blockMining,
+      hashCreation,
+      nonce,
+      hash,
+      timestamp
+    );
   }
 
-  static convertAllToClasses(blocksDTO: BlockDTO[], transactionConversion: TransactionConversionType): IBlock[] {
+  static convertAllToClass(
+    blocksDTO: BlockDTO[],
+    transactionConversion: TransactionConversionType,
+    transactionCalculation: TransactionCalculationType,
+    transactionIdCreation: TransactionIdCreationType,
+    rewardTransactionCreation: RewardTransactionCreationType,
+    blockMining: BlockMiningType,
+    hashCreation: HashCreationType
+  ): IBlock[] {
     const blocks: IBlock[] = [];
 
     for (const block of blocksDTO) {
-      blocks.push(BlockConversion.convertToClass(block, transactionConversion));
+      blocks.push(BlockConversion.convertToClass(block, transactionConversion, transactionCalculation, transactionIdCreation, rewardTransactionCreation, blockMining, hashCreation));
     }
 
     return blocks;

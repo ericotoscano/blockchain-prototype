@@ -5,7 +5,7 @@ import { ITransaction } from '../../types/transaction.types';
 export class MempoolManagement implements IMempoolManagement {
   private _mempoolTransactions: ITransaction[];
 
-  constructor(private readonly mempoolTransacions: ITransaction[]) {
+  constructor(mempoolTransacions: ITransaction[]) {
     this._mempoolTransactions = mempoolTransacions;
   }
 

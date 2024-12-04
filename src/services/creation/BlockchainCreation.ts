@@ -4,8 +4,16 @@ import { BlocksManagement } from '../management/BlocksManagement';
 import { NodeManagement } from '../management/NodeManagement';
 import { IBlockchain } from '../../types/blockchain.types';
 import { BlockMiningType, IBlock } from '../../types/block.types';
-import { ITransaction } from '../../types/transaction.types';
-import { BlockCreationType, HashCreationType, KeyCreationType, NodeAddressCreationType, NodeUrlCreationType } from '../../types/creation.types';
+import { ITransaction, TransactionCalculationType } from '../../types/transaction.types';
+import {
+  BlockCreationType,
+  HashCreationType,
+  KeyCreationType,
+  NodeAddressCreationType,
+  NodeUrlCreationType,
+  RewardTransactionCreationType,
+  TransactionIdCreationType,
+} from '../../types/creation.types';
 import { TargetManagementType } from '../../types/management.types';
 import { NodeCreation } from './NodeCreation';
 
@@ -15,6 +23,9 @@ export class BlockchainCreation {
     targetManagement: TargetManagementType,
     reward: number,
     maxTransactionsPerBlock: number,
+    transactionCalculation: TransactionCalculationType,
+    transactionIdCreation: TransactionIdCreationType,
+    rewardTransactionCreation: RewardTransactionCreationType,
     blockMining: BlockMiningType,
     blockCreation: BlockCreationType,
     nodeUrlCreation: NodeUrlCreationType,
@@ -35,7 +46,7 @@ export class BlockchainCreation {
 
     const target = targetManagement.calculate(targetZeros);
 
-    const genesisBlock = blockCreation.create(0, '0'.repeat(64), [], target, blockMining, mainHashCreation);
+    const genesisBlock = blockCreation.create(0, '0'.repeat(64), [], transactionCalculation, transactionIdCreation, rewardTransactionCreation, target, blockMining, mainHashCreation);
 
     blocksManagement.addBlock(genesisBlock);
 

@@ -2,7 +2,7 @@ import 'dotenv/config';
 
 import { startServer, setupCleanup } from './server';
 
-import { validatePort, checkAvailablePortsInEnv } from './helpers/ports.helpers';
+import { validatePort, checkAvailablePortsInEnv } from './services/ports.helpers';
 
 const main = () => {
   const portArgument = process.argv[2];

@@ -5,7 +5,7 @@ import { ITransaction } from '../../types/transaction.types';
 export class BlocksManagement implements IBlocksManagement {
   private _blocks: IBlock[];
 
-  constructor(private readonly blockchainBlocks: IBlock[]) {
+  constructor(blockchainBlocks: IBlock[]) {
     this._blocks = blockchainBlocks;
   }
 
@@ -19,6 +19,10 @@ export class BlocksManagement implements IBlocksManagement {
 
   getAllBlocksTransactions(): ITransaction[] {
     return this._blocks.flatMap((block) => block.transactions);
+  }
+
+  getChainLength(): number {
+    return this._blocks.length;
   }
 
   addBlock(block: IBlock): void {

@@ -12,9 +12,10 @@ export interface INodeManagement {
 
 export interface IBlocksManagement {
   readonly blocks: IBlock[];
-  addBlock(block: IBlock): void;
   getPreviousBlock(): IBlock;
   getAllBlocksTransactions(): ITransaction[];
+  getChainLength(): number;
+  addBlock(block: IBlock): void;
 }
 
 export interface IMempoolManagement {

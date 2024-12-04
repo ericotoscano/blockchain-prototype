@@ -1,15 +1,27 @@
 import { BlockMiningType } from '../../types/block.types';
 import { IBlockchain } from '../../types/blockchain.types';
 import { BlockConversionType, NodeConversionType, TransactionConversionType } from '../../types/conversion.types';
-import { BlockCreationType, HashCreationType, KeyCreationType, NodeAddressCreationType, NodeUrlCreationType } from '../../types/creation.types';
+import {
+  BlockCreationType,
+  HashCreationType,
+  KeyCreationType,
+  NodeAddressCreationType,
+  NodeUrlCreationType,
+  RewardTransactionCreationType,
+  TransactionIdCreationType,
+} from '../../types/creation.types';
 import { BlockDTO, CreateBlockchainDTO, BlockchainDTO, NodeDTO, TransactionDTO } from '../../types/dto.types';
 import { TargetManagementType } from '../../types/management.types';
+import { TransactionCalculationType } from '../../types/transaction.types';
 import { BlockchainCreation } from '../creation/BlockchainCreation';
 
 export class BlockchainConversion {
   static convertToClass(
     blockchainDTO: CreateBlockchainDTO,
     targetManagement: TargetManagementType,
+    transactionCalculation: TransactionCalculationType,
+    transactionIdCreation: TransactionIdCreationType,
+    rewardTransactionCreation: RewardTransactionCreationType,
     blockMining: BlockMiningType,
     blockCreation: BlockCreationType,
     nodeUrlCreation: NodeUrlCreationType,
@@ -26,6 +38,9 @@ export class BlockchainConversion {
       targetManagement,
       reward,
       maxTransactionsPerBlock,
+      transactionCalculation,
+      transactionIdCreation,
+      rewardTransactionCreation,
       blockMining,
       blockCreation,
       nodeUrlCreation,

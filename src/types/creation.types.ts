@@ -5,6 +5,7 @@ import { BlockMiningType, IBlock } from './block.types';
 import { ITransaction, TransactionCalculationType } from './transaction.types';
 import { TargetManagementType } from './management.types';
 import { INode } from './node.types';
+import { AddBlockDTO } from './dto.types';
 
 export type BlockchainCreationType = {
   create(
@@ -54,6 +55,10 @@ export type BlockCreationType = {
     blockMining: BlockMiningType,
     hashCreation: HashCreationType
   ): IBlock;
+};
+
+export type BlockDTOCreation = {
+  createAddBlockDTO(chainLength: number): AddBlockDTO;
 };
 
 export type TransactionIdCreationType = {

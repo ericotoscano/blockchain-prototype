@@ -25,7 +25,7 @@ const { checkNewNodeData, checkConnectedNodesData } = nodesMiddlewares;
 const { checkSendNewTransactionData, checkAddNewTransactionData } = transactionsMiddlewares;
 
 const { getBlockchain, createBlockchain } = blockchainController;
-const { addNextBlock } = blockController;
+const { addBlock } = blockController;
 
 const router: Router = Router();
 
@@ -33,7 +33,9 @@ router.route('/').post(validateBlockchainDTO, validateTargetZeros, validateRewar
 
 router
   .route('/blocks')
-  .post(validateBlockchain, validateBlockDTO, validateBlockHeight, validateBlockNonce, validateBlockHash, validateBlockPreviousHash, validateBlockTransactions, validateBlockTimestamp, addNextBlock);
+  .post(validateBlockchain, validateBlockDTO, validateBlockHeight, validateBlockNonce, validateBlockHash, validateBlockPreviousHash, validateBlockTransactions, validateBlockTimestamp, addBlock);
+
+//COMEÇAR DAQUI!!! ORGANIZAR PROXIMA ROTA 
 
 /*router.route('/blocks/mining').post(validateBlockchainStructure, validateNextBlockTransactionsMinFee, validateMempoolTransactionsByMinFee, selectMempoolTransactionsByMinFee, mineNextBlock);
 

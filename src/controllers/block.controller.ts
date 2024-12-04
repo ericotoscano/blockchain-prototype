@@ -2,36 +2,47 @@ import { Request, Response } from 'express';
 import axios from 'axios';
 
 import { IBlock } from '../types/block.types';
-import { BlockDTO, ResponseDTO, ErrorDTO } from '../types/dto.types';
+import { ResponseDTO, ErrorDTO, BlockDTO, AddBlockDTO } from '../types/dto.types';
 
 import { BlockMining } from '../services/mining/BlockMining';
 
 import { TransactionIdCreation } from '../services/creation/TransactionIdCreation';
 import { BlockCreation } from '../services/creation/BlockCreation';
 import { Sha256HashCreation } from '../utils/creation/Sha256HashCreation';
-//COMEÇAR DAQUI!!!! VALIDAR essa funcao para liberar a rota /blocks post (seguir padrao do createBlockchain)
-const addNextBlock = async (req: Request<{}, {}, BlockDTO>, res: Response<ResponseDTO<BlockDTO> | ErrorDTO>): Promise<void> => {
+import { BlockConversion } from '../services/conversion/BlockConversion';
+import { TransactionConversion } from '../services/conversion/TransactionConversion';
+import { TransactionCalculation } from '../services/calculation/TransacionCalculation';
+import { RewardTransactionCreation } from '../services/creation/RewardTransactionCreation';
+import { GlobalManagement } from '../services/management/GlobalManagement';
+import { IBlockchain } from '../types/blockchain.types';
+import { BlockDTOCreation } from '../services/creation/BlockDTOCreation';
+
+const addBlock = async (req: Request<{}, {}, BlockDTO>, res: Response<ResponseDTO<AddBlockDTO> | ErrorDTO>): Promise<void> => {
   try {
-    const nextBlock: BlockDTO = req.body;
+    const blockDTO: BlockDTO = req.body;
 
-    const transactionDataConversion = new TransactionDataConversion(Sha256HashCreation, TransactionIdCreation);
+    const block: IBlock = BlockConversion.convertToClass(blockDTO, TransactionConversion, TransactionCalculation, TransactionIdCreation, RewardTransactionCreation, BlockMining, Sha256HashCreation);
 
-    const block: IBlock = BlockDataConversion.convert(nextBlock, transactionDataConversion);
+    const blockchain: IBlockchain = GlobalManagement.getBlockchain();
 
-    global.blockchain.blocksManagement.addBlock(block);
+    blockchain.blocksManagement.addBlock(block);
+
+    const chainLength: number = blockchain.blocksManagement.getChainLength();
+
+    const addBlockDTO: AddBlockDTO = BlockDTOCreation.createAddBlockDTO(chainLength);
 
     res.status(200).send({
-      type: 'Add Next Block Response',
+      type: 'Add Block',
       code: 10,
-      message: 'The next block has been added.',
-      data: nextBlock,
+      message: 'The block has been added.',
+      data: addBlockDTO,
     });
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
+    const errorMessage: string = error instanceof Error ? error.message : 'Unexpected error.';
 
     res.status(500).send({
-      type: 'Server Error',
-      code: 50,
+      type: 'Internal Server Error',
+      code: 99,
       message: errorMessage,
     });
     return;
@@ -102,7 +113,7 @@ const sendNextBlock = async (req: Request<{}, {}, BlockDTO>, res: Response<Respo
 };
 
 export default {
-  addNextBlock,
+  addBlock,
   mineNextBlock,
   sendNextBlock,
 };
