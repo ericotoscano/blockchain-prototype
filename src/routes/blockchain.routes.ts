@@ -2,27 +2,13 @@ import { Router } from 'express';
 
 import blockchainMiddlewares from '../middlewares/blockchain.middlewares';
 import blockMiddlewares from '../middlewares/block.middlewares';
-import nodesMiddlewares from '../middlewares/nodes.middlewares';
-import transactionsMiddlewares from '../middlewares/transactions.middlewares';
 
 import blockchainController from '../controllers/blockchain.controller';
 import blockController from '../controllers/block.controller';
 
 const { validateBlockchainDTO, validateTargetZeros, validateReward, validateMaxTransactionsPerBlock, validateBlockchain } = blockchainMiddlewares;
 
-const {
-  validateBlockDTO,
-  validateBlockHeight,
-  validateBlockNonce,
-  validateBlockHash,
-  validateBlockPreviousHash,
-  validateBlockTransactions,
-  validateBlockTransactionsMinFee,
-  validateBlockTimestamp,
-} = blockMiddlewares;
-
-const { checkNewNodeData, checkConnectedNodesData } = nodesMiddlewares;
-const { checkSendNewTransactionData, checkAddNewTransactionData } = transactionsMiddlewares;
+const { validateBlockDTO, validateBlockHeight, validateBlockNonce, validateBlockHash, validateBlockPreviousHash, validateBlockTimestamp, validateBlockTransactions } = blockMiddlewares;
 
 const { getBlockchain, createBlockchain } = blockchainController;
 const { addBlock } = blockController;
@@ -33,14 +19,9 @@ router.route('/').post(validateBlockchainDTO, validateTargetZeros, validateRewar
 
 router
   .route('/blocks')
-  .post(validateBlockchain, validateBlockDTO, validateBlockHeight, validateBlockNonce, validateBlockHash, validateBlockPreviousHash, validateBlockTransactions, validateBlockTimestamp, addBlock);
+  .post(validateBlockchain, validateBlockDTO, validateBlockHeight, validateBlockNonce, validateBlockHash, validateBlockPreviousHash, validateBlockTimestamp, validateBlockTransactions, addBlock);
 
-//COMEÇAR DAQUI!!! ORGANIZAR PROXIMA ROTA 
-
-/*router.route('/blocks/mining').post(validateBlockchainStructure, validateNextBlockTransactionsMinFee, validateMempoolTransactionsByMinFee, selectMempoolTransactionsByMinFee, mineNextBlock);
-
-
-
+/*
 router.route('/blocks/transmission').post(sendNextBlock);
 
  router

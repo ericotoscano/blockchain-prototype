@@ -8,14 +8,15 @@ export class TransactionCreation {
     recipient: string,
     amount: number,
     fee: number,
-    hashCreation: HashCreationType,
-    transactionIdCreation: TransactionIdCreationType,
+    creationDependencies: { hashCreation: HashCreationType; transactionIdCreation: TransactionIdCreationType },
     txId?: string,
     status?: TransactionStatusType,
     timestamp?: number
   ): ITransaction {
-    const transactionStatus = status ?? 'Pending';
+    const { hashCreation, transactionIdCreation } = creationDependencies;
     
+    const transactionStatus = status ?? 'Pending';
+
     const transactionTimestamp = timestamp ?? Date.now();
 
     const transactionData = `${sender}${recipient}${amount}${fee}${timestamp}`;

@@ -1,7 +1,7 @@
 import { IBlockchain } from '../../../types/blockchain.types';
 import { TransactionDTO, ValidationDTO } from '../../../types/dto.types';
 import { GlobalManagement } from '../../management/GlobalManagement';
-import { TransactionValidation } from '../transactions/TransactionValidation';
+import { TransactionValidation } from '../transactions/TransactionDTOValidation';
 import { RewardTransactionValidation } from '../transactions/RewardTransactionValidation';
 
 export class BlockTransactionsValidation {

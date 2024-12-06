@@ -3,42 +3,32 @@ import { MempoolManagement } from '../management/MempoolManagement';
 import { BlocksManagement } from '../management/BlocksManagement';
 import { NodeManagement } from '../management/NodeManagement';
 import { IBlockchain } from '../../types/blockchain.types';
-import { BlockMiningType, IBlock } from '../../types/block.types';
-import { ITransaction, TransactionCalculationType } from '../../types/transaction.types';
-import {
-  BlockCreationType,
-  HashCreationType,
-  KeyCreationType,
-  NodeAddressCreationType,
-  NodeUrlCreationType,
-  RewardTransactionCreationType,
-  TransactionIdCreationType,
-} from '../../types/creation.types';
-import { TargetManagementType } from '../../types/management.types';
+import { IBlock } from '../../types/block.types';
+import { ITransaction } from '../../types/transaction.types';
 import { NodeCreation } from './NodeCreation';
+import { CreateBlockchainDependenciesType } from '../../types/dependencies.types';
 
 export class BlockchainCreation {
-  static create(
-    targetZeros: number,
-    targetManagement: TargetManagementType,
-    reward: number,
-    maxTransactionsPerBlock: number,
-    transactionCalculation: TransactionCalculationType,
-    transactionIdCreation: TransactionIdCreationType,
-    rewardTransactionCreation: RewardTransactionCreationType,
-    blockMining: BlockMiningType,
-    blockCreation: BlockCreationType,
-    nodeUrlCreation: NodeUrlCreationType,
-    nodeAddressCreation: NodeAddressCreationType,
-    keyCurveOption: string,
-    keyCreation: KeyCreationType,
-    mainHashCreation: HashCreationType,
-    addressHashCreation: HashCreationType
-  ): IBlockchain {
+  static create(targetZeros: number, reward: number, maxTransactionsPerBlock: number, dependencies: CreateBlockchainDependenciesType): IBlockchain {
+    const {
+      targetManagement,
+      keyCurveOption,
+      keyCreation,
+      mainHashCreation,
+      secondHashCreation,
+      nodeUrlCreation,
+      nodeAddressCreation,
+      blockMining,
+      blockCreation,
+      transactionCalculation,
+      transactionIdCreation,
+      rewardTransactionCreation,
+    } = dependencies;
+
     const mempool: ITransaction[] = [];
     const blocks: IBlock[] = [];
 
-    const node = NodeCreation.create(nodeUrlCreation, nodeAddressCreation, keyCurveOption, keyCreation, mainHashCreation, addressHashCreation);
+    const node = NodeCreation.create(nodeUrlCreation, nodeAddressCreation, keyCurveOption, keyCreation, mainHashCreation, secondHashCreation);
 
     const nodeManagement = new NodeManagement(node);
     const mempoolManagement = new MempoolManagement(mempool);

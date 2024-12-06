@@ -10,48 +10,42 @@ import { GlobalManagement } from '../management/GlobalManagement';
 export class BlockConversion {
   static convertToClass(
     blockDTO: BlockDTO,
-    transactionConversion: TransactionConversionType,
-    transactionCalculation: TransactionCalculationType,
-    transactionIdCreation: TransactionIdCreationType,
-    rewardTransactionCreation: RewardTransactionCreationType,
-    blockMining: BlockMiningType,
-    hashCreation: HashCreationType
+    dependencies: {
+      transactionConversion: TransactionConversionType;
+      transactionCalculation: TransactionCalculationType;
+      transactionIdCreation: TransactionIdCreationType;
+      rewardTransactionCreation: RewardTransactionCreationType;
+      blockMining: BlockMiningType;
+      hashCreation: HashCreationType;
+    }
   ): IBlock {
     const { height, nonce, hash, previousHash, timestamp, transactions } = blockDTO;
+    const { transactionConversion, transactionIdCreation, hashCreation } = dependencies;
 
-    const convertedTransactions: ITransaction[] = transactionConversion.convertAllToClass(transactions);
+    const creationDependencies = { hashCreation, transactionIdCreation };
+
+    const convertedTransactions: ITransaction[] = transactionConversion.convertAllToClass(transactions, creationDependencies);
 
     const { target }: IBlockchain = GlobalManagement.getBlockchain();
 
-    return BlockCreation.create(
-      height,
-      previousHash,
-      convertedTransactions,
-      transactionCalculation,
-      transactionIdCreation,
-      rewardTransactionCreation,
-      target,
-      blockMining,
-      hashCreation,
-      nonce,
-      hash,
-      timestamp
-    );
+    return BlockCreation.create(height, previousHash, convertedTransactions, target, dependencies, nonce, hash, timestamp);
   }
 
   static convertAllToClass(
     blocksDTO: BlockDTO[],
-    transactionConversion: TransactionConversionType,
-    transactionCalculation: TransactionCalculationType,
-    transactionIdCreation: TransactionIdCreationType,
-    rewardTransactionCreation: RewardTransactionCreationType,
-    blockMining: BlockMiningType,
-    hashCreation: HashCreationType
+    dependencies: {
+      transactionConversion: TransactionConversionType;
+      transactionCalculation: TransactionCalculationType;
+      transactionIdCreation: TransactionIdCreationType;
+      rewardTransactionCreation: RewardTransactionCreationType;
+      blockMining: BlockMiningType;
+      hashCreation: HashCreationType;
+    }
   ): IBlock[] {
     const blocks: IBlock[] = [];
 
     for (const block of blocksDTO) {
-      blocks.push(BlockConversion.convertToClass(block, transactionConversion, transactionCalculation, transactionIdCreation, rewardTransactionCreation, blockMining, hashCreation));
+      blocks.push(BlockConversion.convertToClass(block, dependencies));
     }
 
     return blocks;

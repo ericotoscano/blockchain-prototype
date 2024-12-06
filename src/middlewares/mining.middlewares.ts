@@ -1,39 +1,62 @@
 import { Request, Response, NextFunction } from 'express';
-import { MempoolTransactionsValidation } from '../services/validation/blockchain/MempoolTransactionsValidation';
-import { MempoolTransactionsSelection } from '../services/selection/MempoolTransactionsSelection';
-import { ErrorDTO, MineBlockDTO, ValidationDTO } from '../types/dto.types';
 
-const validateMempoolTransactionsByMinFee = async (req: Request<{}, {}, MineBlockDTO>, res: Response<ValidationDTO | ErrorDTO>, next: NextFunction): Promise<void> => {
+import { ErrorDTO, TransactionDTO, ValidationDTO } from '../types/dto.types';
+import { TransactionsDTOValidation } from '../services/validation/transactions/TransactionsDTOValidation';
+
+const validateTransactionsDTO = async (req: Request<{}, {}, TransactionDTO[]>, res: Response<ValidationDTO | ErrorDTO>, next: NextFunction): Promise<void> => {
   try {
-    const { minFee } = req.body;
+    const transactionsDTO: TransactionDTO[] = req.body;
 
-    const data = MempoolTransactionsValidation.validateByFee(minFee);
+    const data: ValidationDTO = TransactionsDTOValidation.validateStructure(transactionsDTO);
 
     if (!data.result) {
-      res.status(404).send(data);
+      res.status(400).send(data);
       return;
     }
 
     next();
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
+    const errorMessage: string = error instanceof Error ? error.message : 'Unexpected error.';
 
     res.status(500).send({ type: 'Server Error', code: 50, message: errorMessage });
     return;
   }
 };
 
-const selectMempoolTransactionsByMinFee = async (req: Request<{}, {}, MineBlockDTO>, res: Response<>, next: NextFunction): Promise<void> => {
+const validateTransactionsDTOLength = async (req: Request<{}, {}, TransactionDTO[]>, res: Response<ValidationDTO | ErrorDTO>, next: NextFunction): Promise<void> => {
   try {
-    const { minFee } = req.body;
+    const transactionsDTO: TransactionDTO[] = req.body;
 
-    const selectedTransactions = MempoolTransactionsSelection.selectMempoolTransactionsByFee(minFee);
+    const data: ValidationDTO = TransactionsDTOValidation.validateStructureLength(transactionsDTO);
 
-    req.body.selectedTransactions = selectedTransactions;
+    if (!data.result) {
+      res.status(400).send(data);
+      return;
+    }
 
     next();
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
+    const errorMessage: string = error instanceof Error ? error.message : 'Unexpected error.';
+
+    res.status(500).send({ type: 'Server Error', code: 50, message: errorMessage });
+    return;
+  }
+};
+
+const validateEachTransactionDTO = async (req: Request<{}, {}, TransactionDTO[]>, res: Response<ValidationDTO | ErrorDTO>, next: NextFunction): Promise<void> => {
+  try {
+    const transactionsDTO: TransactionDTO[] = req.body;
+
+    const data: ValidationDTO = TransactionsDTOValidation.validateAll(transactionsDTO);
+
+    if (!data.result) {
+      res.status(400).send(data);
+      return;
+    }
+
+    next();
+  } catch (error) {
+    const errorMessage: string = error instanceof Error ? error.message : 'Unexpected error.';
 
     res.status(500).send({ type: 'Server Error', code: 50, message: errorMessage });
     return;
@@ -41,6 +64,7 @@ const selectMempoolTransactionsByMinFee = async (req: Request<{}, {}, MineBlockD
 };
 
 export default {
-  validateMempoolTransactionsByMinFee,
-  selectMempoolTransactionsByMinFee,
+  validateTransactionsDTO,
+  validateTransactionsDTOLength,
+  validateEachTransactionDTO,
 };

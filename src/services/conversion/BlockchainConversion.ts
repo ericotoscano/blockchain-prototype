@@ -1,59 +1,22 @@
-import { BlockMiningType } from '../../types/block.types';
 import { IBlockchain } from '../../types/blockchain.types';
 import { BlockConversionType, NodeConversionType, TransactionConversionType } from '../../types/conversion.types';
-import {
-  BlockCreationType,
-  HashCreationType,
-  KeyCreationType,
-  NodeAddressCreationType,
-  NodeUrlCreationType,
-  RewardTransactionCreationType,
-  TransactionIdCreationType,
-} from '../../types/creation.types';
+import { CreateBlockchainDependenciesType } from '../../types/dependencies.types';
 import { BlockDTO, CreateBlockchainDTO, BlockchainDTO, NodeDTO, TransactionDTO } from '../../types/dto.types';
-import { TargetManagementType } from '../../types/management.types';
-import { TransactionCalculationType } from '../../types/transaction.types';
 import { BlockchainCreation } from '../creation/BlockchainCreation';
 
 export class BlockchainConversion {
-  static convertToClass(
-    blockchainDTO: CreateBlockchainDTO,
-    targetManagement: TargetManagementType,
-    transactionCalculation: TransactionCalculationType,
-    transactionIdCreation: TransactionIdCreationType,
-    rewardTransactionCreation: RewardTransactionCreationType,
-    blockMining: BlockMiningType,
-    blockCreation: BlockCreationType,
-    nodeUrlCreation: NodeUrlCreationType,
-    nodeAddressCreation: NodeAddressCreationType,
-    keyCurveOption: string,
-    keyCreation: KeyCreationType,
-    mainHashCreation: HashCreationType,
-    secondHashCreation: HashCreationType
-  ): IBlockchain {
-    const { targetZeros, reward, maxTransactionsPerBlock }: CreateBlockchainDTO = blockchainDTO;
+  static convertToClass(createBlockchainDTO: CreateBlockchainDTO, dependencies: CreateBlockchainDependenciesType): IBlockchain {
+    const { targetZeros, reward, maxTransactionsPerBlock } = createBlockchainDTO;
 
-    return BlockchainCreation.create(
-      targetZeros,
-      targetManagement,
-      reward,
-      maxTransactionsPerBlock,
-      transactionCalculation,
-      transactionIdCreation,
-      rewardTransactionCreation,
-      blockMining,
-      blockCreation,
-      nodeUrlCreation,
-      nodeAddressCreation,
-      keyCurveOption,
-      keyCreation,
-      mainHashCreation,
-      secondHashCreation
-    );
+    return BlockchainCreation.create(targetZeros, reward, maxTransactionsPerBlock, dependencies);
   }
-
-  static convertToDTO(blockchain: IBlockchain, blockConversion: BlockConversionType, transactionConversion: TransactionConversionType, nodeConversion: NodeConversionType): BlockchainDTO {
+//ARRUMAR ESSE NEGOCIO DE DEPENDENCIES
+  static convertToDTO(
+    blockchain: IBlockchain,
+    dependencies: { nodeConversion: NodeConversionType; blockConversion: BlockConversionType; transactionConversion: TransactionConversionType }
+  ): BlockchainDTO {
     const { target, reward, maxTransactionsPerBlock, node, mempool, blocks } = blockchain;
+    const { nodeConversion, blockConversion, transactionConversion } = dependencies;
 
     const nodeDTO: NodeDTO = nodeConversion.convertToDTO(node);
 

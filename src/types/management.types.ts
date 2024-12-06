@@ -1,6 +1,14 @@
 import { IBlock } from './block.types';
+import { IBlockchain } from './blockchain.types';
+import { AddBlockDependenciesType } from './dependencies.types';
+import { BlockDTO } from './dto.types';
 import { IConnectedNode, INode } from './node.types';
 import { ITransaction } from './transaction.types';
+
+export interface IBlockchainManagement {
+  readonly blockchain: IBlockchain;
+  addBlock(blockDTO: BlockDTO, dependencies: AddBlockDependenciesType): void
+}
 
 export interface INodeManagement {
   readonly node: INode;

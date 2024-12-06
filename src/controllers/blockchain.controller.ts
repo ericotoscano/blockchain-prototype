@@ -22,26 +22,16 @@ import { IBlockchain } from '../types/blockchain.types';
 import { TransactionCalculation } from '../services/calculation/TransacionCalculation';
 import { TransactionIdCreation } from '../services/creation/TransactionIdCreation';
 import { RewardTransactionCreation } from '../services/creation/RewardTransactionCreation';
+import { DependenciesCreation } from '../services/creation/DependenciesCreation';
+import { CreateBlockchainDependenciesType } from '../types/dependencies.types';
 
 const createBlockchain = async (req: Request<{}, {}, CreateBlockchainDTO>, res: Response<ResponseDTO<BlockchainDTO> | ErrorDTO>): Promise<void> => {
   try {
     const createBlockchainDTO: CreateBlockchainDTO = req.body;
 
-    const blockchain: IBlockchain = BlockchainConversion.convertToClass(
-      createBlockchainDTO,
-      TargetManagement,
-      TransactionCalculation,
-      TransactionIdCreation,
-      RewardTransactionCreation,
-      BlockMining,
-      BlockCreation,
-      LocalHostNodeUrlCreation,
-      LocalHostNodeAddressCreation,
-      'secp256k1',
-      KeyCreation,
-      Sha256HashCreation,
-      Ripemd160HashCreation
-    );
+    const dependencies: CreateBlockchainDependenciesType = DependenciesCreation.createBlockchain();
+
+    const blockchain: IBlockchain = BlockchainConversion.convertToClass(createBlockchainDTO, dependencies);
 
     GlobalManagement.setBlockchain(blockchain);
 

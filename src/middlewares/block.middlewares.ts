@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 
 import { Sha256HashCreation } from '../utils/creation/Sha256HashCreation';
 
-import { BlockDTO, ErrorDTO, GetTransactionsToMineBlockDTO, ValidationDTO } from '../types/dto.types';
+import { BlockDTO, ErrorDTO, ValidationDTO } from '../types/dto.types';
 import { BlockDTOValidation } from '../services/validation/block/BlockDTOValidation';
 import { BlockHeightValidation } from '../services/validation/block/BlockHeightValidation';
 import { BlockHashValidation } from '../services/validation/block/BlockHashValidation';
@@ -13,9 +13,9 @@ import { BlockMiningValidation } from '../services/validation/block/BlockMiningV
 
 const validateBlockDTO = async (req: Request<{}, {}, BlockDTO>, res: Response<ValidationDTO | ErrorDTO>, next: NextFunction): Promise<void> => {
   try {
-    const block: BlockDTO = req.body;
+    const blockDTO: BlockDTO = req.body;
 
-    const data: ValidationDTO = BlockDTOValidation.validateKeys(block);
+    const data: ValidationDTO = BlockDTOValidation.validateKeys(blockDTO);
 
     if (!data.result) {
       res.status(400).send(data);
@@ -153,14 +153,34 @@ const validateBlockTransactions = async (req: Request<{}, {}, BlockDTO>, res: Re
   }
 };
 
-const validateBlockTransactionsMinFee = async (req: Request<{}, {}, GetTransactionsToMineBlockDTO>, res: Response<ValidationDTO | ErrorDTO>, next: NextFunction): Promise<void> => {
+const validateBlockTransactionsMinFee = async (req: Request<{}, {}, MineBlockDTO>, res: Response<ValidationDTO | ErrorDTO>, next: NextFunction): Promise<void> => {
   try {
-    const { minFee }: GetTransactionsToMineBlockDTO = req.body;
+    const { minFee }: MineBlockDTO = req.body;
 
     const data = BlockMiningValidation.validateMinFeeFormat(minFee);
 
     if (!data.result) {
       res.status(400).send(data);
+      return;
+    }
+
+    next();
+  } catch (error) {
+    const errorMessage: string = error instanceof Error ? error.message : 'Unexpected error.';
+
+    res.status(500).send({ type: 'Server Error', code: 50, message: errorMessage });
+    return;
+  }
+};
+
+const validateMempoolTransactions = async (req: Request<{}, {}, MineBlockDTO>, res: Response<ValidationDTO | ErrorDTO>, next: NextFunction): Promise<void> => {
+  try {
+    const { minFee }: MineBlockDTO = req.body;
+
+    const data = BlockMiningValidation.validateMempoolTransactionsByFee(minFee);
+
+    if (!data.result) {
+      res.status(404).send(data);
       return;
     }
 
@@ -181,5 +201,4 @@ export default {
   validateBlockPreviousHash,
   validateBlockTimestamp,
   validateBlockTransactions,
-  validateBlockTransactionsMinFee,
 };

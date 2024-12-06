@@ -1,7 +1,9 @@
 import { Block } from '../../models/Block';
+
 import { BlockMiningType, IBlock, MineBlockResultsType } from '../../types/block.types';
 import { HashCreationType, RewardTransactionCreationType, TransactionIdCreationType } from '../../types/creation.types';
 import { ITransaction, TransactionCalculationType } from '../../types/transaction.types';
+
 import { BlockTransactionsManagement } from '../management/BlockTransactionsManagement';
 
 export class BlockCreation {
@@ -9,16 +11,20 @@ export class BlockCreation {
     height: number,
     previousHash: string,
     transactions: ITransaction[],
-    transactionCalculation: TransactionCalculationType,
-    transactionIdCreation: TransactionIdCreationType,
-    rewardTransactionCreation: RewardTransactionCreationType,
     target: string,
-    blockMining: BlockMiningType,
-    hashCreation: HashCreationType,
+    dependencies: {
+      transactionCalculation: TransactionCalculationType;
+      transactionIdCreation: TransactionIdCreationType;
+      rewardTransactionCreation: RewardTransactionCreationType;
+      blockMining: BlockMiningType;
+      hashCreation: HashCreationType;
+    },
     nonce?: number,
     hash?: string,
     timestamp?: number
   ): IBlock {
+    const { transactionCalculation, transactionIdCreation, rewardTransactionCreation, blockMining, hashCreation } = dependencies;
+
     const blockNonce: number = nonce ?? 0;
     const blockHash: string = hash ?? '';
     const blockTimestamp: number = timestamp ?? Date.now();

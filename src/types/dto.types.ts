@@ -1,10 +1,4 @@
-import { ITransaction } from './transaction.types';
-
-export type CreateBlockchainDTO = {
-  targetZeros: number;
-  reward: number;
-  maxTransactionsPerBlock: number;
-};
+import { TransactionStatusType } from './transaction.types';
 
 export type BlockchainDTO = {
   target: string;
@@ -15,8 +9,10 @@ export type BlockchainDTO = {
   blocks: BlockDTO[];
 };
 
-export type AddBlockDTO = {
-  chainLength: number;
+export type CreateBlockchainDTO = {
+  targetZeros: number;
+  reward: number;
+  maxTransactionsPerBlock: number;
 };
 
 export type BlockDTO = {
@@ -25,6 +21,20 @@ export type BlockDTO = {
   hash: string;
   previousHash: string;
   transactions: TransactionDTO[];
+  timestamp: number;
+};
+
+export type AddBlockDTO = {
+  blockHeight: number;
+};
+
+export type TransactionDTO = {
+  sender: string;
+  recipient: string;
+  amount: number;
+  fee: number;
+  txId: string;
+  status: TransactionStatusType;
   timestamp: number;
 };
 
@@ -38,12 +48,6 @@ export type ConnectedNodeDTO = {
   nodeUrl: string;
   nodeAddress: string;
 };
-
-export type GetTransactionsToMineBlockDTO = {
-  minFee: number;
-};
-
-export type TransactionDTO = Omit<ITransaction, 'setStatus'>;
 
 export type ResponseDTO<T> = {
   type: string;
