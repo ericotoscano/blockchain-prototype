@@ -1,5 +1,5 @@
 import { BlockMiningType } from './block.types';
-import { TransactionConversionType } from './conversion.types';
+import { BlockConversionType, NodeConversionType, TransactionConversionType } from './conversion.types';
 import { BlockCreationType, HashCreationType, KeyCreationType, NodeAddressCreationType, NodeUrlCreationType, RewardTransactionCreationType, TransactionIdCreationType } from './creation.types';
 import { TargetManagementType } from './management.types';
 import { TransactionCalculationType } from './transaction.types';
@@ -17,6 +17,12 @@ export type CreateBlockchainDependenciesType = {
   transactionCalculation: TransactionCalculationType;
   transactionIdCreation: TransactionIdCreationType;
   rewardTransactionCreation: RewardTransactionCreationType;
+};
+
+export type BlockchainConversionDependenciesType = {
+  nodeConversion: NodeConversionType;
+  blockConversion: BlockConversionType;
+  transactionConversion: TransactionConversionType;
 };
 
 export type AddBlockDependenciesType = {

@@ -2,23 +2,13 @@ import { BlockMiningType, IBlock } from './block.types';
 import { ITransaction, TransactionCalculationType } from './transaction.types';
 import { BlockDTO, BlockchainDTO, CreateBlockchainDTO, NodeDTO, TransactionDTO } from './dto.types';
 import { INode } from './node.types';
-import { TargetManagementType } from './management.types';
-import { BlockCreationType, HashCreationType, KeyCreationType, NodeAddressCreationType, NodeUrlCreationType, RewardTransactionCreationType, TransactionIdCreationType } from './creation.types';
+import { HashCreationType, RewardTransactionCreationType, TransactionIdCreationType } from './creation.types';
 import { IBlockchain } from './blockchain.types';
+import { BlockchainConversionDependenciesType, CreateBlockchainDependenciesType } from './dependencies.types';
 
 export type BlockchainConversionType = {
-  convertToClass(
-    createBlockchainDTO: CreateBlockchainDTO,
-    targetManagement: TargetManagementType,
-    keyDependencies: { keyCurveOption: string; keyCreation: KeyCreationType; mainHashCreation: HashCreationType; secondHashCreation: HashCreationType },
-    nodeDependencies: { nodeUrlCreation: NodeUrlCreationType; nodeAddressCreation: NodeAddressCreationType },
-    blockDependencies: { blockMining: BlockMiningType; blockCreation: BlockCreationType },
-    transactionDependencies: { transactionCalculation: TransactionCalculationType; transactionIdCreation: TransactionIdCreationType; rewardTransactionCreation: RewardTransactionCreationType }
-  ): IBlockchain;
-  convertToDTO(
-    blockchain: IBlockchain,
-    conversionDependencies: { nodeConversion: NodeConversionType; blockConversion: BlockConversionType; transactionConversion: TransactionConversionType }
-  ): BlockchainDTO;
+  convertToClass(createBlockchainDTO: CreateBlockchainDTO, createBlockchainDependencies: CreateBlockchainDependenciesType): IBlockchain;
+  convertToDTO(blockchain: IBlockchain, blockchainConversionDependencies: BlockchainConversionDependenciesType): BlockchainDTO;
 };
 
 export type BlockConversionType = {
