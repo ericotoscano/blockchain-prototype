@@ -1,42 +1,59 @@
-import { ec as EC } from 'elliptic';
+import { ec as EC } from "elliptic";
 
-import { IBlockchain } from './blockchain.types';
-import { BlockMiningType, IBlock } from './block.types';
-import { ITransaction, TransactionCalculationType } from './transaction.types';
-import { TargetManagementType } from './management.types';
-import { INode } from './node.types';
-import { AddBlockDTO } from './dto.types';
+import { IBlockchain } from "./blockchain.types";
+import { IBlock } from "./block.types";
+import {
+  ITransaction,
+  TransactionCalculationType,
+  TransactionStatusType,
+} from "./transaction.types";
+import { INode } from "./node.types";
+import { AddBlockDTO } from "./dto.types";
+import {
+  KeyDependenciesType,
+  MiningDependenciesType,
+  NodeDependenciesType,
+  TransactionDependenciesType,
+} from "./dependencies.types";
 
 export type BlockchainCreationType = {
   create(
     targetZeros: number,
-    targetManagement: TargetManagementType,
     reward: number,
     maxTransactionsPerBlock: number,
-    blockMining: BlockMiningType,
-    blockCreation: BlockCreationType,
-    nodeUrlCreation: NodeUrlCreationType,
-    nodeAddressCreation: NodeAddressCreationType,
-    keyCurveOption: string,
-    keyCreation: KeyCreationType,
-    mainHashCreation: HashCreationType,
-    addressHashCreation: HashCreationType
+    nodeDependencies: NodeDependenciesType,
+    keyDependencies: KeyDependenciesType,
+    miningDependencies: MiningDependenciesType,
+    transactionDependencies: Omit<
+      TransactionDependenciesType,
+      "transactionConversion" | "transactionCreation"
+    >
   ): IBlockchain;
+};
+
+export type TransactionCreationType = {
+  create(
+    sender: string,
+    recipient: string,
+    amount: number,
+    fee: number,
+    transactionIdCreation: TransactionIdCreationType,
+    hashCreation: HashCreationType,
+    txId?: string,
+    status?: TransactionStatusType,
+    timestamp?: number
+  ): ITransaction;
 };
 
 export type NodeCreationType = {
   create(
-    nodeUrlCreation: NodeUrlCreationType,
-    nodeAddressCreation: NodeAddressCreationType,
-    keyCurveOption: string,
-    keyCreation: KeyCreationType,
-    mainHashCreation: HashCreationType,
-    addressHashCreation: HashCreationType
+    keyDependencies: KeyDependenciesType,
+    nodeDependencies: NodeDependenciesType
   ): INode;
 };
 
 export type NodeAddressCreationType = {
-  create(data: string, keyCurveOption: string, keyCreation: KeyCreationType, mainHashCreation: HashCreationType, finalHashCreation: HashCreationType): string;
+  create(data: string, keyDependencies: KeyDependenciesType): string;
 };
 
 export type NodeUrlCreationType = {
@@ -48,12 +65,15 @@ export type BlockCreationType = {
     height: number,
     previousHash: string,
     transactions: ITransaction[],
-    transactionCalculation: TransactionCalculationType,
-    transactionIdCreation: TransactionIdCreationType,
-    rewardTransactionCreation: RewardTransactionCreationType,
     target: string,
-    blockMining: BlockMiningType,
-    hashCreation: HashCreationType
+    transactionDependencies: Omit<
+      TransactionDependenciesType,
+      "transactionConversion" | "transactionCreation"
+    >,
+    miningDependencies: Omit<
+      MiningDependenciesType,
+      "targetManagement" | "blockCreation"
+    >
   ): IBlock;
 };
 
@@ -66,7 +86,12 @@ export type TransactionIdCreationType = {
 };
 
 export type RewardTransactionCreationType = {
-  create(blockTransactions: ITransaction[], transactionCalculation: TransactionCalculationType, hashCreation: HashCreationType, transactionIdCreation: TransactionIdCreationType): ITransaction;
+  create(
+    blockTransactions: ITransaction[],
+    transactionIdCreation: TransactionIdCreationType,
+    transactionCalculation: TransactionCalculationType,
+    hashCreation: HashCreationType
+  ): ITransaction;
 };
 
 export type HashCreationType = {

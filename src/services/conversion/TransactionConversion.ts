@@ -1,20 +1,48 @@
-import { HashCreationType, TransactionIdCreationType } from '../../types/creation.types';
-import { TransactionDTO } from '../../types/dto.types';
-import { ITransaction } from '../../types/transaction.types';
-import { TransactionCreation } from '../creation/TransactionCreation';
+import {
+  HashCreationType,
+  TransactionIdCreationType,
+} from "../../types/creation.types";
+import { TransactionDTO } from "../../types/dto.types";
+import { ITransaction } from "../../types/transaction.types";
+import { TransactionCreation } from "../creation/TransactionCreation";
 
 export class TransactionConversion {
-  static convertToClass(transactionDTO: TransactionDTO, creationDependencies: { hashCreation: HashCreationType; transactionIdCreation: TransactionIdCreationType }): ITransaction {
-    const { sender, recipient, amount, fee, txId, status, timestamp } = transactionDTO;
+  static convertToClass(
+    transactionDTO: TransactionDTO,
+    transactionIdCreation: TransactionIdCreationType,
+    hashCreation: HashCreationType
+  ): ITransaction {
+    const { sender, recipient, amount, fee, txId, status, timestamp } =
+      transactionDTO;
 
-    return TransactionCreation.create(sender, recipient, amount, fee, creationDependencies, txId, status, timestamp);
+    return TransactionCreation.create(
+      sender,
+      recipient,
+      amount,
+      fee,
+      transactionIdCreation,
+      hashCreation,
+      txId,
+      status,
+      timestamp
+    );
   }
 
-  static convertAllToClass(transactionsDTO: TransactionDTO[], creationDependencies: { hashCreation: HashCreationType; transactionIdCreation: TransactionIdCreationType }): ITransaction[] {
+  static convertAllToClass(
+    transactionsDTO: TransactionDTO[],
+    transactionIdCreation: TransactionIdCreationType,
+    hashCreation: HashCreationType
+  ): ITransaction[] {
     const transactions: ITransaction[] = [];
 
     for (const transaction of transactionsDTO) {
-      transactions.push(TransactionConversion.convertToClass(transaction, creationDependencies));
+      transactions.push(
+        TransactionConversion.convertToClass(
+          transaction,
+          transactionIdCreation,
+          hashCreation
+        )
+      );
     }
 
     return transactions;

@@ -1,6 +1,12 @@
-import { Transaction } from '../../models/Transaction';
-import { HashCreationType, TransactionIdCreationType } from '../../types/creation.types';
-import { ITransaction, TransactionStatusType } from '../../types/transaction.types';
+import { Transaction } from "../../models/Transaction";
+import {
+  HashCreationType,
+  TransactionIdCreationType,
+} from "../../types/creation.types";
+import {
+  ITransaction,
+  TransactionStatusType,
+} from "../../types/transaction.types";
 
 export class TransactionCreation {
   static create(
@@ -8,21 +14,29 @@ export class TransactionCreation {
     recipient: string,
     amount: number,
     fee: number,
-    creationDependencies: { hashCreation: HashCreationType; transactionIdCreation: TransactionIdCreationType },
+    transactionIdCreation: TransactionIdCreationType,
+    hashCreation: HashCreationType,
     txId?: string,
     status?: TransactionStatusType,
     timestamp?: number
   ): ITransaction {
-    const { hashCreation, transactionIdCreation } = creationDependencies;
-    
-    const transactionStatus = status ?? 'Pending';
+    const transactionStatus = status ?? "Pending";
 
     const transactionTimestamp = timestamp ?? Date.now();
 
     const transactionData = `${sender}${recipient}${amount}${fee}${timestamp}`;
 
-    const transactionId = txId ?? transactionIdCreation.create(transactionData, hashCreation);
+    const transactionId =
+      txId ?? transactionIdCreation.create(transactionData, hashCreation);
 
-    return new Transaction(sender, recipient, amount, fee, transactionId, transactionStatus, transactionTimestamp);
+    return new Transaction(
+      sender,
+      recipient,
+      amount,
+      fee,
+      transactionId,
+      transactionStatus,
+      transactionTimestamp
+    );
   }
 }

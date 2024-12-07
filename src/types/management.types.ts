@@ -1,13 +1,26 @@
-import { IBlock } from './block.types';
-import { IBlockchain } from './blockchain.types';
-import { AddBlockDependenciesType } from './dependencies.types';
-import { BlockDTO } from './dto.types';
-import { IConnectedNode, INode } from './node.types';
-import { ITransaction } from './transaction.types';
+import { IBlock } from "./block.types";
+import { IBlockchain } from "./blockchain.types";
+import {
+  MiningDependenciesType,
+  TransactionDependenciesType,
+} from "./dependencies.types";
+import { BlockDTO } from "./dto.types";
+import { IConnectedNode, INode } from "./node.types";
+import { ITransaction } from "./transaction.types";
 
 export interface IBlockchainManagement {
   readonly blockchain: IBlockchain;
-  addBlock(blockDTO: BlockDTO, dependencies: AddBlockDependenciesType): void
+  addBlock(
+    blockDTO: BlockDTO,
+    transactionDependencies: Omit<
+      TransactionDependenciesType,
+      "transactionCreation"
+    >,
+    miningDependencies: Omit<
+      MiningDependenciesType,
+      "targetManagement" | "blockCreation"
+    >
+  ): void;
 }
 
 export interface INodeManagement {

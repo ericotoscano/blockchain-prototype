@@ -1,21 +1,21 @@
-import { Node } from '../../models/Node';
-
-import { HashCreationType, KeyCreationType, NodeAddressCreationType, NodeUrlCreationType } from '../../types/creation.types';
-import { IConnectedNode, INode } from '../../types/node.types';
+import { Node } from "../../models/Node";
+import {
+  KeyDependenciesType,
+  NodeDependenciesType,
+} from "../../types/dependencies.types";
+import { IConnectedNode, INode } from "../../types/node.types";
 
 export class NodeCreation {
   static create(
-    nodeUrlCreation: NodeUrlCreationType,
-    nodeAddressCreation: NodeAddressCreationType,
-    keyCurveOption: string,
-    keyCreation: KeyCreationType,
-    mainHashCreation: HashCreationType,
-    addressHashCreation: HashCreationType,
+    keyDependencies: KeyDependenciesType,
+    nodeDependencies: NodeDependenciesType,
     connectedNodes?: IConnectedNode[]
   ): INode {
+    const { nodeAddressCreation, nodeUrlCreation } = nodeDependencies;
+
     const nodeUrl = nodeUrlCreation.create();
 
-    const nodeAddress = nodeAddressCreation.create(nodeUrl, keyCurveOption, keyCreation, mainHashCreation, addressHashCreation);
+    const nodeAddress = nodeAddressCreation.create(nodeUrl, keyDependencies);
 
     const networkNodes = connectedNodes ?? [];
 

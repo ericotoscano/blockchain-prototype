@@ -1,45 +1,71 @@
-import { BlockMiningType, IBlock } from './block.types';
-import { ITransaction, TransactionCalculationType } from './transaction.types';
-import { BlockDTO, BlockchainDTO, CreateBlockchainDTO, NodeDTO, TransactionDTO } from './dto.types';
-import { INode } from './node.types';
-import { HashCreationType, RewardTransactionCreationType, TransactionIdCreationType } from './creation.types';
-import { IBlockchain } from './blockchain.types';
-import { BlockchainConversionDependenciesType, CreateBlockchainDependenciesType } from './dependencies.types';
+import { IBlockchain } from "./blockchain.types";
+import { INode } from "./node.types";
+import { IBlock } from "./block.types";
+import { ITransaction } from "./transaction.types";
+import {
+  BlockDTO,
+  BlockchainDTO,
+  CreateBlockchainDTO,
+  NodeDTO,
+  TransactionDTO,
+} from "./dto.types";
+import { HashCreationType, TransactionIdCreationType } from "./creation.types";
+import {
+  BlockchainConversionDependenciesType,
+  KeyDependenciesType,
+  MiningDependenciesType,
+  NodeDependenciesType,
+  TransactionDependenciesType,
+} from "./dependencies.types";
 
 export type BlockchainConversionType = {
-  convertToClass(createBlockchainDTO: CreateBlockchainDTO, createBlockchainDependencies: CreateBlockchainDependenciesType): IBlockchain;
-  convertToDTO(blockchain: IBlockchain, blockchainConversionDependencies: BlockchainConversionDependenciesType): BlockchainDTO;
+  convertToClass(
+    createBlockchainDTO: CreateBlockchainDTO,
+    nodeDependencies: NodeDependenciesType,
+    keyDependencies: KeyDependenciesType,
+    miningDependencies: MiningDependenciesType,
+    transactionDependencies: Omit<
+      TransactionDependenciesType,
+      "transactionConversion" | "transactionCreation"
+    >
+  ): IBlockchain;
+  convertToDTO(
+    blockchain: IBlockchain,
+    blockchainConversionDependencies: BlockchainConversionDependenciesType
+  ): BlockchainDTO;
 };
 
 export type BlockConversionType = {
   convertToClass(
     blockDTO: BlockDTO,
-    transactionDependencies: {
-      transactionConversion: TransactionConversionType;
-      transactionCalculation: TransactionCalculationType;
-      transactionIdCreation: TransactionIdCreationType;
-      rewardTransactionCreation: RewardTransactionCreationType;
-    },
-    miningDependencies: {
-      blockMining: BlockMiningType;
-      hashCreation: HashCreationType;
-    }
+    transactionDependencies: Omit<
+      TransactionDependenciesType,
+      "transactionCreation"
+    >,
+    miningDependencies: Omit<
+      MiningDependenciesType,
+      "targetManagement" | "blockCreation"
+    >
   ): IBlock;
   convertAllToClass(
     blocksDTO: BlockDTO[],
-    transactionDependencies: {
-      transactionConversion: TransactionConversionType;
-      transactionCalculation: TransactionCalculationType;
-      transactionIdCreation: TransactionIdCreationType;
-      rewardTransactionCreation: RewardTransactionCreationType;
-    },
-    miningDependencies: {
-      blockMining: BlockMiningType;
-      hashCreation: HashCreationType;
-    }
+    transactionDependencies: Omit<
+      TransactionDependenciesType,
+      "transactionCreation"
+    >,
+    miningDependencies: Omit<
+      MiningDependenciesType,
+      "targetManagement" | "blockCreation"
+    >
   ): IBlock[];
-  convertToDTO(block: IBlock, transactionConversion: TransactionConversionType): BlockDTO;
-  convertAllToDTO(blocks: IBlock[], transactionConversion: TransactionConversionType): BlockDTO[];
+  convertToDTO(
+    block: IBlock,
+    transactionConversion: TransactionConversionType
+  ): BlockDTO;
+  convertAllToDTO(
+    blocks: IBlock[],
+    transactionConversion: TransactionConversionType
+  ): BlockDTO[];
 };
 
 export type NodeConversionType = {
@@ -47,8 +73,16 @@ export type NodeConversionType = {
 };
 
 export type TransactionConversionType = {
-  convertToClass(transactionDTO: TransactionDTO, creationDependencies: { hashCreation: HashCreationType; transactionIdCreation: TransactionIdCreationType }): ITransaction;
-  convertAllToClass(transactionsDTO: TransactionDTO[], creationDependencies: { hashCreation: HashCreationType; transactionIdCreation: TransactionIdCreationType }): ITransaction[];
+  convertToClass(
+    transactionDTO: TransactionDTO,
+    transactionIdCreation: TransactionIdCreationType,
+    hashCreation: HashCreationType
+  ): ITransaction;
+  convertAllToClass(
+    transactionsDTO: TransactionDTO[],
+    transactionIdCreation: TransactionIdCreationType,
+    hashCreation: HashCreationType
+  ): ITransaction[];
   convertToDTO(transaction: ITransaction): TransactionDTO;
   convertAllToDTO(transactions: ITransaction[]): TransactionDTO[];
 };
