@@ -1,78 +1,62 @@
 import { Request, Response } from 'express';
+import { ResponseDTO, ErrorDTO, BlockchainDTOInput, BlockchainDTOOutput } from '../types/dto.types';
+import { BlockchainConversion } from '../services/blockchain/conversion/BlockchainConversion';
+import { BlockConversion } from '../services/block/conversion/BlockConversion';
+import { TransactionConversion } from '../services/transaction/conversion/TransactionConversion';
+import { NodeConversion } from '../services/node/conversion/NodeConversion';
+import { BlockchainManagement } from '../services/blockchain/management/BlockchainManagement';
+import { IBlockchain } from '../types/BlockchainType';
+import { CreateBlockchainDependenciesType } from '../services/blockchain/dependencies/creation/types/BlockchainDependenciesCreationType';
+import { BlockchainDependenciesCreation } from '../services/blockchain/dependencies/creation/BlockchainDependenciesCreation';
 
-import { ResponseDTO, ErrorDTO, BlockchainDTO, CreateBlockchainDTO } from '../types/dto.types';
-
-import { BlockMining } from '../services/mining/BlockMining';
-
-import { GlobalManagement } from '../services/management/GlobalManagement';
-import { TargetManagement } from '../services/management/TargetManagement';
-
-import { BlockchainConversion } from '../services/conversion/BlockchainConversion';
-import { BlockConversion } from '../services/conversion/BlockConversion';
-import { TransactionConversion } from '../services/conversion/TransactionConversion';
-import { NodeConversion } from '../services/conversion/NodeConversion';
-
-import { BlockCreation } from '../services/creation/BlockCreation';
-import { LocalHostNodeUrlCreation } from '../services/creation/NodeUrlCreation';
-import { LocalHostNodeAddressCreation } from '../services/creation/NodeAddressCreation';
-import { KeyCreation } from '../utils/creation/KeyCreation';
-import { Ripemd160HashCreation } from '../utils/creation/Ripmed160HashCreation';
-import { Sha256HashCreation } from '../utils/creation/Sha256HashCreation';
-import { IBlockchain } from '../types/blockchain.types';
-import { TransactionCalculation } from '../services/calculation/TransacionCalculation';
-import { TransactionIdCreation } from '../services/creation/TransactionIdCreation';
-import { RewardTransactionCreation } from '../services/creation/RewardTransactionCreation';
-import { DependenciesCreation } from '../services/creation/DependenciesCreation';
-import { CreateBlockchainDependenciesType } from '../types/dependencies.types';
-
-const createBlockchain = async (req: Request<{}, {}, CreateBlockchainDTO>, res: Response<ResponseDTO<BlockchainDTO> | ErrorDTO>): Promise<void> => {
+const createBlockchain = async (req: Request<{}, {}, BlockchainDTOInput>, res: Response<ResponseDTO<BlockchainDTOOutput> | ErrorDTO>): Promise<void> => {
   try {
-    const createBlockchainDTO: CreateBlockchainDTO = req.body;
+    const BlockchainDTOInput: BlockchainDTOInput = req.body;
 
-    const dependencies: CreateBlockchainDependenciesType = DependenciesCreation.createBlockchain();
+    const { nodeDependencies, keyDependencies, miningDependencies, transactionDependencies }: CreateBlockchainDependenciesType = BlockchainDependenciesCreation.createBlockchain();
 
-    const blockchain: IBlockchain = BlockchainConversion.convertToClass(createBlockchainDTO, dependencies);
+    const blockchain: IBlockchain = BlockchainConversion.convertToClass(BlockchainDTOInput, nodeDependencies, keyDependencies, miningDependencies, transactionDependencies);
 
-    GlobalManagement.setBlockchain(blockchain);
+    BlockchainManagement.setBlockchain(blockchain);
 
-    const blockchainDTO: BlockchainDTO = BlockchainConversion.convertToDTO(blockchain, BlockConversion, TransactionConversion, NodeConversion);
+    const blockchainDTOOutput: BlockchainDTOOutput = BlockchainConversion.convertToDTO(blockchain, NodeConversion, BlockConversion, TransactionConversion);
 
     res.status(201).send({
       type: 'Create Blockchain',
-      code: 10,
+      code: 1000,
       message: 'The blockchain has been created.',
-      data: blockchainDTO,
+      data: blockchainDTOOutput,
     });
   } catch (error) {
     const errorMessage: string = error instanceof Error ? error.message : 'Unexpected error.';
 
     res.status(500).send({
       type: 'Internal Server Error',
-      code: 99,
+      code: 999,
       message: errorMessage,
     });
     return;
   }
 };
 
-const getBlockchain = async (req: Request, res: Response<ResponseDTO<BlockchainDTO> | ErrorDTO>): Promise<void> => {
+const getBlockchain = async (req: Request, res: Response<ResponseDTO<BlockchainDTOOutput> | ErrorDTO>): Promise<void> => {
   try {
-    const blockchain: IBlockchain = GlobalManagement.getBlockchain();
+    const blockchain: IBlockchain = BlockchainManagement.getBlockchain();
 
-    const blockchainDTO: BlockchainDTO = BlockchainConversion.convertToDTO(blockchain, BlockConversion, TransactionConversion, NodeConversion);
+    const blockchainDTOOutput: BlockchainDTOOutput = BlockchainConversion.convertToDTO(blockchain, NodeConversion, BlockConversion, TransactionConversion);
 
     res.status(200).send({
       type: 'Get Blockchain',
-      code: 11,
+      code: 1100,
       message: 'The blockchain has been found.',
-      data: blockchainDTO,
+      data: blockchainDTOOutput,
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unexpected error.';
 
     res.status(500).send({
-      type: 'Server Error',
-      code: 50,
+      type: 'Internal Server Error',
+      code: 999,
       message: errorMessage,
     });
     return;

@@ -3,12 +3,12 @@ import { Request, Response, NextFunction } from 'express';
 import { Sha256HashCreation } from '../utils/creation/Sha256HashCreation';
 
 import { BlockDTO, ErrorDTO, ValidationDTO } from '../types/dto.types';
-import { BlockDTOValidation } from '../services/validation/block/BlockDTOValidation';
-import { BlockHeightValidation } from '../services/validation/block/BlockHeightValidation';
-import { BlockHashValidation } from '../services/validation/block/BlockHashValidation';
-import { BlockPreviousHashValidation } from '../services/validation/block/BlockPreviousHashValidation';
-import { BlockTransactionsValidation } from '../services/validation/block/BlockTransactionsValidation';
-import { BlockTimestampValidation } from '../services/validation/block/BlockTimestampValidation';
+import { BlockDTOValidation } from '../services/block/validation/BlockDTOValidation';
+import { BlockHeightValidation } from '../services/block/validation/BlockHeightValidation';
+import { BlockHashValidation } from '../services/block/validation/BlockHashValidation';
+import { BlockPreviousHashValidation } from '../services/block/validation/BlockPreviousHashValidation';
+import { BlockTransactionsValidation } from '../services/block/validation/BlockTransactionsValidation';
+import { BlockTimestampValidation } from '../services/block/validation/BlockTimestampValidation';
 import { BlockMiningValidation } from '../services/validation/block/BlockMiningValidation';
 
 const validateBlockDTO = async (req: Request<{}, {}, BlockDTO>, res: Response<ValidationDTO | ErrorDTO>, next: NextFunction): Promise<void> => {

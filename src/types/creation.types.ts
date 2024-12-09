@@ -1,35 +1,10 @@
-import { ec as EC } from "elliptic";
+import { ec as EC } from 'elliptic';
 
-import { IBlockchain } from "./blockchain.types";
-import { IBlock } from "./block.types";
-import {
-  ITransaction,
-  TransactionCalculationType,
-  TransactionStatusType,
-} from "./transaction.types";
-import { INode } from "./node.types";
-import { AddBlockDTO } from "./dto.types";
-import {
-  KeyDependenciesType,
-  MiningDependenciesType,
-  NodeDependenciesType,
-  TransactionDependenciesType,
-} from "./dependencies.types";
-
-export type BlockchainCreationType = {
-  create(
-    targetZeros: number,
-    reward: number,
-    maxTransactionsPerBlock: number,
-    nodeDependencies: NodeDependenciesType,
-    keyDependencies: KeyDependenciesType,
-    miningDependencies: MiningDependenciesType,
-    transactionDependencies: Omit<
-      TransactionDependenciesType,
-      "transactionConversion" | "transactionCreation"
-    >
-  ): IBlockchain;
-};
+import { IBlock } from './block.types';
+import { ITransaction, TransactionCalculationType, TransactionStatusType } from './transaction.types';
+import { INode } from './node.types';
+import { AddBlockDTO } from './dto.types';
+import { KeyDependenciesType, MiningDependenciesType, NodeDependenciesType, TransactionDependenciesType } from './dependencies.types';
 
 export type TransactionCreationType = {
   create(
@@ -46,10 +21,7 @@ export type TransactionCreationType = {
 };
 
 export type NodeCreationType = {
-  create(
-    keyDependencies: KeyDependenciesType,
-    nodeDependencies: NodeDependenciesType
-  ): INode;
+  create(keyDependencies: KeyDependenciesType, nodeDependencies: NodeDependenciesType): INode;
 };
 
 export type NodeAddressCreationType = {
@@ -66,14 +38,8 @@ export type BlockCreationType = {
     previousHash: string,
     transactions: ITransaction[],
     target: string,
-    transactionDependencies: Omit<
-      TransactionDependenciesType,
-      "transactionConversion" | "transactionCreation"
-    >,
-    miningDependencies: Omit<
-      MiningDependenciesType,
-      "targetManagement" | "blockCreation"
-    >
+    transactionDependencies: Omit<TransactionDependenciesType, 'transactionConversion' | 'transactionCreation'>,
+    miningDependencies: Omit<MiningDependenciesType, 'targetManagement' | 'blockCreation'>
   ): IBlock;
 };
 
@@ -86,12 +52,7 @@ export type TransactionIdCreationType = {
 };
 
 export type RewardTransactionCreationType = {
-  create(
-    blockTransactions: ITransaction[],
-    transactionIdCreation: TransactionIdCreationType,
-    transactionCalculation: TransactionCalculationType,
-    hashCreation: HashCreationType
-  ): ITransaction;
+  create(blockTransactions: ITransaction[], transactionIdCreation: TransactionIdCreationType, transactionCalculation: TransactionCalculationType, hashCreation: HashCreationType): ITransaction;
 };
 
 export type HashCreationType = {

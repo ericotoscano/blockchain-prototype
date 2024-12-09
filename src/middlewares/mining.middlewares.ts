@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 
 import { ErrorDTO, TransactionDTO, ValidationDTO } from '../types/dto.types';
-import { TransactionsDTOValidation } from '../services/validation/transactions/TransactionsDTOValidation';
+import { TransactionsDTOValidation } from '../services/transaction/validation/TransactionsDTOValidation';
 
 const validateTransactionsDTO = async (req: Request<{}, {}, TransactionDTO[]>, res: Response<ValidationDTO | ErrorDTO>, next: NextFunction): Promise<void> => {
   try {

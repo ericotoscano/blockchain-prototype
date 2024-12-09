@@ -14,10 +14,10 @@ export interface IBlock {
 }
 
 export type BlockMiningType = {
-  mine(blockData: string, target: string, hashCreation: HashCreationType): MineBlockResultsType;
+  mine(blockData: string, target: string, hashCreation: HashCreationType): MineResultsType;
 };
 
-export type MineBlockResultsType = {
+export type MineResultsType = {
   calculatedHash: string;
   foundNonce: number;
 };

@@ -1,9 +1,6 @@
-import { BlockMiningType } from "./block.types";
-import {
-  BlockConversionType,
-  NodeConversionType,
-  TransactionConversionType,
-} from "./conversion.types";
+import { TargetManagementType } from '../services/blockchain/target/management/types/TargetManagementType';
+import { BlockMiningType } from './block.types';
+import { TransactionConversionType } from './conversion.types';
 import {
   BlockCreationType,
   HashCreationType,
@@ -13,9 +10,9 @@ import {
   RewardTransactionCreationType,
   TransactionCreationType,
   TransactionIdCreationType,
-} from "./creation.types";
-import { TargetManagementType } from "./management.types";
-import { TransactionCalculationType } from "./transaction.types";
+} from './creation.types';
+
+import { TransactionCalculationType } from './transaction.types';
 
 export type KeyDependenciesType = {
   keyCurveOption: string;
@@ -44,29 +41,7 @@ export type TransactionDependenciesType = {
   rewardTransactionCreation: RewardTransactionCreationType;
 };
 
-export type BlockchainConversionDependenciesType = {
-  nodeConversion: NodeConversionType;
-  blockConversion: BlockConversionType;
-  transactionConversion: TransactionConversionType;
-};
-
-export type CreateBlockchainDependenciesType = {
-  nodeDependencies: NodeDependenciesType;
-  keyDependencies: KeyDependenciesType;
-  miningDependencies: Omit<MiningDependenciesType, "hashCreation">;
-  transactionDependencies: Omit<
-    TransactionDependenciesType,
-    "transactionConversion" | "transactionCreation"
-  >;
-};
-
 export type AddBlockDependenciesType = {
-  miningDependencies: Omit<
-    MiningDependenciesType,
-    "targetManagement" | "blockCreation"
-  >;
-  transactionDependencies: Omit<
-    TransactionDependenciesType,
-    "transactionCreation"
-  >;
+  miningDependencies: Omit<MiningDependenciesType, 'targetManagement' | 'blockCreation'>;
+  transactionDependencies: Omit<TransactionDependenciesType, 'transactionCreation'>;
 };

@@ -1,16 +1,16 @@
 import { Request, Response, NextFunction } from 'express';
 
-import { CreateBlockchainDTO, ErrorDTO, ValidationDTO } from '../types/dto.types';
+import { BlockchainDTOInput, ErrorDTO, ValidationDTO } from '../types/dto.types';
 
-import { BlockchainValidation } from '../services/validation/blockchain/BlockchainValidation';
-import { BlockchainDTOValidation } from '../services/validation/blockchain/BlockchainDTOValidation';
-import { BlockchainTargetZerosValidation } from '../services/validation/blockchain/BlockchainTargetZerosValidation';
-import { BlockchainRewardValidation } from '../services/validation/blockchain/BlockchainRewardValidation';
-import { BlockchainMaxTransactionsPerBlockValidation } from '../services/validation/blockchain/BlockchainMaxTransactionsPerBlockValidation';
+import { BlockchainValidation } from '../services/blockchain/validation/BlockchainValidation';
+import { BlockchainDTOInputValidation } from '../services/blockchain/validation/BlockchainDTOInputValidation';
+import { BlockchainTargetZerosValidation } from '../services/blockchain/validation/BlockchainTargetZerosValidation';
+import { BlockchainRewardValidation } from '../services/blockchain/validation/BlockchainRewardValidation';
+import { BlockchainMaxTransactionsPerBlockValidation } from '../services/blockchain/validation/BlockchainMaxTransactionsPerBlockValidation';
 
-const validateBlockchainDTO = async (req: Request<{}, {}, CreateBlockchainDTO>, res: Response<ValidationDTO | ErrorDTO>, next: NextFunction): Promise<void> => {
+const validateBlockchainDTO = async (req: Request<{}, {}, BlockchainDTOInput>, res: Response<ValidationDTO | ErrorDTO>, next: NextFunction): Promise<void> => {
   try {
-    const data: ValidationDTO = BlockchainDTOValidation.validateKeys(req.body);
+    const data: ValidationDTO = BlockchainDTOInputValidation.validateKeys(req.body);
 
     if (!data.result) {
       res.status(404).send(data);
@@ -26,9 +26,9 @@ const validateBlockchainDTO = async (req: Request<{}, {}, CreateBlockchainDTO>, 
   }
 };
 
-const validateTargetZeros = async (req: Request<{}, {}, CreateBlockchainDTO>, res: Response<ValidationDTO | ErrorDTO>, next: NextFunction): Promise<void> => {
+const validateTargetZeros = async (req: Request<{}, {}, BlockchainDTOInput>, res: Response<ValidationDTO | ErrorDTO>, next: NextFunction): Promise<void> => {
   try {
-    const { targetZeros }: CreateBlockchainDTO = req.body;
+    const { targetZeros }: BlockchainDTOInput = req.body;
 
     const data: ValidationDTO = BlockchainTargetZerosValidation.validateFormat(targetZeros);
 
@@ -46,9 +46,9 @@ const validateTargetZeros = async (req: Request<{}, {}, CreateBlockchainDTO>, re
   }
 };
 
-const validateReward = async (req: Request<{}, {}, CreateBlockchainDTO>, res: Response<ValidationDTO | ErrorDTO>, next: NextFunction): Promise<void> => {
+const validateReward = async (req: Request<{}, {}, BlockchainDTOInput>, res: Response<ValidationDTO | ErrorDTO>, next: NextFunction): Promise<void> => {
   try {
-    const { reward }: CreateBlockchainDTO = req.body;
+    const { reward }: BlockchainDTOInput = req.body;
 
     const data: ValidationDTO = BlockchainRewardValidation.validateFormat(reward);
 
@@ -66,9 +66,9 @@ const validateReward = async (req: Request<{}, {}, CreateBlockchainDTO>, res: Re
   }
 };
 
-const validateMaxTransactionsPerBlock = async (req: Request<{}, {}, CreateBlockchainDTO>, res: Response<ValidationDTO | ErrorDTO>, next: NextFunction): Promise<void> => {
+const validateMaxTransactionsPerBlock = async (req: Request<{}, {}, BlockchainDTOInput>, res: Response<ValidationDTO | ErrorDTO>, next: NextFunction): Promise<void> => {
   try {
-    const { maxTransactionsPerBlock }: CreateBlockchainDTO = req.body;
+    const { maxTransactionsPerBlock }: BlockchainDTOInput = req.body;
 
     const data: ValidationDTO = BlockchainMaxTransactionsPerBlockValidation.validateFormat(maxTransactionsPerBlock);
 

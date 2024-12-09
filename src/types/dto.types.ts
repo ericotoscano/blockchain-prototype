@@ -1,18 +1,18 @@
 import { TransactionStatusType } from './transaction.types';
 
-export type BlockchainDTO = {
+export type BlockchainDTOInput = {
+  targetZeros: number;
+  reward: number;
+  maxTransactionsPerBlock: number;
+};
+
+export type BlockchainDTOOutput = {
   target: string;
   reward: number;
   maxTransactionsPerBlock: number;
   node: NodeDTO;
   mempool: TransactionDTO[];
   blocks: BlockDTO[];
-};
-
-export type CreateBlockchainDTO = {
-  targetZeros: number;
-  reward: number;
-  maxTransactionsPerBlock: number;
 };
 
 export type BlockDTO = {

@@ -6,20 +6,20 @@ import '../global';
 import { IBlock } from '../types/block.types';
 import { BlockDTO, ResponseDTO, ErrorDTO, CreateBlockchainResponseDTO, CreateBlockchainRequestDTO } from '../types/dto.types';
 
-import { BlockMining } from '../services/mining/BlockMining';
+import { BlockMining } from '../services/block/mining/BlockMining';
 
 import { GlobalManagement } from '../services/management/GlobalManagement';
-import { TargetManagement } from '../services/management/TargetManagement';
+import { TargetManagement } from '../services/blockchain/target/management/TargetManagement';
 
-import { BlockchainConversion } from '../services/conversion/BlockchainConversion';
-import { BlockConversion } from '../services/conversion/BlockConversion';
-import { TransactionConversion } from '../services/conversion/TransactionConversion';
-import { NodeConversion } from '../services/conversion/NodeConversion';
+import { BlockchainConversion } from '../services/blockchain/conversion/BlockchainConversion';
+import { BlockConversion } from '../services/block/conversion/BlockConversion';
+import { TransactionConversion } from '../services/transaction/conversion/TransactionConversion';
+import { NodeConversion } from '../services/node/conversion/NodeConversion';
 
-import { TransactionIdCreation } from '../services/creation/TransactionIdCreation';
-import { BlockCreation } from '../services/creation/BlockCreation';
-import { LocalHostNodeUrlCreation } from '../services/creation/NodeUrlCreation';
-import { LocalHostNodeAddressCreation } from '../services/creation/NodeAddressCreation';
+import { TransactionIdCreation } from '../services/transaction/creation/TransactionIdCreation';
+import { BlockCreation } from '../services/block/creation/BlockCreation';
+import { LocalHostNodeUrlCreation } from '../services/node/creation/NodeUrlCreation';
+import { LocalHostNodeAddressCreation } from '../services/node/creation/NodeAddressCreation';
 import { KeyCreation } from '../utils/creation/KeyCreation';
 import { Ripemd160HashCreation } from '../utils/creation/Ripmed160HashCreation';
 import { Sha256HashCreation } from '../utils/creation/Sha256HashCreation';
