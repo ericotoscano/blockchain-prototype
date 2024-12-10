@@ -1,4 +1,4 @@
-import { Block } from '../../../models/Block';
+import { Block } from '../../../domain/entities/Block';
 import { ITransaction } from '../../../types/ITransaction';
 import { IBlock } from '../../../types/IBlock';
 import { MiningDependenciesType, TransactionDependenciesType } from '../../../helpers/dependencies/types/DependenciesTypes';
@@ -9,15 +9,15 @@ export class BlockCreation {
   static create(
     height: number,
     previousHash: string,
-    transactions: ITransaction[],
     target: string,
-    transactionDependencies: Omit<TransactionDependenciesType, 'transactionConversion' | 'transactionCreation'>,
+    transactions: ITransaction[],
+    transactionsDependencies: Omit<TransactionDependenciesType, 'transactionConversion' | 'transactionCreation'>,
     miningDependencies: Omit<MiningDependenciesType, 'targetManagement' | 'blockCreation'>,
     nonce?: number,
     hash?: string,
     timestamp?: number
   ): IBlock {
-    const { transactionCalculation, transactionIdCreation, rewardTransactionCreation } = transactionDependencies;
+    const { transactionCalculation, transactionIdCreation, rewardTransactionCreation } = transactionsDependencies;
     const { blockMining, hashCreation } = miningDependencies;
 
     const blockNonce: number = nonce ?? 0;

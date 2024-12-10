@@ -3,11 +3,13 @@ import { ITransaction } from './ITransaction';
 
 export interface IBlock {
   readonly height: number;
-  nonce: number;
-  hash: string;
   readonly previousHash: string;
   readonly timestamp: number;
   readonly transactions: ITransaction[];
   readonly blockTransactionsManagement: IBlockTransactionsManagement;
+  getNonce(): number;
+  getHash(): string;
   getData(): string;
+  setNonce(blockNonce: number): void;
+  setHash(blockHash: string): void;
 }

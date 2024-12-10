@@ -1,4 +1,4 @@
-import { Node } from '../../../models/Node';
+import { Node } from '../../../domain/entities/Node';
 import { KeyDependenciesType, NodeDependenciesType } from '../../../helpers/dependencies/types/DependenciesTypes';
 import { IConnectedNode, INode } from '../../../types/INode';
 

@@ -1,9 +1,10 @@
-import { TransactionDTO, ValidationDTO } from '../../../types/ResponseDTO';
+import { IBlockchain } from '../../../types/IBlockchain';
+import { ValidationDTO } from '../../../types/ResponseDTO';
+import { DTOValidation } from '../../../utils/validation/DTOValidation';
 import { HexStringValidation } from '../../../utils/validation/HexStringValidation';
 import { TimestampValidation } from '../../../utils/validation/TimestampValidation';
-import { IBlockchain } from '../../../types/blockchain.types';
-import { GlobalManagement } from '../../management/GlobalManagement';
-import { DTOKeysValidation } from '../../../utils/validation/DTOValidation';
+import { BlockchainManagement } from '../../blockchain/management/BlockchainManagement';
+import { TransactionDTO } from '../conversion/types/TransactionDTO';
 
 export class TransactionDTOValidation {
   static validateKeys(transactionDTO: TransactionDTO): ValidationDTO {
@@ -13,7 +14,7 @@ export class TransactionDTOValidation {
 
     const requiredKeys: string[] = ['sender', 'recipient', 'amount', 'fee', 'txId', 'status', 'timestamp'];
 
-    const result: boolean = DTOKeysValidation.validate(transactionDTO, requiredKeys);
+    const result: boolean = DTOValidation.validateKeys(transactionDTO, requiredKeys);
 
     return {
       type: TYPE,
@@ -148,7 +149,7 @@ export class TransactionDTOValidation {
 
     const { txId }: TransactionDTO = transactionDTO;
 
-    const { mempool }: IBlockchain = GlobalManagement.getBlockchain();
+    const { mempool }: IBlockchain = BlockchainManagement.getBlockchain();
 
     const result: boolean = mempool.some((mempoolTransaction) => mempoolTransaction.txId === txId);
 

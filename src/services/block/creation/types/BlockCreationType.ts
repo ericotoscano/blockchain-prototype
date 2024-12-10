@@ -6,9 +6,9 @@ export type BlockCreationType = {
   create(
     height: number,
     previousHash: string,
-    transactions: ITransaction[],
     target: string,
-    transactionDependencies: Omit<TransactionDependenciesType, 'transactionConversion' | 'transactionCreation'>,
+    transactions: ITransaction[],
+    transactionsDependencies: Omit<TransactionDependenciesType, 'transactionConversion' | 'transactionCreation'>,
     miningDependencies: Omit<MiningDependenciesType, 'targetManagement' | 'blockCreation'>
   ): IBlock;
 };

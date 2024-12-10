@@ -1,7 +1,9 @@
-import { HashCreationType, TransactionIdCreationType } from '../../../types/creation.types';
-import { TransactionDTO } from '../../../types/ResponseDTO';
+
 import { ITransaction } from '../../../types/ITransaction';
+import { HashCreationType } from '../../../utils/creation/types/HashCreationType';
 import { TransactionCreation } from '../creation/TransactionCreation';
+import { TransactionIdCreationType } from '../creation/types/TransactionIdCreationType';
+import { TransactionDTO } from './types/TransactionDTO';
 
 export class TransactionConversion {
   static convertToClass(transactionDTO: TransactionDTO, transactionIdCreation: TransactionIdCreationType, hashCreation: HashCreationType): ITransaction {

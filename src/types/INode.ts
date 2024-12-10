@@ -1,7 +1,8 @@
 export interface INode {
   readonly nodeUrl: string;
   readonly nodeAddress: string;
-  connectedNodes: IConnectedNode[];
+  getConnectedNodes(): IConnectedNode[];
+  setConnectedNodes(newConnectedNodes: IConnectedNode[]): void;
 }
 
 export interface IConnectedNode {

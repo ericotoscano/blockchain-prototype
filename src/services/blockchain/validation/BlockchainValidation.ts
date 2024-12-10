@@ -1,4 +1,4 @@
-import { Blockchain } from '../../../models/Blockchain';
+import { Blockchain } from '../../../domain/entities/Blockchain';
 import { IBlockchain } from '../../../types/IBlockchain';
 import { ValidationDTO } from '../../../types/ResponseDTO';
 import { BlockchainManagement } from '../management/BlockchainManagement';

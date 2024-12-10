@@ -1,4 +1,4 @@
-import { Blockchain } from '../../../models/Blockchain';
+import { Blockchain } from '../../../domain/entities/Blockchain';
 import { MempoolManagement } from '../mempool/management/MempoolManagement';
 
 import { BlocksManagement } from '../blocks/management/BlocksManagement';

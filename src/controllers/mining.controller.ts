@@ -1,44 +1,34 @@
 import { Request, Response } from 'express';
 import axios from 'axios';
-
-import { ResponseDTO, ErrorDTO, BlockDTO, TransactionDTO } from '../types/ResponseDTO';
-
-import { TransactionIdCreation } from '../services/transaction/creation/TransactionIdCreation';
-import { BlockCreation } from '../services/block/creation/BlockCreation';
-import { Sha256HashCreation } from '../utils/creation/Sha256HashCreation';
+import { ResponseDTO, ErrorDTO } from '../types/ResponseDTO';
 import { ITransaction } from '../types/ITransaction';
-import { TransactionConversion } from '../services/transaction/conversion/TransactionConversion';
-import { IBlockchain } from '../types/blockchain.types';
-import { GlobalManagement } from '../services/management/GlobalManagement';
 import { IBlock } from '../types/IBlock';
-import { TransactionCalculation } from '../services/transaction/calculation/TransacionCalculation';
-import { RewardTransactionCreation } from '../services/transaction/creation/RewardTransactionCreation';
-import { BlockMining } from '../services/block/mining/BlockMining';
 import { BlockConversion } from '../services/block/conversion/BlockConversion';
+import { BlockDTO } from '../services/block/conversion/types/BlockDTO';
+import { TransactionDTO } from '../services/transaction/conversion/types/TransactionDTO';
+import { MineBlockDependenciesType } from '../helpers/dependencies/types/MiningDependenciesCreationType';
+import { MiningDependenciesCreation } from '../helpers/dependencies/MiningDependenciesCreation';
+import { BlockchainManagement } from '../services/blockchain/management/BlockchainManagement';
+import { BlockDependenciesType, MiningDependenciesType, TransactionDependenciesType } from '../helpers/dependencies/types/DependenciesTypes';
 
 const mineBlock = async (req: Request<{}, {}, TransactionDTO[]>, res: Response<ResponseDTO<BlockDTO> | ErrorDTO>): Promise<void> => {
   try {
     const transactionsDTO: TransactionDTO[] = req.body;
 
-    const creationDependencies = { hashCreation: Sha256HashCreation, transactionIdCreation: TransactionIdCreation };
+    const { blockHeight, previousBlockHash, target, blockDependencies, miningDependencies, transactionsDependencies }: MineBlockDependenciesType = MiningDependenciesCreation.mineBlock();
 
-    const transactions: ITransaction[] = TransactionConversion.convertAllToClass(transactionsDTO, creationDependencies);
+    const { blockCreation }: BlockDependenciesType = blockDependencies;
+    const { hashCreation }: Omit<MiningDependenciesType, 'targetManagement'> = miningDependencies;
+    const { transactionConversion, transactionCalculation, transactionIdCreation, rewardTransactionCreation }: Omit<TransactionDependenciesType, 'transactionCreation'> = transactionsDependencies;
 
-    const blockchain: IBlockchain = GlobalManagement.getBlockchain();
+    const transactions: ITransaction[] = transactionConversion.convertAllToClass(transactionsDTO, transactionIdCreation, hashCreation);
 
-    const { target }: IBlockchain = blockchain;
+    const block: IBlock = blockCreation.create(blockHeight, previousBlockHash, target, transactions, { transactionCalculation, transactionIdCreation, rewardTransactionCreation }, miningDependencies);
+    //COMECAR DAQUI!!!!!
+    //TALVEZ FAÇA SENTIDO JUNTAR ESSES DOIS CREATE E ADDBLOCK EM UMA COISA SO
+    BlockchainManagement.addBlock(block);
 
-    const { height, hash }: IBlock = blockchain.blocksManagement.getPreviousBlock();
-
-    const transactionDependencies = { transactionCalculation: TransactionCalculation, transactionIdCreation: TransactionIdCreation, rewardTransactionCreation: RewardTransactionCreation };
-
-    const miningDependencies = { blockMining: BlockMining, hashCreation: Sha256HashCreation };
-
-    const block = BlockCreation.create(height, hash, transactions, target, transactionDependencies, miningDependencies);
-
-    blockchain.blocksManagement.addBlock(block);
-
-    const blockDTO: BlockDTO = BlockConversion.convertToDTO(block, TransactionConversion);
+    const blockDTO: BlockDTO = BlockConversion.convertToDTO(block, transactionConversion);
 
     res.status(201).send({
       type: 'Mine Block',

@@ -1,13 +1,14 @@
-import { IBlockchain } from '../../../types/blockchain.types';
-import { TransactionDTO, ValidationDTO } from '../../../types/ResponseDTO';
-import { GlobalManagement } from '../../management/GlobalManagement';
+import { IBlockchain } from '../../../types/IBlockchain';
+import { ValidationDTO } from '../../../types/ResponseDTO';
+import { BlockchainManagement } from '../../blockchain/management/BlockchainManagement';
+import { TransactionDTO } from '../conversion/types/TransactionDTO';
 import { TransactionDTOValidation } from './TransactionDTOValidation';
 
 export class TransactionsDTOValidation {
   static validateStructure(transactionsDTO: TransactionDTO[]): ValidationDTO {
     const TYPE: string = 'Transactions DTO Structure Validation';
 
-    const result: boolean = Array.isArray(transactionsDTO) && transactionsDTO.length > 0;
+    const result: boolean = Array.isArray(transactionsDTO);
 
     return {
       type: TYPE,
@@ -20,7 +21,7 @@ export class TransactionsDTOValidation {
   static validateStructureLength(transactionsDTO: TransactionDTO[]): ValidationDTO {
     const TYPE: string = 'Transactions DTO Structure Length Validation';
 
-    const { maxTransactionsPerBlock }: IBlockchain = GlobalManagement.getBlockchain();
+    const { maxTransactionsPerBlock }: IBlockchain = BlockchainManagement.getBlockchain();
 
     const result: boolean = transactionsDTO.length > 0 && transactionsDTO.length < maxTransactionsPerBlock;
 
