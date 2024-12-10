@@ -1,4 +1,5 @@
-import { BlockchainDTOInput, ValidationDTO } from '../../../../types/dto.types';
+import {  ValidationDTO } from '../../../../types/ResponseDTO';
+import { BlockchainDTOInput } from '../../conversion/types/BlockchainDTO';
 
 export type BlockchainDTOInputValidation = {
   validateKeys(blockchainDTOInput: BlockchainDTOInput): ValidationDTO;

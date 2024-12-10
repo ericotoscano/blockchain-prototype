@@ -3,12 +3,12 @@ import { MempoolManagement } from '../mempool/management/MempoolManagement';
 
 import { BlocksManagement } from '../blocks/management/BlocksManagement';
 import { NodeManagement } from '../../node/management/NodeManagement';
-import { IBlock } from '../../../types/block.types';
-import { ITransaction } from '../../../types/transaction.types';
+import { IBlock } from '../../../types/IBlock';
+import { ITransaction } from '../../../types/ITransaction';
 import { NodeCreation } from '../../node/creation/NodeCreation';
-import { KeyDependenciesType, MiningDependenciesType, NodeDependenciesType, TransactionDependenciesType } from '../../../types/dependencies.types';
-import { BlockchainDTOInput } from '../../../types/dto.types';
-import { IBlockchain } from '../../../types/BlockchainType';
+import { KeyDependenciesType, MiningDependenciesType, NodeDependenciesType, TransactionDependenciesType } from '../../../helpers/dependencies/types/DependenciesTypes';
+import { IBlockchain } from '../../../types/IBlockchain';
+import { BlockchainDTOInput } from '../conversion/types/BlockchainDTO';
 
 export class BlockchainCreation {
   static create(

@@ -1,8 +1,9 @@
-import { IBlockchain } from '../../../types/BlockchainType';
-import { IBlock } from '../../../types/block.types';
-import { MiningDependenciesType, TransactionDependenciesType } from '../../../types/dependencies.types';
-import { BlockDTO } from '../../../types/dto.types';
+import { IBlockchain } from '../../../types/IBlockchain';
+import { IBlock } from '../../../types/IBlock';
+import { MiningDependenciesType, TransactionDependenciesType } from '../../../helpers/dependencies/types/DependenciesTypes';
+
 import { BlockConversion } from '../../block/conversion/BlockConversion';
+import { BlockDTO } from '../../block/conversion/types/BlockDTO';
 
 export class BlockchainManagement {
   static getBlockchain(): IBlockchain {

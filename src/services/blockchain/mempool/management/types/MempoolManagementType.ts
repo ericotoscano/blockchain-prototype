@@ -1,5 +1,5 @@
-import { IBlock } from '../../../../../types/block.types';
-import { ITransaction } from '../../../../../types/transaction.types';
+import { IBlock } from '../../../../../types/IBlock';
+import { ITransaction } from '../../../../../types/ITransaction';
 
 export interface IMempoolManagement {
   readonly mempool: ITransaction[];

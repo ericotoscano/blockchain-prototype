@@ -1,7 +1,6 @@
-
-import { IBlockchain } from '../../../../types/BlockchainType';
-import { TransactionDependenciesType, MiningDependenciesType } from '../../../../types/dependencies.types';
-import { BlockDTO } from '../../../../types/dto.types';
+import { IBlockchain } from '../../../../types/IBlockchain';
+import { TransactionDependenciesType, MiningDependenciesType } from '../../../../helpers/dependencies/types/DependenciesTypes';
+import { BlockDTO } from '../../../block/conversion/types/BlockDTO';
 
 export type BlockchainManagementType = {
   getBlockchain(): IBlockchain;

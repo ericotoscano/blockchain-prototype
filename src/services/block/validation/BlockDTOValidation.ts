@@ -1,5 +1,6 @@
-import { BlockDTO, ValidationDTO } from '../../../types/dto.types';
-import { DTOKeysValidation } from '../../../utils/validation/DTOKeysValidation';
+import { ValidationDTO } from '../../../types/ResponseDTO';
+import { DTOKeysValidation } from '../../../utils/validation/DTOValidation';
+import { BlockDTO } from '../conversion/types/BlockDTO';
 
 export class BlockDTOValidation {
   static validateKeys(blockDTO: BlockDTO): ValidationDTO {
@@ -17,5 +18,3 @@ export class BlockDTOValidation {
     };
   }
 }
-
-

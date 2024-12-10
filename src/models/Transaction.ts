@@ -1,4 +1,4 @@
-import { ITransaction, TransactionStatusType } from '../types/transaction.types';
+import { ITransaction, TransactionStatusType } from '../types/ITransaction';
 
 export class Transaction implements ITransaction {
   status: TransactionStatusType;

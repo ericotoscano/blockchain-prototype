@@ -1,6 +1,6 @@
-import { IBlock } from '../types/block.types';
+import { IBlock } from '../types/IBlock';
 import { IBlockTransactionsManagement } from '../types/management.types';
-import { ITransaction } from '../types/transaction.types';
+import { ITransaction } from '../types/ITransaction';
 
 export class Block implements IBlock {
   nonce: number;

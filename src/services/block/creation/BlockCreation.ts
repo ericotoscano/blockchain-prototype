@@ -1,8 +1,9 @@
 import { Block } from '../../../models/Block';
-import { ITransaction } from '../../../types/transaction.types';
-import { IBlock, MineResultsType } from '../../../types/block.types';
-import { MiningDependenciesType, TransactionDependenciesType } from '../../../types/dependencies.types';
+import { ITransaction } from '../../../types/ITransaction';
+import { IBlock } from '../../../types/IBlock';
+import { MiningDependenciesType, TransactionDependenciesType } from '../../../helpers/dependencies/types/DependenciesTypes';
 import { BlockTransactionsManagement } from '../management/BlockTransactionsManagement';
+import { MineResultsType } from '../mining/types/BlockMiningType';
 
 export class BlockCreation {
   static create(

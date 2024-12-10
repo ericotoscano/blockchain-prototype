@@ -1,16 +1,16 @@
 import { Request, Response } from 'express';
 import axios from 'axios';
 
-import { ResponseDTO, ErrorDTO, BlockDTO, TransactionDTO } from '../types/dto.types';
+import { ResponseDTO, ErrorDTO, BlockDTO, TransactionDTO } from '../types/ResponseDTO';
 
 import { TransactionIdCreation } from '../services/transaction/creation/TransactionIdCreation';
 import { BlockCreation } from '../services/block/creation/BlockCreation';
 import { Sha256HashCreation } from '../utils/creation/Sha256HashCreation';
-import { ITransaction } from '../types/transaction.types';
+import { ITransaction } from '../types/ITransaction';
 import { TransactionConversion } from '../services/transaction/conversion/TransactionConversion';
 import { IBlockchain } from '../types/blockchain.types';
 import { GlobalManagement } from '../services/management/GlobalManagement';
-import { IBlock } from '../types/block.types';
+import { IBlock } from '../types/IBlock';
 import { TransactionCalculation } from '../services/transaction/calculation/TransacionCalculation';
 import { RewardTransactionCreation } from '../services/transaction/creation/RewardTransactionCreation';
 import { BlockMining } from '../services/block/mining/BlockMining';

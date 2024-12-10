@@ -1,4 +1,4 @@
-import { ValidationDTO } from '../../../types/dto.types';
+import { ValidationDTO } from '../../../types/ResponseDTO';
 
 export class BlockchainRewardValidation {
   static validateFormat(reward: number): ValidationDTO {

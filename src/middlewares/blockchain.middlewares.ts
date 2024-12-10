@@ -1,12 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
 
-import { BlockchainDTOInput, ErrorDTO, ValidationDTO } from '../types/dto.types';
-
+import { ErrorDTO, ValidationDTO } from '../types/ResponseDTO';
 import { BlockchainValidation } from '../services/blockchain/validation/BlockchainValidation';
 import { BlockchainDTOInputValidation } from '../services/blockchain/validation/BlockchainDTOInputValidation';
 import { BlockchainTargetZerosValidation } from '../services/blockchain/validation/BlockchainTargetZerosValidation';
 import { BlockchainRewardValidation } from '../services/blockchain/validation/BlockchainRewardValidation';
 import { BlockchainMaxTransactionsPerBlockValidation } from '../services/blockchain/validation/BlockchainMaxTransactionsPerBlockValidation';
+import { BlockchainDTOInput } from '../services/blockchain/conversion/types/BlockchainDTO';
 
 const validateBlockchainDTO = async (req: Request<{}, {}, BlockchainDTOInput>, res: Response<ValidationDTO | ErrorDTO>, next: NextFunction): Promise<void> => {
   try {

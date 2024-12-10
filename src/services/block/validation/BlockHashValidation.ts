@@ -1,8 +1,9 @@
-import { IBlockchain } from '../../../types/blockchain.types';
-import { HashCreationType } from '../../../types/creation.types';
-import { BlockDTO, ValidationDTO } from '../../../types/dto.types';
+import { IBlockchain } from '../../../types/IBlockchain';
+import { ValidationDTO } from '../../../types/ResponseDTO';
+import { HashCreationType } from '../../../utils/creation/types/HashCreationType';
 import { HexStringValidation } from '../../../utils/validation/HexStringValidation';
-import { GlobalManagement } from '../../management/GlobalManagement';
+import { BlockchainManagement } from '../../blockchain/management/BlockchainManagement';
+import { BlockDTO } from '../conversion/types/BlockDTO';
 
 export class BlockHashValidation {
   static validateAll(block: BlockDTO, hash: string, hashCreation: HashCreationType): ValidationDTO {
@@ -37,12 +38,12 @@ export class BlockHashValidation {
     };
   }
 
-  static validateDifficulty(hash: string) {
+  static validateDifficulty(hash: string): ValidationDTO {
     const TYPE: string = 'Block Hash Difficulty Validation';
 
     const hashValue: bigint = BigInt('0x' + hash);
 
-    const { target }: IBlockchain = GlobalManagement.getBlockchain();
+    const { target }: IBlockchain = BlockchainManagement.getBlockchain();
 
     const targetValue: bigint = BigInt('0x' + target);
 
@@ -56,7 +57,7 @@ export class BlockHashValidation {
     };
   }
 
-  static validateExpectedHash(block: BlockDTO, hashCreation: HashCreationType) {
+  static validateExpectedHash(block: BlockDTO, hashCreation: HashCreationType): ValidationDTO {
     const TYPE: string = 'Block Expected Hash Validation';
 
     const { height, nonce, hash, previousHash, transactions, timestamp } = block;

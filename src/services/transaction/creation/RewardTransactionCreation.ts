@@ -1,5 +1,5 @@
 import { HashCreationType, TransactionIdCreationType } from '../../../types/creation.types';
-import { ITransaction, TransactionCalculationType } from '../../../types/transaction.types';
+import { ITransaction, TransactionCalculationType } from '../../../types/ITransaction';
 import { BlockchainManagement } from '../../blockchain/management/BlockchainManagement';
 import { TransactionCreation } from './TransactionCreation';
 

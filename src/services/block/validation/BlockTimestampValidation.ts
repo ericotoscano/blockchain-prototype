@@ -1,4 +1,4 @@
-import { ValidationDTO } from '../../../types/dto.types';
+import { ValidationDTO } from '../../../types/ResponseDTO';
 import { TimestampValidation } from '../../../utils/validation/TimestampValidation';
 
 export class BlockTimestampValidation {

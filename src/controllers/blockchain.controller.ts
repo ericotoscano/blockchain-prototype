@@ -1,13 +1,15 @@
 import { Request, Response } from 'express';
-import { ResponseDTO, ErrorDTO, BlockchainDTOInput, BlockchainDTOOutput } from '../types/dto.types';
+import { ResponseDTO, ErrorDTO} from '../types/ResponseDTO';
 import { BlockchainConversion } from '../services/blockchain/conversion/BlockchainConversion';
 import { BlockConversion } from '../services/block/conversion/BlockConversion';
 import { TransactionConversion } from '../services/transaction/conversion/TransactionConversion';
 import { NodeConversion } from '../services/node/conversion/NodeConversion';
 import { BlockchainManagement } from '../services/blockchain/management/BlockchainManagement';
-import { IBlockchain } from '../types/BlockchainType';
-import { CreateBlockchainDependenciesType } from '../services/blockchain/dependencies/creation/types/BlockchainDependenciesCreationType';
-import { BlockchainDependenciesCreation } from '../services/blockchain/dependencies/creation/BlockchainDependenciesCreation';
+import { IBlockchain } from '../types/IBlockchain';
+import { CreateBlockchainDependenciesType } from '../helpers/dependencies/types/BlockchainDependenciesCreationTypes';
+import { BlockchainDependenciesCreation } from '../helpers/dependencies/BlockchainDependenciesCreation';
+import { BlockchainDTOInput, BlockchainDTOOutput } from '../services/blockchain/conversion/types/BlockchainDTO';
+
 
 const createBlockchain = async (req: Request<{}, {}, BlockchainDTOInput>, res: Response<ResponseDTO<BlockchainDTOOutput> | ErrorDTO>): Promise<void> => {
   try {

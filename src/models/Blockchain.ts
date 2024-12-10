@@ -1,7 +1,7 @@
-import { IBlock } from '../types/block.types';
+import { IBlock } from '../types/IBlock';
 import { IBlockchain } from '../types/blockchain.types';
-import { INode } from '../types/node.types';
-import { ITransaction } from '../types/transaction.types';
+import { INode } from '../types/INode';
+import { ITransaction } from '../types/ITransaction';
 import { IBlocksManagement, IMempoolManagement, INodeManagement } from '../types/management.types';
 
 export class Blockchain implements IBlockchain {

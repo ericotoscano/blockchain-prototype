@@ -1,4 +1,4 @@
-import { ITransaction } from '../../../types/transaction.types';
+import { ITransaction } from '../../../types/ITransaction';
 
 export class TransactionCalculation {
   static getTotalFee(transactions: ITransaction[]): number {

@@ -1,6 +1,6 @@
 import { HashCreationType, TransactionIdCreationType } from '../../../types/creation.types';
-import { TransactionDTO } from '../../../types/dto.types';
-import { ITransaction } from '../../../types/transaction.types';
+import { TransactionDTO } from '../../../types/ResponseDTO';
+import { ITransaction } from '../../../types/ITransaction';
 import { TransactionCreation } from '../creation/TransactionCreation';
 
 export class TransactionConversion {

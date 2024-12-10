@@ -1,5 +1,5 @@
-import { IBlock } from '../../../../types/block.types';
-import { ITransaction } from '../../../../types/transaction.types';
+import { IBlock } from '../../../../types/IBlock';
+import { ITransaction } from '../../../../types/ITransaction';
 import { IMempoolManagement } from './types/MempoolManagementType';
 
 export class MempoolManagement implements IMempoolManagement {

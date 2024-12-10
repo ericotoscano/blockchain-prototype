@@ -1,6 +1,6 @@
 import { Node } from '../../../models/Node';
-import { KeyDependenciesType, NodeDependenciesType } from '../../../types/dependencies.types';
-import { IConnectedNode, INode } from '../../../types/node.types';
+import { KeyDependenciesType, NodeDependenciesType } from '../../../helpers/dependencies/types/DependenciesTypes';
+import { IConnectedNode, INode } from '../../../types/INode';
 
 export class NodeCreation {
   static create(keyDependencies: KeyDependenciesType, nodeDependencies: NodeDependenciesType, connectedNodes?: IConnectedNode[]): INode {

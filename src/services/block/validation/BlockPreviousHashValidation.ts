@@ -1,8 +1,8 @@
-import { IBlock } from '../../../types/block.types';
-import { IBlockchain } from '../../../types/blockchain.types';
-import { ValidationDTO } from '../../../types/dto.types';
+import { IBlock } from '../../../types/IBlock';
+import { IBlockchain } from '../../../types/IBlockchain';
+import { ValidationDTO } from '../../../types/ResponseDTO';
 import { HexStringValidation } from '../../../utils/validation/HexStringValidation';
-import { GlobalManagement } from '../../management/GlobalManagement';
+import { BlockchainManagement } from '../../blockchain/management/BlockchainManagement';
 
 export class BlockPreviousHashValidation {
   static validateAll(previousHash: string): ValidationDTO {
@@ -40,7 +40,7 @@ export class BlockPreviousHashValidation {
   static validateExpectedPreviousHash(previousHash: string): ValidationDTO {
     const TYPE: string = 'Block Expected Previous Hash Validation';
 
-    const blockchain: IBlockchain = GlobalManagement.getBlockchain();
+    const blockchain: IBlockchain = BlockchainManagement.getBlockchain();
 
     const { hash }: IBlock = blockchain.blocksManagement.getPreviousBlock();
 

@@ -1,5 +1,5 @@
 import { ec as EC } from 'elliptic';
-import { KeyDependenciesType } from '../../../types/dependencies.types';
+import { KeyDependenciesType } from '../../../helpers/dependencies/types/DependenciesTypes';
 
 export class LocalHostNodeAddressCreation {
   static create(data: string, keyDependencies: KeyDependenciesType): string {

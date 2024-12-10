@@ -1,11 +1,12 @@
-import { IBlockchain } from '../../../types/blockchain.types';
-import { IBlock } from '../../../types/block.types';
-import { ITransaction } from '../../../types/transaction.types';
-import { BlockDTO, TransactionDTO } from '../../../types/dto.types';
-import { TransactionConversionType } from '../../../types/conversion.types';
-import { MiningDependenciesType, TransactionDependenciesType } from '../../../types/dependencies.types';
+import { IBlock } from '../../../types/IBlock';
+import { ITransaction } from '../../../types/ITransaction';
+import { MiningDependenciesType, TransactionDependenciesType } from '../../../helpers/dependencies/types/DependenciesTypes';
 import { BlockCreation } from '../creation/BlockCreation';
 import { BlockchainManagement } from '../../blockchain/management/BlockchainManagement';
+import { IBlockchain } from '../../../types/IBlockchain';
+import { TransactionConversionType } from '../../transaction/conversion/types/TransactionConversionType';
+import { TransactionDTO } from '../../transaction/conversion/types/TransactionDTO';
+import { BlockDTO } from './types/BlockDTO';
 
 export class BlockConversion {
   static convertToClass(

@@ -1,9 +1,9 @@
-import { TransactionDTO, ValidationDTO } from '../../../types/dto.types';
+import { TransactionDTO, ValidationDTO } from '../../../types/ResponseDTO';
 import { HexStringValidation } from '../../../utils/validation/HexStringValidation';
 import { TimestampValidation } from '../../../utils/validation/TimestampValidation';
 import { IBlockchain } from '../../../types/blockchain.types';
 import { GlobalManagement } from '../../management/GlobalManagement';
-import { DTOKeysValidation } from '../../../utils/validation/DTOKeysValidation';
+import { DTOKeysValidation } from '../../../utils/validation/DTOValidation';
 
 export class TransactionDTOValidation {
   static validateKeys(transactionDTO: TransactionDTO): ValidationDTO {

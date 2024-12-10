@@ -1,8 +1,9 @@
-import { IBlockchain } from '../../../types/blockchain.types';
-import { TransactionDTO, ValidationDTO } from '../../../types/dto.types';
-import { GlobalManagement } from '../../management/GlobalManagement';
-import { TransactionValidation } from '../../transaction/validation/TransactionDTOValidation';
+import { ValidationDTO } from '../../../types/ResponseDTO';
+import { TransactionsDTOValidation } from '../../transaction/validation/TransactionsDTOValidation';
 import { RewardTransactionValidation } from '../../transaction/validation/RewardTransactionValidation';
+import { IBlockchain } from '../../../types/IBlockchain';
+import { BlockchainManagement } from '../../blockchain/management/BlockchainManagement';
+import { TransactionDTO } from '../../transaction/conversion/types/TransactionDTO';
 
 export class BlockTransactionsValidation {
   static validateAll(transactions: TransactionDTO[]): ValidationDTO {
@@ -14,7 +15,7 @@ export class BlockTransactionsValidation {
       BlockTransactionsValidation.validateStructure(transactions),
       BlockTransactionsValidation.validateStructureLength(transactions),
       RewardTransactionValidation.validateAll(rewardTransaction),
-      TransactionValidation.validateAll(transactions),
+      TransactionsDTOValidation.validateAll(transactions),
     ];
 
     for (const data of allValidationData) {
@@ -47,7 +48,7 @@ export class BlockTransactionsValidation {
   static validateStructureLength(transactions: TransactionDTO[]): ValidationDTO {
     const TYPE: string = 'Block Transactions Structure Length Validation';
 
-    const { maxTransactionsPerBlock }: IBlockchain = GlobalManagement.getBlockchain();
+    const { maxTransactionsPerBlock }: IBlockchain = BlockchainManagement.getBlockchain();
 
     const result: boolean = transactions.length > maxTransactionsPerBlock;
 

@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 
 import { Sha256HashCreation } from '../utils/creation/Sha256HashCreation';
 
-import { BlockDTO, ErrorDTO, ValidationDTO } from '../types/dto.types';
+import { BlockDTO, ErrorDTO, ValidationDTO } from '../types/ResponseDTO';
 import { BlockDTOValidation } from '../services/block/validation/BlockDTOValidation';
 import { BlockHeightValidation } from '../services/block/validation/BlockHeightValidation';
 import { BlockHashValidation } from '../services/block/validation/BlockHashValidation';

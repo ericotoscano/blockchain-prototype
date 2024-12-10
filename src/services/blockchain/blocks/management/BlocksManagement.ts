@@ -1,5 +1,5 @@
-import { IBlock } from '../../../../types/block.types';
-import { ITransaction } from '../../../../types/transaction.types';
+import { IBlock } from '../../../../types/IBlock';
+import { ITransaction } from '../../../../types/ITransaction';
 import { IBlocksManagement } from './types/IBlocksManagement';
 
 export class BlocksManagement implements IBlocksManagement {

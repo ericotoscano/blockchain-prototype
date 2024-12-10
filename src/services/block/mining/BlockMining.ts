@@ -1,5 +1,5 @@
-import { MineResultsType } from '../../../types/block.types';
-import { HashCreationType } from '../../../types/creation.types';
+import { HashCreationType } from '../../../utils/creation/types/HashCreationType';
+import { MineResultsType } from './types/BlockMiningType';
 
 export class BlockMining {
   static mine(blockData: string, target: string, hashCreation: HashCreationType): MineResultsType {

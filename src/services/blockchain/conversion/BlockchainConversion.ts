@@ -1,8 +1,14 @@
-import { IBlockchain } from '../../../types/BlockchainType';
-import { NodeConversionType, BlockConversionType, TransactionConversionType } from '../../../types/conversion.types';
-import { KeyDependenciesType, MiningDependenciesType, NodeDependenciesType, TransactionDependenciesType } from '../../../types/dependencies.types';
-import { BlockDTO, BlockchainDTOInput, BlockchainDTOOutput, NodeDTO, TransactionDTO } from '../../../types/dto.types';
+import { IBlockchain } from '../../../types/IBlockchain';
+import { KeyDependenciesType, MiningDependenciesType, NodeDependenciesType, TransactionDependenciesType } from '../../../helpers/dependencies/types/DependenciesTypes';
+import { BlockConversionType } from '../../block/conversion/types/BlockConversionType';
+import { BlockDTO } from '../../block/conversion/types/BlockDTO';
+import { NodeConversionType } from '../../node/conversion/types/NodeConversionType';
+import { NodeDTO } from '../../node/conversion/types/NodeDTO';
+import { TransactionConversionType } from '../../transaction/conversion/types/TransactionConversionType';
+import { TransactionDTO } from '../../transaction/conversion/types/TransactionDTO';
+
 import { BlockchainCreation } from '../creation/BlockchainCreation';
+import { BlockchainDTOInput, BlockchainDTOOutput } from './types/BlockchainDTO';
 
 export class BlockchainConversion {
   static convertToClass(

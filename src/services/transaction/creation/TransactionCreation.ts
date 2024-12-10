@@ -1,6 +1,7 @@
 import { Transaction } from '../../../models/Transaction';
-import { HashCreationType, TransactionIdCreationType } from '../../../types/creation.types';
-import { ITransaction, TransactionStatusType } from '../../../types/transaction.types';
+import { ITransaction, TransactionStatusType } from '../../../types/ITransaction';
+import { TransactionIdCreationType } from './types/TransactionIdCreationType';
+import { HashCreationType } from '../../../utils/creation/types/HashCreationType';
 
 export class TransactionCreation {
   static create(

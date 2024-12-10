@@ -3,8 +3,8 @@ import axios from 'axios';
 
 import '../global';
 
-import { IBlock } from '../types/block.types';
-import { BlockDTO, ResponseDTO, ErrorDTO, CreateBlockchainResponseDTO, CreateBlockchainRequestDTO } from '../types/dto.types';
+import { IBlock } from '../types/IBlock';
+import { BlockDTO, ResponseDTO, ErrorDTO, CreateBlockchainResponseDTO, CreateBlockchainRequestDTO } from '../types/ResponseDTO';
 
 import { BlockMining } from '../services/block/mining/BlockMining';
 
