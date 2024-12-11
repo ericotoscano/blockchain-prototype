@@ -6,9 +6,9 @@ import { LocalHostNodeUrlCreation } from '../../services/node/creation/NodeUrlCr
 import { TransactionCalculation } from '../../services/transaction/calculation/TransacionCalculation';
 import { RewardTransactionCreation } from '../../services/transaction/creation/RewardTransactionCreation';
 import { TransactionIdCreation } from '../../services/transaction/creation/TransactionIdCreation';
-import { KeyCreation } from '../../utils/creation/KeyCreation';
-import { Ripemd160HashCreation } from '../../utils/creation/Ripmed160HashCreation';
-import { Sha256HashCreation } from '../../utils/creation/Sha256HashCreation';
+import { KeyCreation } from '../../shared/utils/KeyCreation';
+import { Ripemd160HashCreation } from '../../shared/utils/Ripmed160HashCreation';
+import { Sha256HashCreation } from '../../shared/utils/Sha256HashCreation';
 import { CreateBlockchainDependenciesType } from './types/BlockchainDependenciesCreationTypes';
 
 export class BlockchainDependenciesCreation {

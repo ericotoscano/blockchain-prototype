@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import axios from 'axios';
-import { ResponseDTO, ErrorDTO } from '../types/ResponseDTO';
-import { ITransaction } from '../types/ITransaction';
-import { IBlock } from '../types/IBlock';
+import { ResponseDTO, ErrorDTO } from '../shared/types/ResponseDTO';
+import { ITransaction } from '../domain/types/ITransaction';
+import { IBlock } from '../domain/types/IBlock';
 import { BlockConversion } from '../services/block/conversion/BlockConversion';
 import { BlockDTO } from '../services/block/conversion/types/BlockDTO';
 import { TransactionDTO } from '../services/transaction/conversion/types/TransactionDTO';

@@ -1,5 +1,5 @@
-import { ValidationDTO } from '../../../../types/ResponseDTO';
-import { HashCreationType } from '../../../../utils/creation/types/HashCreationType';
+import { ValidationDTO } from '../../../../shared/types/ResponseDTO';
+import { HashCreationType } from '../../../../shared/utils/HashCreationType';
 import { BlockDTO } from '../../conversion/types/BlockDTO';
 
 export type BlockHashValidation = {

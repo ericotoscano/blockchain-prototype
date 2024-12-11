@@ -1,6 +1,5 @@
-
-import { ITransaction } from '../../../types/ITransaction';
-import { HashCreationType } from '../../../utils/creation/types/HashCreationType';
+import { ITransaction } from '../../../domain/types/ITransaction';
+import { HashCreationType } from '../../../shared/utils/HashCreationType';
 import { TransactionCreation } from '../creation/TransactionCreation';
 import { TransactionIdCreationType } from '../creation/types/TransactionIdCreationType';
 import { TransactionDTO } from './types/TransactionDTO';

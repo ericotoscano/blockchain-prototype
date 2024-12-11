@@ -1,5 +1,5 @@
 import { IBlockTransactionsManagement } from './types/IBlockTransactionsManagement';
-import { ITransaction } from '../../../types/ITransaction';
+import { ITransaction } from '../../../domain/types/ITransaction';
 
 export class BlockTransactionsManagement implements IBlockTransactionsManagement {
   private _blockTransactions: ITransaction[];

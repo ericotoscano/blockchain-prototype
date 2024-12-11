@@ -4,10 +4,10 @@ export class TransactionTimestamp implements ITransactionTimestamp {
   private readonly value: number;
 
   constructor(value?: number) {
-    this.value = value || TransactionTimestamp.create();
+    this.value = value || this.create();
   }
 
-  static create(): number {
+  private create(): number {
     return Date.now();
   }
 

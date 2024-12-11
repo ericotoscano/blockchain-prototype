@@ -1,4 +1,4 @@
-import { INode, IConnectedNode } from '../../../../types/INode';
+import { INode, IConnectedNode } from '../../../../domain/types/INode';
 
 export interface INodeManagement {
   readonly node: INode;

@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { ResponseDTO, ErrorDTO, BlockDTO, AddBlockDTO } from '../types/ResponseDTO';
+import { ResponseDTO, ErrorDTO, BlockDTO, AddBlockDTO } from '../shared/types/ResponseDTO';
 import { BlockDTOCreation } from '../services/block/conversion/BlockDTOCreation';
 import { BlockchainManagement } from '../services/blockchain/management/BlockchainManagement';
 import { DependenciesCreation } from '../helpers/dependencies/BlockDependenciesCreation';

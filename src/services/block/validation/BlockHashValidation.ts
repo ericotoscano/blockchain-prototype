@@ -1,7 +1,7 @@
-import { IBlockchain } from '../../../types/IBlockchain';
-import { ValidationDTO } from '../../../types/ResponseDTO';
-import { HashCreationType } from '../../../utils/creation/types/HashCreationType';
-import { HexStringValidation } from '../../../utils/validation/HexStringValidation';
+import { IBlockchain } from '../../../domain/types/IBlockchain';
+import { ValidationDTO } from '../../../shared/types/ResponseDTO';
+import { HashCreationType } from '../../../shared/utils/HashCreationType';
+import { HexStringValidation } from '../../../shared/utils/HexStringValidation';
 import { BlockchainManagement } from '../../blockchain/management/BlockchainManagement';
 import { BlockDTO } from '../conversion/types/BlockDTO';
 

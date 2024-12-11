@@ -1,4 +1,4 @@
-import { ValidationDTO } from '../../../../types/ResponseDTO';
+import { ValidationDTO } from '../../../../shared/types/ResponseDTO';
 
 export type BlockPreviousHashValidation = {
   validateAll(previousHash: string): ValidationDTO;

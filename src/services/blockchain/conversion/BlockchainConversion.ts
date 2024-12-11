@@ -1,4 +1,4 @@
-import { IBlockchain } from '../../../types/IBlockchain';
+import { IBlockchain } from '../../../domain/types/IBlockchain';
 import { KeyDependenciesType, MiningDependenciesType, NodeDependenciesType, TransactionDependenciesType } from '../../../helpers/dependencies/types/DependenciesTypes';
 import { BlockConversionType } from '../../block/conversion/types/BlockConversionType';
 import { BlockDTO } from '../../block/conversion/types/BlockDTO';

@@ -1,5 +1,5 @@
-import { INode } from '../../../types/INode';
-import { NodeDTO } from '../../../types/ResponseDTO';
+import { INode } from '../../../domain/types/INode';
+import { NodeDTO } from '../../../shared/types/ResponseDTO';
 
 export class NodeConversion {
   static convertToDTO(node: INode): NodeDTO {

@@ -5,9 +5,9 @@ import { TransactionCalculation } from '../../services/transaction/calculation/T
 import { TransactionConversion } from '../../services/transaction/conversion/TransactionConversion';
 import { RewardTransactionCreation } from '../../services/transaction/creation/RewardTransactionCreation';
 import { TransactionIdCreation } from '../../services/transaction/creation/TransactionIdCreation';
-import { IBlock } from '../../types/IBlock';
-import { IBlockchain } from '../../types/IBlockchain';
-import { Sha256HashCreation } from '../../utils/creation/Sha256HashCreation';
+import { IBlock } from '../../domain/types/IBlock';
+import { IBlockchain } from '../../domain/types/IBlockchain';
+import { Sha256HashCreation } from '../../shared/utils/Sha256HashCreation';
 import { MineBlockDependenciesType } from './types/MiningDependenciesCreationType';
 
 export class MiningDependenciesCreation {

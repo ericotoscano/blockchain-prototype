@@ -1,7 +1,7 @@
-import { IBlock } from '../../../types/IBlock';
-import { IBlockchain } from '../../../types/IBlockchain';
-import { ValidationDTO } from '../../../types/ResponseDTO';
-import { HexStringValidation } from '../../../utils/validation/HexStringValidation';
+import { IBlock } from '../../../domain/types/IBlock';
+import { IBlockchain } from '../../../domain/types/IBlockchain';
+import { ValidationDTO } from '../../../shared/types/ResponseDTO';
+import { HexStringValidation } from '../../../shared/utils/HexStringValidation';
 import { BlockchainManagement } from '../../blockchain/management/BlockchainManagement';
 
 export class BlockPreviousHashValidation {

@@ -3,8 +3,8 @@ import axios from 'axios';
 
 import '../global';
 
-import { IBlock } from '../types/IBlock';
-import { BlockDTO, ResponseDTO, ErrorDTO, CreateBlockchainResponseDTO, CreateBlockchainRequestDTO } from '../types/ResponseDTO';
+import { IBlock } from '../domain/types/IBlock';
+import { BlockDTO, ResponseDTO, ErrorDTO, CreateBlockchainResponseDTO, CreateBlockchainRequestDTO } from '../shared/types/ResponseDTO';
 
 import { BlockMining } from '../services/block/mining/BlockMining';
 
@@ -20,9 +20,9 @@ import { TransactionIdCreation } from '../services/transaction/creation/Transact
 import { BlockCreation } from '../services/block/creation/BlockCreation';
 import { LocalHostNodeUrlCreation } from '../services/node/creation/NodeUrlCreation';
 import { LocalHostNodeAddressCreation } from '../services/node/creation/NodeAddressCreation';
-import { KeyCreation } from '../utils/creation/KeyCreation';
-import { Ripemd160HashCreation } from '../utils/creation/Ripmed160HashCreation';
-import { Sha256HashCreation } from '../utils/creation/Sha256HashCreation';
+import { KeyCreation } from '../shared/utils/KeyCreation';
+import { Ripemd160HashCreation } from '../shared/utils/Ripmed160HashCreation';
+import { Sha256HashCreation } from '../shared/utils/Sha256HashCreation';
 
 const createBlockchain = async (req: Request<{}, {}, CreateBlockchainRequestDTO>, res: Response<ResponseDTO<CreateBlockchainResponseDTO> | ErrorDTO>): Promise<void> => {
   try {

@@ -1,4 +1,4 @@
-import { TransactionStatusType } from '../../../../types/ITransaction';
+import { TransactionStatusType } from '../../../../domain/types/ITransaction';
 
 export type TransactionDTO = {
   sender: string;

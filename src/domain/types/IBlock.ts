@@ -1,4 +1,4 @@
-import { IBlockTransactionsManagement } from '../services/block/management/types/IBlockTransactionsManagement';
+import { IBlockTransactionsManagement } from '../../services/block/management/types/IBlockTransactionsManagement';
 import { ITransaction } from './ITransaction';
 
 export interface IBlock {

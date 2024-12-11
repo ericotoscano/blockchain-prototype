@@ -1,4 +1,4 @@
-import { IBlock } from '../../../../types/IBlock';
+import { IBlock } from '../../../../domain/types/IBlock';
 import { TransactionDependenciesType, MiningDependenciesType } from '../../../../helpers/dependencies/types/DependenciesTypes';
 import { TransactionConversionType } from '../../../transaction/conversion/types/TransactionConversionType';
 import { BlockDTO } from './BlockDTO';

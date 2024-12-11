@@ -1,4 +1,4 @@
-import { ITransaction, TransactionStatusType } from '../../types/ITransaction';
+import { ITransaction, TransactionStatusType } from '../types/ITransaction';
 import { ITransactionId } from '../value-objects/ITransactionId';
 import { ITransactionTimestamp } from '../value-objects/ITransactionTimestamp';
 

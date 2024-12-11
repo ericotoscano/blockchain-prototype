@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 
-import { ErrorDTO, ValidationDTO } from '../types/ResponseDTO';
+import { ErrorDTO, ValidationDTO } from '../shared/types/ResponseDTO';
 import { BlockchainValidation } from '../services/blockchain/validation/BlockchainValidation';
 import { BlockchainDTOInputValidation } from '../services/blockchain/validation/BlockchainDTOInputValidation';
 import { BlockchainTargetZerosValidation } from '../services/blockchain/validation/BlockchainTargetZerosValidation';

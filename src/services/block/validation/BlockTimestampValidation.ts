@@ -1,5 +1,5 @@
-import { ValidationDTO } from '../../../types/ResponseDTO';
-import { TimestampValidation } from '../../../utils/validation/TimestampValidation';
+import { ValidationDTO } from '../../../shared/types/ResponseDTO';
+import { TimestampValidation } from '../../../shared/utils/TimestampValidation';
 
 export class BlockTimestampValidation {
   static validateFormat(timestamp: number): ValidationDTO {

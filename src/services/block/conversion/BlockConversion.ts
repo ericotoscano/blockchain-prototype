@@ -1,9 +1,9 @@
-import { IBlock } from '../../../types/IBlock';
-import { ITransaction } from '../../../types/ITransaction';
+import { IBlock } from '../../../domain/types/IBlock';
+import { ITransaction } from '../../../domain/types/ITransaction';
 import { MiningDependenciesType, TransactionDependenciesType } from '../../../helpers/dependencies/types/DependenciesTypes';
 import { BlockCreation } from '../creation/BlockCreation';
 import { BlockchainManagement } from '../../blockchain/management/BlockchainManagement';
-import { IBlockchain } from '../../../types/IBlockchain';
+import { IBlockchain } from '../../../domain/types/IBlockchain';
 import { TransactionConversionType } from '../../transaction/conversion/types/TransactionConversionType';
 import { TransactionDTO } from '../../transaction/conversion/types/TransactionDTO';
 import { BlockDTO } from './types/BlockDTO';

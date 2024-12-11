@@ -1,4 +1,4 @@
-import { ValidationDTO } from '../../../../types/ResponseDTO';
+import { ValidationDTO } from '../../../../shared/types/ResponseDTO';
 import { TransactionDTO } from '../../../transaction/conversion/types/TransactionDTO';
 
 export type BlockTransactionsValidation = {

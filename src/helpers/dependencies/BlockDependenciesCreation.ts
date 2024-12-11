@@ -1,4 +1,4 @@
-import { Sha256HashCreation } from '../../utils/creation/Sha256HashCreation';
+import { Sha256HashCreation } from '../../shared/utils/Sha256HashCreation';
 import { TransactionCalculation } from '../../services/transaction/calculation/TransacionCalculation';
 import { TransactionConversion } from '../../services/transaction/conversion/TransactionConversion';
 import { BlockMining } from '../../services/block/mining/BlockMining';

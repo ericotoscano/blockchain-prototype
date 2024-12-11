@@ -8,8 +8,8 @@ import { TransactionConversionType } from '../../../services/transaction/convers
 import { RewardTransactionCreationType } from '../../../services/transaction/creation/types/RewardTransactionCreationType';
 import { TransactionCreationType } from '../../../services/transaction/creation/types/TransactionCreationType';
 import { TransactionIdCreationType } from '../../../services/transaction/creation/types/TransactionIdCreationType';
-import { HashCreationType } from '../../../utils/creation/types/HashCreationType';
-import { KeyCreationType } from '../../../utils/creation/types/KeyCreationType';
+import { HashCreationType } from '../../../shared/utils/HashCreationType';
+import { KeyCreationType } from '../../../shared/utils/KeyCreationType';
 
 export type BlockDependenciesType = {
   blockCreation: BlockCreationType;

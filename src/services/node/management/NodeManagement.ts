@@ -1,5 +1,5 @@
 import { INodeManagement } from '../../../types/management.types';
-import { IConnectedNode, INode } from '../../../types/INode';
+import { IConnectedNode, INode } from '../../../domain/types/INode';
 
 export class NodeManagement implements INodeManagement {
   constructor(readonly node: INode) {}

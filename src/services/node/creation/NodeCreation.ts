@@ -1,6 +1,6 @@
 import { Node } from '../../../domain/entities/Node';
 import { KeyDependenciesType, NodeDependenciesType } from '../../../helpers/dependencies/types/DependenciesTypes';
-import { IConnectedNode, INode } from '../../../types/INode';
+import { IConnectedNode, INode } from '../../../domain/types/INode';
 
 export class NodeCreation {
   static create(keyDependencies: KeyDependenciesType, nodeDependencies: NodeDependenciesType, connectedNodes?: IConnectedNode[]): INode {

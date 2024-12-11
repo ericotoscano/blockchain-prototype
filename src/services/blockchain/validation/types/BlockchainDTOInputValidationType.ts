@@ -1,4 +1,4 @@
-import {  ValidationDTO } from '../../../../types/ResponseDTO';
+import { ValidationDTO } from '../../../../shared/types/ResponseDTO';
 import { BlockchainDTOInput } from '../../conversion/types/BlockchainDTO';
 
 export type BlockchainDTOInputValidation = {

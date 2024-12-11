@@ -1,5 +1,5 @@
-import { ValidationDTO } from '../../../types/ResponseDTO';
-import { DTOKeysValidation } from '../../../utils/validation/DTOValidation';
+import { ValidationDTO } from '../../../shared/types/ResponseDTO';
+import { DTOKeysValidation } from '../../../shared/utils/DTOValidation';
 import { BlockDTO } from '../conversion/types/BlockDTO';
 
 export class BlockDTOValidation {

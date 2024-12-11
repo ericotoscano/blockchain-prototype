@@ -1,6 +1,6 @@
 import { Blockchain } from '../../../domain/entities/Blockchain';
-import { IBlockchain } from '../../../types/IBlockchain';
-import { ValidationDTO } from '../../../types/ResponseDTO';
+import { IBlockchain } from '../../../domain/types/IBlockchain';
+import { ValidationDTO } from '../../../shared/types/ResponseDTO';
 import { BlockchainManagement } from '../management/BlockchainManagement';
 
 export class BlockchainValidation {

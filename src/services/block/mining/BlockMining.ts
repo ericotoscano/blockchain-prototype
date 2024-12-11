@@ -1,4 +1,4 @@
-import { HashCreationType } from '../../../utils/creation/types/HashCreationType';
+import { HashCreationType } from '../../../shared/utils/HashCreationType';
 import { MineResultsType } from './types/BlockMiningType';
 
 export class BlockMining {

@@ -1,4 +1,4 @@
-import { IConnectedNode, INode } from '../../types/INode';
+import { IConnectedNode, INode } from '../types/INode';
 
 export class Node implements INode {
   private connectedNodes: IConnectedNode[] = [];
@@ -6,10 +6,10 @@ export class Node implements INode {
   constructor(readonly nodeUrl: string, readonly nodeAddress: string) {}
 
   getConnectedNodes(): IConnectedNode[] {
-    return this.connectedNodes;
+    return [...this.connectedNodes];
   }
 
   setConnectedNodes(newConnectedNodes: IConnectedNode[]): void {
-    this.connectedNodes = newConnectedNodes;
+    this.connectedNodes = [...newConnectedNodes];
   }
 }

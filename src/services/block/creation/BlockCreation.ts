@@ -1,6 +1,6 @@
 import { Block } from '../../../domain/entities/Block';
-import { ITransaction } from '../../../types/ITransaction';
-import { IBlock } from '../../../types/IBlock';
+import { ITransaction } from '../../../domain/types/ITransaction';
+import { IBlock } from '../../../domain/types/IBlock';
 import { MiningDependenciesType, TransactionDependenciesType } from '../../../helpers/dependencies/types/DependenciesTypes';
 import { BlockTransactionsManagement } from '../management/BlockTransactionsManagement';
 import { MineResultsType } from '../mining/types/BlockMiningType';

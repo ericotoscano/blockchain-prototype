@@ -1,5 +1,5 @@
 import { IBlockchain } from '../../../types/blockchain.types';
-import { TransactionDTO, ValidationDTO } from '../../../types/ResponseDTO';
+import { TransactionDTO, ValidationDTO } from '../../../shared/types/ResponseDTO';
 import { GlobalManagement } from '../../management/GlobalManagement';
 import { TransactionDTOValidation } from './TransactionDTOValidation';
 

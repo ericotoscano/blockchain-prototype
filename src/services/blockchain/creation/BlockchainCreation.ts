@@ -1,13 +1,13 @@
 import { Blockchain } from '../../../domain/entities/Blockchain';
 import { MempoolManagement } from '../mempool/management/MempoolManagement';
 
-import { BlocksManagement } from '../blocks/management/BlocksManagement';
+import { BlocksManagement } from '../../../domain/services/BlocksService';
 import { NodeManagement } from '../../node/management/NodeManagement';
-import { IBlock } from '../../../types/IBlock';
-import { ITransaction } from '../../../types/ITransaction';
+import { IBlock } from '../../../domain/types/IBlock';
+import { ITransaction } from '../../../domain/types/ITransaction';
 import { NodeCreation } from '../../node/creation/NodeCreation';
 import { KeyDependenciesType, MiningDependenciesType, NodeDependenciesType, TransactionDependenciesType } from '../../../helpers/dependencies/types/DependenciesTypes';
-import { IBlockchain } from '../../../types/IBlockchain';
+import { IBlockchain } from '../../../domain/types/IBlockchain';
 import { BlockchainDTOInput } from '../conversion/types/BlockchainDTO';
 
 export class BlockchainCreation {

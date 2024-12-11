@@ -1,7 +1,7 @@
-import { IBlock } from '../../../../../types/IBlock';
-import { ITransaction } from '../../../../../types/ITransaction';
+import { IBlock } from '../types/IBlock';
+import { ITransaction } from '../types/ITransaction';
 
-export interface IBlocksManagement {
+export interface IBlocksService {
   readonly blocks: IBlock[];
   getPreviousBlock(): IBlock;
   getAllBlocksTransactions(): ITransaction[];

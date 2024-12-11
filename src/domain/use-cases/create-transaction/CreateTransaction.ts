@@ -1,10 +1,11 @@
-import { ITransaction } from "../../../types/ITransaction";
-import { ITransactionFactory } from "../../factories/ITransactionFactory";
+import { ITransaction } from '../../types/ITransaction';
+import { ITransactionService } from '../../services/ITransactionService';
+import { ICreateTransaction } from './ICreateTransaction';
 
-export class CreateTransaction {
-  constructor(private readonly factory: ITransactionFactory) {}
+export class CreateTransaction implements ICreateTransaction {
+  constructor(private readonly service: ITransactionService) {}
 
   execute(sender: string, recipient: string, amount: number, fee: number): ITransaction {
-    return this.factory.create(sender, recipient, amount, fee);
+    return this.service.createTransaction(sender, recipient, amount, fee);
   }
 }

@@ -1,7 +1,7 @@
-import { ValidationDTO } from '../../../types/ResponseDTO';
+import { ValidationDTO } from '../../../shared/types/ResponseDTO';
 import { TransactionsDTOValidation } from '../../transaction/validation/TransactionsDTOValidation';
 import { RewardTransactionValidation } from '../../transaction/validation/RewardTransactionValidation';
-import { IBlockchain } from '../../../types/IBlockchain';
+import { IBlockchain } from '../../../domain/types/IBlockchain';
 import { BlockchainManagement } from '../../blockchain/management/BlockchainManagement';
 import { TransactionDTO } from '../../transaction/conversion/types/TransactionDTO';
 

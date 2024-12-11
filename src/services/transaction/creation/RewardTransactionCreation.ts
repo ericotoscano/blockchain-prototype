@@ -1,7 +1,6 @@
 import { HashCreationType, TransactionIdCreationType } from '../../../types/creation.types';
-import { ITransaction, TransactionCalculationType } from '../../../types/ITransaction';
+import { ITransaction, TransactionCalculationType } from '../../../domain/types/ITransaction';
 import { BlockchainManagement } from '../../blockchain/management/BlockchainManagement';
-import { TransactionCreation } from './TransactionCreation';
 
 export class RewardTransactionCreation {
   static create(blockTransactions: ITransaction[], transactionIdCreation: TransactionIdCreationType, transactionCalculation: TransactionCalculationType, hashCreation: HashCreationType): ITransaction {

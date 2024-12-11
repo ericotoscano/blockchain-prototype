@@ -1,5 +1,5 @@
-import { ITransactionId } from '../domain/value-objects/ITransactionId';
-import { ITransactionTimestamp } from '../domain/value-objects/ITransactionTimestamp';
+import { ITransactionId } from '../value-objects/ITransactionId';
+import { ITransactionTimestamp } from '../value-objects/ITransactionTimestamp';
 
 export interface ITransaction {
   readonly sender: string;

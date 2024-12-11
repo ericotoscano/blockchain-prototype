@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 
-import { ErrorDTO,  ValidationDTO } from '../types/ResponseDTO';
+import { ErrorDTO, ValidationDTO } from '../shared/types/ResponseDTO';
 import { TransactionsDTOValidation } from '../services/transaction/validation/TransactionsDTOValidation';
 import { TransactionDTO } from '../services/transaction/conversion/types/TransactionDTO';
 

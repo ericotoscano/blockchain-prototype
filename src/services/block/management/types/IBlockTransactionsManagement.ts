@@ -1,4 +1,4 @@
-import { ITransaction } from '../../../../types/ITransaction';
+import { ITransaction } from '../../../../domain/types/ITransaction';
 
 export interface IBlockTransactionsManagement {
   readonly transactions: ITransaction[];

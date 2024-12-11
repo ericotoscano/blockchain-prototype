@@ -1,8 +1,8 @@
-import { IBlockchain } from '../../../types/IBlockchain';
-import { ValidationDTO } from '../../../types/ResponseDTO';
-import { DTOValidation } from '../../../utils/validation/DTOValidation';
-import { HexStringValidation } from '../../../utils/validation/HexStringValidation';
-import { TimestampValidation } from '../../../utils/validation/TimestampValidation';
+import { IBlockchain } from '../../../domain/types/IBlockchain';
+import { ValidationDTO } from '../../../shared/types/ResponseDTO';
+import { DTOValidation } from '../../../shared/utils/DTOValidation';
+import { HexStringValidation } from '../../../shared/utils/HexStringValidation';
+import { TimestampValidation } from '../../../shared/utils/TimestampValidation';
 import { BlockchainManagement } from '../../blockchain/management/BlockchainManagement';
 import { TransactionDTO } from '../conversion/types/TransactionDTO';
 
