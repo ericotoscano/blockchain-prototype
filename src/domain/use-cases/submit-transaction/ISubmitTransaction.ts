@@ -1,5 +1,5 @@
 import { ITransaction } from '../../types/ITransaction';
 
-export interface ICreateTransaction {
+export interface ISubmitTransaction {
   execute(sender: string, recipient: string, amount: number, fee: number): ITransaction;
 }

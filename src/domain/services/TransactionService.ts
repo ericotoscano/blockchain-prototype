@@ -5,12 +5,18 @@ import { ITransactionService } from './ITransactionService';
 
 export class TransactionService implements ITransactionService {
   constructor(private readonly factory: ITransactionFactory, private readonly repository: IBlockchainRepository) {}
+  submitTransaction(sender: string, recipient: string, amount: number, fee: number): ITransaction {
+    const transaction: ITransaction = this.createTransaction(sender, recipient, amount, fee);
+    this.addTransactionToMempool(transaction);
 
-  createTransaction(sender: string, recipient: string, amount: number, fee: number): ITransaction {
-    return this.factory.create(sender, recipient, amount, fee);
+    return transaction;
   }
 
-  addTransactionToMempool(transaction: ITransaction): void {
+  private createTransaction(sender: string, recipient: string, amount: number, fee: number): ITransaction {
+    return this.factory.createTransaction(sender, recipient, amount, fee);
+  }
+
+  private addTransactionToMempool(transaction: ITransaction): void {
     this.repository.addTransactionToMempool(transaction);
   }
 }
