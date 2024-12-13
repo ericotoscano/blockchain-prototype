@@ -1,28 +1,28 @@
 import { Request, Response } from 'express';
 import axios from 'axios';
 
-import '../global';
+import '../../global';
 
-import { IBlock } from '../domain/types/IBlock';
-import { BlockDTO, ResponseDTO, ErrorDTO, CreateBlockchainResponseDTO, CreateBlockchainRequestDTO } from '../shared/types/ResponseDTO';
+import { IBlock } from '../../domain/types/IBlock';
+import { BlockDTO, ResponseDTO, ErrorDTO, CreateBlockchainResponseDTO, CreateBlockchainRequestDTO } from '../../shared/types/ResponseDTO';
 
-import { BlockMining } from '../services/block/mining/BlockMining';
+import { BlockMining } from '../../services/block/mining/BlockMining';
 
 import { GlobalManagement } from '../services/management/GlobalManagement';
-import { TargetManagement } from '../services/blockchain/target/management/TargetManagement';
+import { TargetManagement } from '../../services/blockchain/target/management/TargetManagement';
 
-import { BlockchainConversion } from '../services/blockchain/conversion/BlockchainConversion';
-import { BlockConversion } from '../services/block/conversion/BlockConversion';
-import { TransactionConversion } from '../services/transaction/conversion/TransactionConversion';
-import { NodeConversion } from '../services/node/conversion/NodeConversion';
+import { BlockchainConversion } from '../../services/blockchain/conversion/BlockchainConversion';
+import { BlockConversion } from '../../services/block/conversion/BlockConversion';
+import { TransactionConversion } from '../../services/transaction/conversion/TransactionConversion';
+import { NodeConversion } from '../../services/node/conversion/NodeConversion';
 
 import { TransactionIdCreation } from '../services/transaction/creation/TransactionIdCreation';
-import { BlockCreation } from '../services/block/creation/BlockCreation';
-import { LocalHostNodeUrlCreation } from '../services/node/creation/NodeUrlCreation';
-import { LocalHostNodeAddressCreation } from '../services/node/creation/NodeAddressCreation';
-import { KeyCreation } from '../shared/utils/KeyCreation';
-import { Ripemd160HashCreation } from '../shared/utils/Ripmed160HashCreation';
-import { Sha256HashCreation } from '../shared/utils/Sha256HashCreation';
+import { BlockCreation } from '../../services/block/creation/BlockCreation';
+import { LocalHostNodeUrlCreation } from '../../services/node/creation/NodeUrlCreation';
+import { LocalHostNodeAddressCreation } from '../../services/node/creation/NodeAddressCreation';
+import { KeyCreation } from '../../shared/utils/KeyCreation';
+import { Ripemd160HashCreation } from '../../shared/utils/Ripmed160HashCreation';
+import { Sha256HashCreation } from '../../shared/utils/Sha256HashCreation';
 
 const createBlockchain = async (req: Request<{}, {}, CreateBlockchainRequestDTO>, res: Response<ResponseDTO<CreateBlockchainResponseDTO> | ErrorDTO>): Promise<void> => {
   try {

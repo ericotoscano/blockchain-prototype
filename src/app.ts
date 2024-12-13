@@ -1,7 +1,7 @@
 import express, { Express, json } from 'express';
 
-import blockchainRoutes from './routes/blockchain.routes';
-import miningRoutes from './routes/mining.routes';
+import blockchainRoutes from './presentation/routes/blockchain.routes';
+import miningRoutes from './presentation/routes/mining.routes';
 
 const createApp = (): Express => {
   const app: Express = express();

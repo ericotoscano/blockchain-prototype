@@ -1,5 +1,5 @@
 import { Node } from '../../../domain/entities/Node';
-import { KeyDependenciesType, NodeDependenciesType } from '../../../helpers/dependencies/types/DependenciesTypes';
+import { KeyDependenciesType, NodeDependenciesType } from '../../../shared/helpers/DependenciesTypes';
 import { IConnectedNode, INode } from '../../../domain/types/INode';
 
 export class NodeCreation {

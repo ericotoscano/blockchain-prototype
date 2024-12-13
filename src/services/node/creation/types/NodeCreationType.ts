@@ -1,4 +1,4 @@
-import { KeyDependenciesType, NodeDependenciesType } from '../../../../helpers/dependencies/types/DependenciesTypes';
+import { KeyDependenciesType, NodeDependenciesType } from '../../../../shared/helpers/DependenciesTypes';
 import { INode } from '../../../../domain/types/INode';
 
 export type NodeCreationType = {

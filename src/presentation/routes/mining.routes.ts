@@ -1,6 +1,6 @@
 import { Router } from 'express';
 
-import miningMiddlewares from '../middlewares/mining.middlewares';
+import miningMiddlewares from '../../middlewares/mining.middlewares';
 
 import miningController from '../controllers/mining.controller';
 

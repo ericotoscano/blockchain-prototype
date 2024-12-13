@@ -1,5 +1,5 @@
 import { IBlock } from '../../../../domain/types/IBlock';
-import { TransactionDependenciesType, MiningDependenciesType } from '../../../../helpers/dependencies/types/DependenciesTypes';
+import { TransactionDependenciesType, MiningDependenciesType } from '../../../../shared/helpers/DependenciesTypes';
 import { ITransaction } from '../../../../domain/types/ITransaction';
 
 export type BlockCreationType = {

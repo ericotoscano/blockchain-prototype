@@ -1,5 +1,5 @@
 import { IBlockchain } from '../../../../domain/types/IBlockchain';
-import { NodeDependenciesType, KeyDependenciesType, MiningDependenciesType, TransactionDependenciesType } from '../../../../helpers/dependencies/types/DependenciesTypes';
+import { NodeDependenciesType, KeyDependenciesType, MiningDependenciesType, TransactionDependenciesType } from '../../../../shared/helpers/DependenciesTypes';
 
 export type BlockchainCreationType = {
   create(

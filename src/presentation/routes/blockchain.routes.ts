@@ -1,7 +1,7 @@
 import { Router } from 'express';
 
-import blockchainMiddlewares from '../middlewares/blockchain.middlewares';
-import blockMiddlewares from '../middlewares/block.middlewares';
+import blockchainMiddlewares from '../../middlewares/blockchain.middlewares';
+import blockMiddlewares from '../../middlewares/block.middlewares';
 
 import blockchainController from '../controllers/blockchain.controller';
 import blockController from '../controllers/block.controller';
