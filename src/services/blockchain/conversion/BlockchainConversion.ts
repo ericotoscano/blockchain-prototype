@@ -1,5 +1,5 @@
 import { IBlockchain } from '../../../domain/types/IBlockchain';
-import { KeyDependenciesType, MiningDependenciesType, NodeDependenciesType, TransactionDependenciesType } from '../../../helpers/dependencies/types/DependenciesTypes';
+import { KeyDependenciesType, MiningDependenciesType, NodeDependenciesType, TransactionDependenciesType } from '../../../shared/helpers/DependenciesTypes';
 import { BlockConversionType } from '../../block/conversion/types/BlockConversionType';
 import { BlockDTO } from '../../block/conversion/types/BlockDTO';
 import { NodeConversionType } from '../../node/conversion/types/NodeConversionType';

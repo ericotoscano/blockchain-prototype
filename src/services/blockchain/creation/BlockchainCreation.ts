@@ -6,7 +6,7 @@ import { NodeManagement } from '../../node/management/NodeManagement';
 import { IBlock } from '../../../domain/types/IBlock';
 import { ITransaction } from '../../../domain/types/ITransaction';
 import { NodeCreation } from '../../node/creation/NodeCreation';
-import { KeyDependenciesType, MiningDependenciesType, NodeDependenciesType, TransactionDependenciesType } from '../../../helpers/dependencies/types/DependenciesTypes';
+import { KeyDependenciesType, MiningDependenciesType, NodeDependenciesType, TransactionDependenciesType } from '../../../shared/helpers/DependenciesTypes';
 import { IBlockchain } from '../../../domain/types/IBlockchain';
 import { BlockchainDTOInput } from '../conversion/types/BlockchainDTO';
 

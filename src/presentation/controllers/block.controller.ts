@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
-import { ResponseDTO, ErrorDTO, BlockDTO, AddBlockDTO } from '../shared/types/ResponseDTO';
-import { BlockDTOCreation } from '../services/block/conversion/BlockDTOCreation';
+import { ResponseDTO, ErrorDTO, BlockDTO, AddBlockDTO } from '../../shared/types/ResponseDTO';
+import { BlockDTOCreation } from '../../services/block/conversion/BlockDTOCreation';
 import { BlockchainManagement } from '../services/blockchain/management/BlockchainManagement';
-import { DependenciesCreation } from '../helpers/dependencies/BlockDependenciesCreation';
-import { AddBlockDependenciesType } from '../helpers/dependencies/types/DependenciesTypes';
+import { DependenciesCreation } from '../../shared/helpers/BlockDependenciesCreation';
+import { AddBlockDependenciesType } from '../../shared/helpers/DependenciesTypes';
 
 const addBlock = async (req: Request<{}, {}, BlockDTO>, res: Response<ResponseDTO<AddBlockDTO> | ErrorDTO>): Promise<void> => {
   try {

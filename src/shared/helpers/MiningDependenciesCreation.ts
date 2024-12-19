@@ -7,8 +7,8 @@ import { RewardTransactionCreation } from '../../services/transaction/creation/R
 import { TransactionIdCreation } from '../../services/transaction/creation/TransactionIdCreation';
 import { IBlock } from '../../domain/types/IBlock';
 import { IBlockchain } from '../../domain/types/IBlockchain';
-import { Sha256HashCreation } from '../../shared/utils/Sha256HashCreation';
-import { MineBlockDependenciesType } from './types/MiningDependenciesCreationType';
+import { Sha256HashCreation } from '../utils/Sha256HashCreation';
+import { MineBlockDependenciesType } from './MiningDependenciesCreationType';
 
 export class MiningDependenciesCreation {
   static mineBlock(): MineBlockDependenciesType {

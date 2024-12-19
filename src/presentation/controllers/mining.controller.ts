@@ -1,15 +1,15 @@
 import { Request, Response } from 'express';
 import axios from 'axios';
-import { ResponseDTO, ErrorDTO } from '../shared/types/ResponseDTO';
-import { ITransaction } from '../domain/types/ITransaction';
-import { IBlock } from '../domain/types/IBlock';
-import { BlockConversion } from '../services/block/conversion/BlockConversion';
-import { BlockDTO } from '../services/block/conversion/types/BlockDTO';
-import { TransactionDTO } from '../services/transaction/conversion/types/TransactionDTO';
-import { MineBlockDependenciesType } from '../helpers/dependencies/types/MiningDependenciesCreationType';
-import { MiningDependenciesCreation } from '../helpers/dependencies/MiningDependenciesCreation';
+import { ResponseDTO, ErrorDTO } from '../../shared/types/ResponseDTO';
+import { ITransaction } from '../../domain/types/ITransaction';
+import { IBlock } from '../../domain/types/IBlock';
+import { BlockConversion } from '../../services/block/conversion/BlockConversion';
+import { BlockDTO } from '../../services/block/conversion/types/BlockDTO';
+import { TransactionDTO } from '../../services/transaction/conversion/types/TransactionDTO';
+import { MineBlockDependenciesType } from '../../shared/helpers/MiningDependenciesCreationType';
+import { MiningDependenciesCreation } from '../../shared/helpers/MiningDependenciesCreation';
 import { BlockchainManagement } from '../services/blockchain/management/BlockchainManagement';
-import { BlockDependenciesType, MiningDependenciesType, TransactionDependenciesType } from '../helpers/dependencies/types/DependenciesTypes';
+import { BlockDependenciesType, MiningDependenciesType, TransactionDependenciesType } from '../../shared/helpers/DependenciesTypes';
 
 const mineBlock = async (req: Request<{}, {}, TransactionDTO[]>, res: Response<ResponseDTO<BlockDTO> | ErrorDTO>): Promise<void> => {
   try {
