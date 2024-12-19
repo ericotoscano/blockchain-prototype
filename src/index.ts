@@ -1,28 +1,33 @@
 import 'dotenv/config';
+import express, { Express } from 'express';
+import ServerManagement from './shared/utils/ServerManagement';
+import ExpressAppSetup from './shared/utils/ExpressAppSetup';
+import ServerListeningSetup from './shared/utils/SetupServerListener';
+import ProcessListeningSetup from './shared/utils/SetupProcessListener';
+import PortValidationService from './shared/utils/PortValidationService';
+import EnvFileService from './shared/utils/EnvFileService';
+import ErrorHandling from './shared/utils/ErrorHandling';
+import AppInputService from './shared/utils/AppInputService';
 
-import { startServer, setupCleanup } from './server';
+ErrorHandling.initializeGlobalErrorHandlers();
 
-import { validatePort, checkAvailablePortsInEnv } from './services/ports.helpers';
-
-const main = () => {
-  const portArgument = process.argv[2];
-
+const main = async (): Promise<void> => {
   try {
-    const portNumber = validatePort(portArgument);
+    const port: number = AppInputService.formatInput(process.argv[2]);
+    const portOptions: number[] = EnvFileService.formatPortsOptions(process.env.PORTS_OPTIONS);
+    new PortValidationService(port, portOptions);
 
-    checkAvailablePortsInEnv(portNumber.toString());
+    const app: Express = express();
+    new ExpressAppSetup(app);
 
-    const server = startServer(portNumber);
+    const serverManagement = new ServerManagement(port, app);
+    const serverListeningSetup = new ServerListeningSetup(serverManagement);
+    const processListeningSetup = new ProcessListeningSetup(serverManagement);
 
-    setupCleanup(server);
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      console.error(`[error]: ${error.message}`);
-    } else {
-      console.error(`[error]: Unknown error occurred.`);
-    }
-
-    process.exit(1);
+    serverListeningSetup.setupErrorListener();
+    processListeningSetup.setupGracefulShutdown();
+  } catch (error: any) {
+    ErrorHandling.handleStartupError(error);
   }
 };
 
